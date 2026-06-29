@@ -1,0 +1,14 @@
+{
+  "name": "pillar",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --parallel -r dev"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^9.0.0"
+    }
+  }
+}
