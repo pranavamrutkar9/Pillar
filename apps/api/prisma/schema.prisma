@@ -6,3 +6,453 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum WorkspaceRole {
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum ProjectRole {
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum Priority {
+  NONE
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ProjectStatus {
+  ACTIVE
+  ARCHIVED
+  PAUSED
+}
+
+enum CycleStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+}
+
+enum ModuleStatus {
+  PLANNED
+  ACTIVE
+  COMPLETED
+}
+
+enum AdrStatus {
+  PROPOSED
+  ACCEPTED
+  DEPRECATED
+  SUPERSEDED
+}
+
+enum RfcStatus {
+  DRAFT
+  IN_REVIEW
+  ACCEPTED
+  IMPLEMENTED
+}
+
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  username       String?  @unique
+  avatarUrl      String?
+  githubId       String?  @unique
+  githubUsername String?
+  createdAt      DateTime @default(now())
+
+  ownedWorkspaces  Workspace[]       @relation("WorkspaceOwner")
+  workspaceMembers WorkspaceMember[]
+  invitesSent      Invite[]          @relation("InviteSender")
+  projectsCreated  Project[]         @relation("ProjectCreator")
+  projectMembers   ProjectMember[]
+  issuesAssigned   Issue[]           @relation("IssueAssignee")
+  issuesCreated    Issue[]           @relation("IssueCreator")
+  issueActivities  IssueActivity[]   @relation("ActivityActor")
+  comments         Comment[]         @relation("CommentAuthor")
+  cycleIssuesAdded CycleIssue[]      @relation("CycleIssueAddedBy")
+  adrsAuthored     Adr[]             @relation("AdrAuthor")
+  rfcsAuthored     Rfc[]             @relation("RfcAuthor")
+  rfcVotes         RfcVote[]
+  rfcComments      RfcComment[]      @relation("RfcCommentAuthor")
+  events           Event[]           @relation("EventActor")
+
+  @@map("users")
+}
+
+model Workspace {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  ownerId   String
+  plan      String   @default("free")
+  createdAt DateTime @default(now())
+
+  owner    User              @relation("WorkspaceOwner", fields: [ownerId], references: [id])
+  members  WorkspaceMember[]
+  invites  Invite[]
+  projects Project[]
+  events   Event[]
+
+  @@index([ownerId])
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id          String        @id @default(cuid())
+  workspaceId String
+  userId      String
+  role        WorkspaceRole @default(MEMBER)
+  joinedAt    DateTime      @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@index([userId])
+  @@map("workspace_members")
+}
+
+model Invite {
+  id          String        @id @default(cuid())
+  workspaceId String
+  email       String
+  token       String        @unique
+  role        WorkspaceRole @default(MEMBER)
+  invitedBy   String
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  createdAt   DateTime      @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  sender    User      @relation("InviteSender", fields: [invitedBy], references: [id])
+
+  @@index([workspaceId])
+  @@map("invites")
+}
+
+model Project {
+  id              String        @id @default(cuid())
+  workspaceId     String
+  name            String
+  slug            String
+  description     String?
+  status          ProjectStatus @default(ACTIVE)
+  isHackathonMode Boolean       @default(false)
+  deadline        DateTime?
+  githubRepoId    String?
+  createdBy       String
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  creator   User      @relation("ProjectCreator", fields: [createdBy], references: [id])
+
+  members       ProjectMember[]
+  issueStatuses IssueStatus[]
+  issues        Issue[]
+  issueLabels   IssueLabel[]
+  modules       Module[]
+  cycles        Cycle[]
+  adrs          Adr[]
+  rfcs          Rfc[]
+  events        Event[]
+
+  @@unique([workspaceId, slug])
+  @@index([workspaceId])
+  @@map("projects")
+}
+
+model ProjectMember {
+  id        String      @id @default(cuid())
+  projectId String
+  userId    String
+  role      ProjectRole @default(MEMBER)
+  joinedAt  DateTime    @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([userId])
+  @@map("project_members")
+}
+
+model IssueStatus {
+  id        String  @id @default(cuid())
+  projectId String
+  name      String
+  color     String?
+  position  Float
+  isDefault Boolean @default(false)
+  isDone    Boolean @default(false)
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  issues  Issue[]
+
+  @@index([projectId])
+  @@map("issue_statuses")
+}
+
+model Issue {
+  id          String    @id @default(cuid())
+  projectId   String
+  title       String
+  description Json?
+  statusId    String
+  priority    Priority  @default(NONE)
+  assigneeId  String?
+  creatorId   String
+  dueDate     DateTime?
+  estimate    Int?
+  sequenceId  Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  project  Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  status   IssueStatus @relation(fields: [statusId], references: [id])
+  assignee User?       @relation("IssueAssignee", fields: [assigneeId], references: [id])
+  creator  User        @relation("IssueCreator", fields: [creatorId], references: [id])
+
+  labels       IssueLabelMap[]
+  relations    IssueRelation[] @relation("IssueRelations")
+  relatedTo    IssueRelation[] @relation("RelatedIssues")
+  activities   IssueActivity[]
+  comments     Comment[]
+  moduleIssues ModuleIssue[]
+  cycleIssues  CycleIssue[]
+
+  @@unique([projectId, sequenceId])
+  @@index([projectId, statusId])
+  @@index([assigneeId])
+  @@index([createdAt])
+  @@map("issues")
+}
+
+model IssueLabel {
+  id        String  @id @default(cuid())
+  projectId String
+  name      String
+  color     String?
+
+  project Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  issues  IssueLabelMap[]
+
+  @@index([projectId])
+  @@map("issue_labels")
+}
+
+model IssueLabelMap {
+  issueId String
+  labelId String
+
+  issue Issue      @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  label IssueLabel @relation(fields: [labelId], references: [id], onDelete: Cascade)
+
+  @@id([issueId, labelId])
+  @@map("issue_label_map")
+}
+
+model IssueRelation {
+  id             String @id @default(cuid())
+  issueId        String
+  relatedIssueId String
+  relationType   String
+
+  issue        Issue @relation("IssueRelations", fields: [issueId], references: [id], onDelete: Cascade)
+  relatedIssue Issue @relation("RelatedIssues", fields: [relatedIssueId], references: [id], onDelete: Cascade)
+
+  @@index([issueId])
+  @@map("issue_relations")
+}
+
+model IssueActivity {
+  id        String   @id @default(cuid())
+  issueId   String
+  actorId   String
+  action    String
+  oldValue  Json?
+  newValue  Json?
+  createdAt DateTime @default(now())
+
+  issue Issue @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  actor User  @relation("ActivityActor", fields: [actorId], references: [id])
+
+  @@index([issueId, createdAt])
+  @@map("issue_activities")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  issueId   String
+  authorId  String
+  body      Json
+  parentId  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  issue   Issue     @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  author  User      @relation("CommentAuthor", fields: [authorId], references: [id])
+  parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: SetNull)
+  replies Comment[] @relation("CommentReplies")
+
+  @@index([issueId, createdAt])
+  @@map("comments")
+}
+
+model Module {
+  id          String       @id @default(cuid())
+  projectId   String
+  name        String
+  description String?
+  status      ModuleStatus @default(PLANNED)
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  project Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  issues  ModuleIssue[]
+
+  @@index([projectId])
+  @@map("modules")
+}
+
+model ModuleIssue {
+  moduleId String
+  issueId  String
+
+  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  issue  Issue  @relation(fields: [issueId], references: [id], onDelete: Cascade)
+
+  @@id([moduleId, issueId])
+  @@map("module_issues")
+}
+
+model Cycle {
+  id        String      @id @default(cuid())
+  projectId String
+  name      String
+  startDate DateTime
+  endDate   DateTime
+  status    CycleStatus @default(DRAFT)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  project Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  issues  CycleIssue[]
+
+  @@index([projectId])
+  @@map("cycles")
+}
+
+model CycleIssue {
+  cycleId String
+  issueId String
+  addedBy String
+  addedAt DateTime @default(now())
+
+  cycle Cycle @relation(fields: [cycleId], references: [id], onDelete: Cascade)
+  issue Issue @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  user  User  @relation("CycleIssueAddedBy", fields: [addedBy], references: [id])
+
+  @@id([cycleId, issueId])
+  @@map("cycle_issues")
+}
+
+model Adr {
+  id             String    @id @default(cuid())
+  projectId      String
+  title          String
+  context        String
+  decision       String
+  alternatives   String?
+  consequences   String?
+  status         AdrStatus @default(PROPOSED)
+  authorId       String
+  supersededById String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  project      Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  author       User    @relation("AdrAuthor", fields: [authorId], references: [id])
+  supersededBy Adr?    @relation("AdrSupersededBy", fields: [supersededById], references: [id], onDelete: SetNull)
+  supersedes   Adr[]   @relation("AdrSupersededBy")
+
+  @@index([projectId])
+  @@map("adrs")
+}
+
+model Rfc {
+  id         String    @id @default(cuid())
+  projectId  String
+  title      String
+  body       Json
+  status     RfcStatus @default(DRAFT)
+  authorId   String
+  voteCounts Json?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  project  Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  author   User         @relation("RfcAuthor", fields: [authorId], references: [id])
+  votes    RfcVote[]
+  comments RfcComment[]
+
+  @@index([projectId])
+  @@map("rfcs")
+}
+
+model RfcVote {
+  id     String @id @default(cuid())
+  rfcId  String
+  userId String
+  vote   String
+
+  rfc  Rfc  @relation(fields: [rfcId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([rfcId, userId])
+  @@map("rfc_votes")
+}
+
+model RfcComment {
+  id         String   @id @default(cuid())
+  rfcId      String
+  sectionKey String
+  authorId   String
+  body       String
+  createdAt  DateTime @default(now())
+
+  rfc    Rfc  @relation(fields: [rfcId], references: [id], onDelete: Cascade)
+  author User @relation("RfcCommentAuthor", fields: [authorId], references: [id])
+
+  @@index([rfcId])
+  @@map("rfc_comments")
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  eventType   String
+  workspaceId String?
+  projectId   String?
+  actorId     String?
+  payload     Json
+  createdAt   DateTime @default(now())
+
+  workspace Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
+  project   Project?   @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  actor     User?      @relation("EventActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([projectId, createdAt])
+  @@index([actorId, createdAt])
+  @@index([eventType])
+  @@map("events")
+}
