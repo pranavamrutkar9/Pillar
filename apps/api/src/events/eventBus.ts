@@ -6,10 +6,6 @@ export const activityQueue = new Queue('pillar-activity', { connection: redis as
 export const realtimeQueue = new Queue('pillar-realtime', { connection: redis as any })
 export const notificationQueue = new Queue('pillar-notification', { connection: redis as any })
 
-/**
- * Our "Event Bus" abstraction. It takes an event and fans it out 
- * to all the relevant queues.
- */
 export async function emit(eventType: string, payload: any) {
   const jobOptions = {
     attempts: 3,
