@@ -12,8 +12,15 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
-    async signIn({ user, account, profile }) {
-      if (account?.provider === "github" && profile) {
+    async session({ session, token }) {
+      if (session.user && token.sub) {
+        session.user.id = token.sub;
+      }
+      return session;
+    },
+    async jwt({ token, user, account, profile }) {
+      // initial sign in
+      if (account?.provider === "github" && profile && user) {
         try {
           const apiUrl = process.env.API_URL || 'http://localhost:4000';
           const res = await fetch(`${apiUrl}/api/auth/signin`, {
@@ -30,28 +37,16 @@ export const authOptions: NextAuthOptions = {
             }),
           });
           
-          if (!res.ok) {
+          if (res.ok) {
+            const data = await res.json();
+            // Set the token.sub to the database cuid(), NOT the github ID
+            token.sub = data.user.id;
+          } else {
             console.error('Failed to upsert user on backend', await res.text());
-            return false;
           }
-          
-          return true;
         } catch (error) {
-          console.error('Error in signIn callback:', error);
-          return false;
+          console.error('Error in jwt callback:', error);
         }
-      }
-      return true;
-    },
-    async session({ session, token }) {
-      if (session.user && token.sub) {
-        session.user.id = token.sub;
-      }
-      return session;
-    },
-    async jwt({ token, user }) {
-      if (user) {
-        token.sub = user.id;
       }
       return token;
     },

@@ -1,10 +1,43 @@
 import Image from "next/image";
 import { getServerSession } from "next-auth";
+import { cookies } from "next/headers";
 import { authOptions } from "@/lib/auth";
 import { SignInButton, SignOutButton } from "../components/AuthButtons";
+import { WorkspaceForm } from "../components/WorkspaceForm";
+
+async function getWorkspaces() {
+  const cookieStore = await cookies();
+  const sessionToken = 
+    cookieStore.get("next-auth.session-token")?.value || 
+    cookieStore.get("__Secure-next-auth.session-token")?.value;
+
+  const apiUrl = process.env.API_URL || 'http://localhost:4000';
+  
+  try {
+    const res = await fetch(`${apiUrl}/api/workspaces`, {
+      headers: {
+        ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
+      },
+      cache: "no-store",
+    });
+    
+    if (res.ok) {
+      const data = await res.json();
+      return data.workspaces || [];
+    }
+  } catch (err) {
+    console.error("Failed to fetch workspaces:", err);
+  }
+  return [];
+}
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
+  
+  let workspaces = [];
+  if (session) {
+    workspaces = await getWorkspaces();
+  }
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black min-h-screen">
@@ -19,14 +52,33 @@ export default async function Home() {
         />
         
         {session ? (
-          <div className="flex flex-col items-center gap-6 sm:items-start">
-            <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
+          <div className="flex flex-col items-center sm:items-start w-full">
+            <h1 className="text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50 mb-2">
               Welcome, {session.user?.name || session.user?.email}
             </h1>
-            <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
+            <p className="text-lg text-zinc-600 dark:text-zinc-400 mb-6">
               You are signed in as {session.user?.email}
             </p>
-            <div className="mt-4">
+            
+            <div className="w-full mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black dark:text-white">Your Workspaces</h2>
+              {workspaces.length === 0 ? (
+                <p className="text-zinc-500 italic">No workspaces found.</p>
+              ) : (
+                <ul className="flex flex-col gap-3">
+                  {workspaces.map((ws: any) => (
+                    <li key={ws.id} className="p-4 border border-zinc-200 dark:border-zinc-800 rounded-lg flex items-center justify-between">
+                      <span className="font-medium text-black dark:text-white">{ws.name}</span>
+                      <span className="text-sm text-zinc-500">({ws.slug})</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <WorkspaceForm />
+
+            <div className="mt-12">
               <SignOutButton />
             </div>
           </div>
