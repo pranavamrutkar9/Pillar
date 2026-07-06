@@ -1,11 +1,49 @@
 import type { NextAuthOptions } from "next-auth";
 import GithubProvider from "next-auth/providers/github";
+import CredentialsProvider from "next-auth/providers/credentials";
 
 export const authOptions: NextAuthOptions = {
   providers: [
     GithubProvider({
       clientId : process.env.GITHUB_CLIENT_ID as string,
       clientSecret : process.env.GITHUB_CLIENT_SECRET as string,
+    }),
+    CredentialsProvider({
+      name: 'Credentials',
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) return null;
+        
+        try {
+          const apiUrl = process.env.API_URL || 'http://localhost:4000';
+          const res = await fetch(`${apiUrl}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: credentials.email,
+              password: credentials.password,
+            }),
+          });
+          
+          if (res.ok) {
+            const data = await res.json();
+            if (data.user) {
+              return {
+                id: data.user.id,
+                email: data.user.email,
+                name: data.user.username,
+              };
+            }
+          }
+          return null;
+        } catch (error) {
+          console.error("Credentials error:", error);
+          return null;
+        }
+      }
     })
   ],
   session: {
@@ -19,6 +57,11 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async jwt({ token, user, account, profile }) {
+      // Credentials provider — user.id is already the db cuid from authorize()
+      if (account?.provider === "credentials" && user) {
+        token.sub = user.id;
+      }
+      
       // initial sign in
       if (account?.provider === "github" && profile && user) {
         try {
@@ -52,6 +95,6 @@ export const authOptions: NextAuthOptions = {
     },
   },
   pages: {
-    // signIn: "/auth/signin", // Example custom sign-in page
+    signIn: "/auth",
   },
 };

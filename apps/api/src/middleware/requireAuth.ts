@@ -15,7 +15,8 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
   try {
     // Make sure your Express server has access to the NEXTAUTH_SECRET env variable
     // It should match the secret used in your Next.js application
-    const secret = process.env.NEXTAUTH_SECRET || process.env.GITHUB_CLIENT_SECRET;
+    const secret = process.env.NEXTAUTH_SECRET;
+    if (!secret) throw new Error('NEXTAUTH_SECRET is not set');
     
     // next-auth/jwt's getToken handles both cookies and Bearer tokens in headers
     const token = await getToken({ 

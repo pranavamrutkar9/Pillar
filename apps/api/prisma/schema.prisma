@@ -64,6 +64,7 @@ model User {
   email          String   @unique
   username       String?  @unique
   avatarUrl      String?
+  passwordHash   String?
   githubId       String?  @unique
   githubUsername String?
   createdAt      DateTime @default(now())

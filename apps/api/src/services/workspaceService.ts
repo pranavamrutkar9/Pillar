@@ -3,20 +3,20 @@ import { emit } from '../events/eventBus.js';
 
 export const workspaceService = {
   async create(data: { name: string; userId: string }) {
-    // Generate a simple unique slug from the name
-    let slug = data.name
+    // Generate a simple base slug from the name
+    const baseSlug = data.name
       .toLowerCase()
       .replace(/[^a-z0-9]/g, '-')
       .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '');
+      .replace(/^-|-$/g, '') || 'workspace';
     
-    if (!slug) slug = 'workspace';
-    
-    // Add random string to guarantee uniqueness
-    const uniqueSuffix = Math.random().toString(36).substring(2, 8);
-    slug = `${slug}-${uniqueSuffix}`;
+    const existing = await prisma.workspace.findUnique({ where: { slug: baseSlug } });
+    const slug = existing
+      ? `${baseSlug}-${Math.random().toString(36).substring(2, 8)}`
+      : baseSlug;
 
-    // Execute within a transaction
+    // Execute within a transaction with an extended timeout (e.g. 10s) 
+    // to account for Neon Serverless cold starts or connection pool queues
     const workspace = await prisma.$transaction(async (tx) => {
       const createdWorkspace = await tx.workspace.create({
         data: {
@@ -32,7 +32,7 @@ export const workspaceService = {
         },
       });
       return createdWorkspace;
-    });
+    }, { timeout: 15000 });
 
     // Emit event after transaction commits successfully
     await emit('workspace.created', { workspaceId: workspace.id, ownerId: workspace.ownerId });
@@ -48,6 +48,18 @@ export const workspaceService = {
             userId,
           },
         },
+      },
+      include: {
+        owner: {
+          select: {
+            username: true,
+            email: true,
+          }
+        },
+        members: {
+          where: { userId },
+          select: { role: true }
+        }
       },
       orderBy: {
         createdAt: 'desc',

@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { workspaceService } from '../services/workspaceService.js';
+import { requireWorkspaceAdmin } from '../middleware/workspaceAuth.js';
+import { inviteService } from '../services/inviteService.js';
 
 const router = Router();
 
@@ -35,6 +37,42 @@ router.get('/', async (req, res) => {
     res.status(200).json({ success: true, workspaces });
   } catch (error) {
     console.error('Error fetching workspaces:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.post('/:workspaceId/invites', requireWorkspaceAdmin, async (req, res) => {
+  try {
+    const { email, role } = req.body;
+    const workspaceId = req.params.workspaceId;
+    const userId = req.user!.id;
+
+    if (!email || !role) {
+       res.status(400).json({ error: 'Email and role are required' });
+       return;
+    }
+
+    const invite = await inviteService.createInvite({
+      workspaceId,
+      email,
+      role,
+      invitedBy: userId,
+    });
+
+    res.status(201).json({ success: true, invite });
+  } catch (error) {
+    console.error('Error creating invite:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.delete('/:workspaceId/invites/:inviteId', requireWorkspaceAdmin, async (req, res) => {
+  try {
+    const inviteId = req.params.inviteId;
+    await inviteService.revokeInvite(inviteId);
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error('Error revoking invite:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
