@@ -20,3 +20,8 @@ export const activityWorker = new Worker('pillar-activity', async (job) => {
     }
   })
 }, { connection: redis as any })
+
+activityWorker.on('error', (err: any) => {
+  if (err.message && err.message.includes('ECONNRESET')) return;
+  console.error('[ActivityWorker Error]', err);
+})

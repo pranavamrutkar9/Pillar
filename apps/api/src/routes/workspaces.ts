@@ -1,80 +1,69 @@
 import { Router } from 'express';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { workspaceService } from '../services/workspaceService.js';
-import { requireWorkspaceAdmin } from '../middleware/workspaceAuth.js';
+import { requireWorkspaceAdmin, requireWorkspaceMember } from '../middleware/workspaceAuth.js';
 import { inviteService } from '../services/inviteService.js';
+import { asyncHandler } from '../lib/asyncHandler.js';
+import { successResponse } from '../lib/apiResponse.js';
 
 const router = Router();
 
 // Protect all workspace routes
 router.use(requireAuth);
 
-router.post('/', async (req, res) => {
-  try {
-    const { name } = req.body;
-    
-    if (!name || typeof name !== 'string' || name.trim().length === 0) {
-       res.status(400).json({ error: 'Workspace name is required' });
-       return;
-    }
-
-    const userId = req.user!.id;
-
-    const workspace = await workspaceService.create({ name: name.trim(), userId });
-
-    res.status(201).json({ success: true, workspace });
-  } catch (error) {
-    console.error('Error creating workspace:', error);
-    res.status(500).json({ error: 'Internal server error' });
+router.post('/', asyncHandler(async (req, res) => {
+  const { name } = req.body;
+  
+  if (!name || typeof name !== 'string' || name.trim().length === 0) {
+    throw new Error('Workspace name is required');
   }
-});
 
-router.get('/', async (req, res) => {
-  try {
-    const userId = req.user!.id;
-    const workspaces = await workspaceService.getByUser(userId);
-    
-    res.status(200).json({ success: true, workspaces });
-  } catch (error) {
-    console.error('Error fetching workspaces:', error);
-    res.status(500).json({ error: 'Internal server error' });
+  const userId = req.user!.id;
+  const workspace = await workspaceService.create({ name: name.trim(), userId });
+
+  return successResponse(res, workspace, 201);
+}));
+
+router.get('/', asyncHandler(async (req, res) => {
+  const userId = req.user!.id;
+  const workspaces = await workspaceService.getByUser(userId);
+  return successResponse(res, workspaces);
+}));
+
+router.get('/:workspaceId', requireWorkspaceMember, asyncHandler(async (req, res) => {
+  const workspaceId = req.params.workspaceId as string;
+  const workspace = await workspaceService.getById(workspaceId);
+  
+  if (!workspace) {
+    throw Object.assign(new Error('Workspace not found'), { name: 'NotFoundError' });
   }
-});
 
-router.post('/:workspaceId/invites', requireWorkspaceAdmin, async (req, res) => {
-  try {
-    const { email, role } = req.body;
-    const workspaceId = req.params.workspaceId;
-    const userId = req.user!.id;
+  return successResponse(res, workspace);
+}));
 
-    if (!email || !role) {
-       res.status(400).json({ error: 'Email and role are required' });
-       return;
-    }
+router.post('/:workspaceId/invites', requireWorkspaceAdmin, asyncHandler(async (req, res) => {
+  const { email, role } = req.body;
+  const workspaceId = req.params.workspaceId as string;
+  const userId = req.user!.id;
 
-    const invite = await inviteService.createInvite({
-      workspaceId,
-      email,
-      role,
-      invitedBy: userId,
-    });
-
-    res.status(201).json({ success: true, invite });
-  } catch (error) {
-    console.error('Error creating invite:', error);
-    res.status(500).json({ error: 'Internal server error' });
+  if (!email || !role) {
+    throw new Error('Email and role are required');
   }
-});
 
-router.delete('/:workspaceId/invites/:inviteId', requireWorkspaceAdmin, async (req, res) => {
-  try {
-    const inviteId = req.params.inviteId;
-    await inviteService.revokeInvite(inviteId);
-    res.status(200).json({ success: true });
-  } catch (error) {
-    console.error('Error revoking invite:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
+  const invite = await inviteService.createInvite({
+    workspaceId,
+    email,
+    role,
+    invitedBy: userId,
+  });
+
+  return successResponse(res, invite, 201);
+}));
+
+router.delete('/:workspaceId/invites/:inviteId', requireWorkspaceAdmin, asyncHandler(async (req, res) => {
+  const inviteId = req.params.inviteId as string;
+  await inviteService.revokeInvite(inviteId);
+  return successResponse(res, null);
+}));
 
 export default router;

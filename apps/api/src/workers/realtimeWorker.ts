@@ -7,3 +7,8 @@ export const realtimeWorker = new Worker('pillar-realtime', async (job) => {
 
   console.log(`[RealtimeWorker] Stub: would broadcast ${eventType} via websockets/SSE`, payload)
 }, { connection: redis as any })
+
+realtimeWorker.on('error', (err: any) => {
+  if (err.message && err.message.includes('ECONNRESET')) return;
+  console.error('[RealtimeWorker Error]', err);
+})

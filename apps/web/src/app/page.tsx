@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 import { authOptions } from "@/lib/auth";
@@ -25,8 +26,8 @@ async function getWorkspaces() {
     });
     
     if (res.ok) {
-      const data = await res.json();
-      return data.workspaces || [];
+      const json = await res.json();
+      return json.data || [];
     }
   } catch (err) {
     console.error("Failed to fetch workspaces:", err);
@@ -51,8 +52,8 @@ async function getPendingInvites() {
     });
     
     if (res.ok) {
-      const data = await res.json();
-      return data.invites || [];
+      const json = await res.json();
+      return json.data || [];
     }
   } catch (err) {
     console.error("Failed to fetch pending invites:", err);
@@ -110,23 +111,27 @@ export default async function Home() {
               ) : (
                 <ul className="flex flex-col gap-3">
                   {workspaces.map((ws: any) => (
-                    <li key={ws.id} className="p-4 border border-zinc-200 dark:border-zinc-800 rounded-lg flex flex-col gap-4">
-                      <div className="flex items-start justify-between w-full">
+                    <li key={ws.id} className="p-4 border border-zinc-200 dark:border-zinc-800 rounded-lg flex flex-col gap-4 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
+                      <Link href={`/workspaces/${ws.id}`} className="flex items-start justify-between w-full group">
                         <div className="flex flex-col items-start gap-1.5">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-black dark:text-white">{ws.name}</span>
-                            <span className="text-sm text-zinc-500">({ws.slug})</span>
+                          <div className="flex flex-col gap-1">
+                            <span className="font-medium text-black dark:text-white group-hover:underline">{ws.name}</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-zinc-500">
+                                Created {new Date(ws.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                              </span>
+                              <span className="text-xs text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full border border-zinc-200 dark:border-zinc-700">
+                                Owner: {ws.owner?.username || ws.owner?.email?.split('@')[0]}
+                              </span>
+                            </div>
                           </div>
-                          <span className="text-xs text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full border border-zinc-200 dark:border-zinc-700">
-                            Owned by {ws.owner?.username || ws.owner?.email?.split('@')[0]}
-                          </span>
                         </div>
                         {ws.members?.[0]?.role && (
                           <span className="text-xs text-zinc-600 bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-400 px-2.5 py-1 rounded-full border border-zinc-200 dark:border-zinc-700 font-semibold uppercase tracking-widest shrink-0">
                             {ws.members[0].role}
                           </span>
                         )}
-                      </div>
+                      </Link>
                       
                       {(ws.members?.[0]?.role === 'ADMIN' || ws.ownerId === session.user?.id) && (
                         <div className="w-full">

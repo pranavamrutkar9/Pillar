@@ -2,88 +2,69 @@ import { Router } from 'express';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { inviteService } from '../services/inviteService.js';
 import { prisma } from '../db/client.js';
+import { asyncHandler } from '../lib/asyncHandler.js';
+import { successResponse } from '../lib/apiResponse.js';
 
 const router = Router();
 
 // GET /api/invites/pending - Protected endpoint to get pending invites for the logged-in user
-router.get('/pending', requireAuth, async (req, res) => {
-  try {
-    const userId = req.user!.id;
-    
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    if (!user || !user.email) {
-       res.status(401).json({ error: 'User email not found' });
-       return;
-    }
-
-    const invites = await inviteService.getPendingInvitesForEmail(user.email);
-    res.status(200).json({ success: true, invites });
-  } catch (error) {
-    console.error('Error fetching pending invites:', error);
-    res.status(500).json({ error: 'Internal server error' });
+router.get('/pending', requireAuth, asyncHandler(async (req, res) => {
+  const userId = req.user!.id;
+  
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user || !user.email) {
+    throw Object.assign(new Error('User email not found'), { name: 'UnauthorizedError' });
   }
-});
+
+  const invites = await inviteService.getPendingInvitesForEmail(user.email);
+  return successResponse(res, invites);
+}));
 
 // GET /api/invites/:token - Public endpoint to view invite details
-router.get('/:token', async (req, res) => {
-  try {
-    const token = req.params.token;
-    
-    if (!token) {
-       res.status(400).json({ error: 'Token is required' });
-       return;
-    }
-
-    const invite = await inviteService.getInviteByToken(token);
-    
-    if (!invite) {
-       res.status(404).json({ error: 'Invite not found or invalid' });
-       return;
-    }
-
-    res.status(200).json({ success: true, invite });
-  } catch (error) {
-    console.error('Error fetching invite:', error);
-    res.status(500).json({ error: 'Internal server error' });
+router.get('/:token', asyncHandler(async (req, res) => {
+  const token = req.params.token as string;
+  
+  if (!token) {
+    throw new Error('Token is required');
   }
-});
+
+  const invite = await inviteService.getInviteByToken(token);
+  
+  if (!invite) {
+    throw Object.assign(new Error('Invite not found or invalid'), { name: 'NotFoundError' });
+  }
+
+  return successResponse(res, invite);
+}));
 
 // POST /api/invites/:token/accept - Protected endpoint to accept invite
-router.post('/:token/accept', requireAuth, async (req, res) => {
-  try {
-    const token = req.params.token;
-    const userId = req.user!.id;
-    
-    // We need the user's email to validate against the invite email
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    
-    if (!user || !user.email) {
-       res.status(401).json({ error: 'User email not found' });
-       return;
-    }
+router.post('/:token/accept', requireAuth, asyncHandler(async (req, res) => {
+  const token = req.params.token as string;
+  const userId = req.user!.id;
+  
+  // We need the user's email to validate against the invite email
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  
+  if (!user || !user.email) {
+    throw Object.assign(new Error('User email not found'), { name: 'UnauthorizedError' });
+  }
 
+  try {
     const result = await inviteService.acceptInvite({
       token,
       userId,
       userEmail: user.email,
     });
-
-    res.status(200).json(result);
+    return successResponse(res, result);
   } catch (error: any) {
-    console.error('Error accepting invite:', error);
-    
     if (['INVITE_NOT_FOUND', 'INVITE_EXPIRED', 'INVITE_ACCEPTED'].includes(error.code)) {
-       res.status(400).json({ error: error.message });
-       return;
+      throw new Error(error.message);
     }
-    
     if (error.code === 'EMAIL_MISMATCH') {
-       res.status(403).json({ error: error.message });
-       return;
+      throw Object.assign(new Error(error.message), { name: 'ForbiddenError' });
     }
-
-    res.status(500).json({ error: 'Internal server error' });
+    throw error;
   }
-});
+}));
 
 export default router;

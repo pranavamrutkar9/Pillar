@@ -1,20 +1,27 @@
 import { Request, Response, NextFunction } from 'express';
 import { prisma } from '../db/client.js';
 
+class UnauthorizedError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'UnauthorizedError';
+  }
+}
+
+class ForbiddenError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'ForbiddenError';
+  }
+}
+
 export const requireWorkspaceAdmin = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.user?.id;
-    const workspaceId = req.params.workspaceId;
+    const workspaceId = req.params.workspaceId || req.body.workspaceId;
 
-    if (!userId) {
-       res.status(401).json({ error: 'Unauthorized: Missing user' });
-       return;
-    }
-
-    if (!workspaceId) {
-       res.status(400).json({ error: 'Bad Request: Missing workspaceId parameter' });
-       return;
-    }
+    if (!userId) throw new UnauthorizedError('Missing user');
+    if (!workspaceId) throw new Error('Bad Request: Missing workspaceId parameter');
 
     const member = await prisma.workspaceMember.findUnique({
       where: {
@@ -26,13 +33,38 @@ export const requireWorkspaceAdmin = async (req: Request, res: Response, next: N
     });
 
     if (!member || member.role !== 'ADMIN') {
-       res.status(403).json({ error: 'Forbidden: Requires workspace admin role' });
-       return;
+      throw new ForbiddenError('Requires workspace admin role');
     }
 
     next();
   } catch (error) {
-    console.error('Authorization Error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    next(error);
+  }
+};
+
+export const requireWorkspaceMember = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.id;
+    const workspaceId = req.params.workspaceId || req.body.workspaceId;
+
+    if (!userId) throw new UnauthorizedError('Missing user');
+    if (!workspaceId) throw new Error('Bad Request: Missing workspaceId parameter');
+
+    const member = await prisma.workspaceMember.findUnique({
+      where: {
+        workspaceId_userId: {
+          workspaceId,
+          userId,
+        },
+      },
+    });
+
+    if (!member) {
+      throw new ForbiddenError('Requires workspace member role');
+    }
+
+    next();
+  } catch (error) {
+    next(error);
   }
 };

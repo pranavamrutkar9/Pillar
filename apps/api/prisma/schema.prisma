@@ -149,6 +149,7 @@ model Project {
   isHackathonMode Boolean       @default(false)
   deadline        DateTime?
   githubRepoId    String?
+  nextIssueSequence Int         @default(1)
   createdBy       String
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt

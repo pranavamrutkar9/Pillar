@@ -66,4 +66,32 @@ export const workspaceService = {
       },
     });
   },
+
+  async getById(workspaceId: string) {
+    return prisma.workspace.findUnique({
+      where: { id: workspaceId },
+      include: {
+        owner: {
+          select: { id: true, username: true, email: true, avatarUrl: true },
+        },
+        members: {
+          include: {
+            user: { select: { id: true, username: true, email: true, avatarUrl: true } },
+          },
+          orderBy: { joinedAt: 'desc' },
+        },
+        projects: {
+          orderBy: { createdAt: 'desc' },
+        },
+        invites: {
+          where: { acceptedAt: null },
+          orderBy: { createdAt: 'desc' },
+        },
+        events: {
+          orderBy: { createdAt: 'desc' },
+          take: 50,
+        },
+      },
+    });
+  },
 };
