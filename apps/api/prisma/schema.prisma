@@ -215,6 +215,7 @@ model Issue {
   dueDate     DateTime?
   estimate    Int?
   sequenceId  Int
+  position    Float     @default(0)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -232,7 +233,7 @@ model Issue {
   cycleIssues  CycleIssue[]
 
   @@unique([projectId, sequenceId])
-  @@index([projectId, statusId])
+  @@index([projectId, statusId, position])
   @@index([assigneeId])
   @@index([createdAt])
   @@map("issues")

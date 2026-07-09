@@ -117,3 +117,31 @@ export async function updateIssueAction(projectId: string, issueId: string, data
   revalidatePath(`/projects/${projectId}/issues`, 'layout');
   return resData.data;
 }
+
+export async function moveIssueAction(projectId: string, issueId: string, data: { statusId: string, position: number }) {
+  const cookieStore = await cookies();
+  const sessionToken = 
+    cookieStore.get("next-auth.session-token")?.value || 
+    cookieStore.get("__Secure-next-auth.session-token")?.value;
+    
+  const apiUrl = process.env.API_URL || 'http://localhost:4000';
+  
+  const res = await fetch(`${apiUrl}/api/projects/${projectId}/issues/${issueId}/move`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
+    },
+    body: JSON.stringify(data),
+  });
+
+  const resData = await res.json();
+
+  if (!res.ok || !resData.success) {
+    throw new Error(resData.error?.message || "Failed to move issue");
+  }
+
+  // Realtime will handle state updates but revalidate to ensure cache is correct on refresh
+  // revalidatePath(`/projects/${projectId}/issues`, 'layout');
+  return resData.data;
+}
