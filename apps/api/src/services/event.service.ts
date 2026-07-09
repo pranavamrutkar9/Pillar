@@ -1,4 +1,5 @@
 import { prisma } from "../db/client.js";
+import { emit as publishToQueue } from "../events/eventBus.js";
 
 export const eventService = {
   /**
@@ -17,8 +18,8 @@ export const eventService = {
         },
       });
 
-      // TODO: If using BullMQ or external queue, emit it here, e.g.:
-      // queue.add(eventType, payload)
+      // Fan out to BullMQ queues for background processing (Realtime, Activity, etc.)
+      await publishToQueue(eventType, { ...payload, ...metadata });
     } catch (error) {
       console.error("Failed to emit event:", error);
     }

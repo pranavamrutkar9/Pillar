@@ -1,5 +1,5 @@
 import express from 'express'
-// import './workers/index.js' // Disabled locally: causes ECONNRESET spam from Upstash
+import './workers/index.js'
 import authRouter from './routes/auth.js'
 import workspacesRouter from './routes/workspaces.js'
 import invitesRouter from './routes/invites.js'
@@ -27,4 +27,10 @@ app.use('/api/invites', invitesRouter)
 
 app.use(errorHandler)
 
-app.listen(4000, () => console.log('API running on port 4000'))
+import { createServer } from 'http'
+import { initSocket } from './lib/socket.js'
+
+const httpServer = createServer(app)
+initSocket(httpServer)
+
+httpServer.listen(4000, () => console.log('API & Socket Server running on port 4000'))

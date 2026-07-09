@@ -24,5 +24,11 @@ export const updateIssueSchema = z.object({
   labelIds: z.array(z.string()).optional(),
 });
 
+export const moveIssueSchema = z.object({
+  statusId: z.string().min(1, "Status is required"),
+  position: z.number(),
+});
+
 export type CreateIssueInput = z.infer<typeof createIssueSchema>;
 export type UpdateIssueInput = z.infer<typeof updateIssueSchema>;
+export type MoveIssueInput = z.infer<typeof moveIssueSchema>;

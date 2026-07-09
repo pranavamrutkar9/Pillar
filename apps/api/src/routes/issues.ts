@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { requireProjectMember, requireProjectViewer } from '../middleware/projectAuth.js';
 import { issueService } from '../services/issue.service.js';
-import { createIssueSchema, updateIssueSchema } from '../validators/issue.schema.js';
+import { createIssueSchema, updateIssueSchema, moveIssueSchema } from '../validators/issue.schema.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
 import { successResponse } from '../lib/apiResponse.js';
 
@@ -60,6 +60,22 @@ router.patch('/:issueId', requireProjectMember, asyncHandler(async (req, res) =>
 
   try {
     const issue = await issueService.updateIssue(issueId, userId, parseResult);
+    return successResponse(res, issue);
+  } catch (error: any) {
+    if (error.message === 'Issue not found') {
+      throw Object.assign(new Error('Issue not found'), { name: 'NotFoundError' });
+    }
+    throw error;
+  }
+}));
+
+router.post('/:issueId/move', requireProjectMember, asyncHandler(async (req, res) => {
+  const parseResult = moveIssueSchema.parse(req.body);
+  const issueId = req.params.issueId as string;
+  const userId = req.user!.id;
+
+  try {
+    const issue = await issueService.moveIssue(issueId, userId, parseResult.statusId, parseResult.position);
     return successResponse(res, issue);
   } catch (error: any) {
     if (error.message === 'Issue not found') {

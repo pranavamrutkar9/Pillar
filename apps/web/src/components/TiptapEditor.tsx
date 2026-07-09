@@ -13,6 +13,7 @@ interface TiptapEditorProps {
 
 export default function TiptapEditor({ value, onChange, editable = true }: TiptapEditorProps) {
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit,
       Placeholder.configure({

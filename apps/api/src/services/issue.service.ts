@@ -108,11 +108,44 @@ export const issueService = {
     });
 
     if (result.changedKeys.length > 0) {
+      const changedValues: any = {};
+      result.changedKeys.forEach((key: string) => {
+        changedValues[key] = (result.newIssue as any)[key];
+      });
+      
       await eventService.emit('issue.updated', { 
         issueId, 
-        changes: result.changedKeys 
+        changes: changedValues 
       }, { projectId: result.newIssue.projectId, actorId });
     }
+
+    return result.newIssue;
+  },
+
+  async moveIssue(issueId: string, actorId: string, statusId: string, position: number) {
+    const result = await prisma.$transaction(async (tx) => {
+      const oldIssue = await tx.issue.findUnique({ where: { id: issueId } });
+      if (!oldIssue) throw new Error("Issue not found");
+
+      const newIssue = await tx.issue.update({
+        where: { id: issueId },
+        data: { statusId, position },
+      });
+
+      // Compute changed fields for activity logging
+      if (oldIssue.statusId !== statusId) {
+        await tx.issueActivity.create({
+          data: activityService.createActivityPayload(issueId, actorId, 'updated', { statusId: oldIssue.statusId }, { statusId: newIssue.statusId }),
+        });
+      }
+
+      return { oldIssue, newIssue };
+    });
+
+    await eventService.emit('issue.moved', { 
+      issueId, 
+      changes: { statusId, position } 
+    }, { projectId: result.newIssue.projectId, actorId });
 
     return result.newIssue;
   },
