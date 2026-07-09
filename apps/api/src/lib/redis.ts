@@ -3,12 +3,7 @@ import { env } from '../config/env.js'
 
 export const redis = new Redis(env.REDIS_URL, {
   maxRetriesPerRequest: null,
-  family: 4,
-  tls: env.REDIS_URL.startsWith('rediss://') ? { rejectUnauthorized: false } : undefined,
-  retryStrategy(times) {
-    console.warn(`[Redis] Retrying connection (${times})...`);
-    return Math.min(times * 1000, 10000); // Exponential backoff, max 10s
-  }
+  tls: env.REDIS_URL.startsWith('rediss://') ? {} : undefined,
 })
 
 redis.on('error', (err: any) => {
