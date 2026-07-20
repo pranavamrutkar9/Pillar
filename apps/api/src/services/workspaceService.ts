@@ -16,7 +16,7 @@ export interface WorkspaceDashboard {
   myTasks: Issue[];
   recentActivity: Event[];
   projectHealth: ProjectHealth[];
-  upcomingDeadlines: any[];
+  upcomingDeadlines: Project[];
 }
 
 export const workspaceService = {

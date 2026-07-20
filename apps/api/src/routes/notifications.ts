@@ -22,7 +22,7 @@ router.patch('/read-all', asyncHandler(async (req, res) => {
 
 router.patch('/:id/read', asyncHandler(async (req, res) => {
   const userId = req.user!.id;
-  const notificationId = req.params.id as string;
+  const notificationId = req.params.id;
   await notificationService.markAsRead(notificationId, userId);
   return successResponse(res, { success: true });
 }));
