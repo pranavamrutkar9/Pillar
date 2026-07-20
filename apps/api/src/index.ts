@@ -1,6 +1,9 @@
 import express from 'express'
 import cors from 'cors'
-import './workers/index.js'
+// For the free tier, we run the worker inside the same process as the API.
+if (!process.env.DISABLE_WORKER) {
+  import('./workers/index.js');
+}
 import authRouter from './routes/auth.js'
 import workspacesRouter from './routes/workspaces.js'
 import invitesRouter from './routes/invites.js'
