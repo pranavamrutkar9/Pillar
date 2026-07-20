@@ -25,6 +25,8 @@ export const projectService = {
           name: data.name,
           slug: finalSlug,
           description: data.description,
+          isHackathonMode: data.isHackathonMode,
+          deadline: data.deadline ? new Date(data.deadline) : null,
           createdBy: userId,
         },
       });
@@ -94,10 +96,45 @@ export const projectService = {
           orderBy: { position: 'asc' }
         },
         issueLabels: true,
+        workspace: {
+          include: {
+            members: {
+              include: { user: { select: { id: true, username: true, email: true, avatarUrl: true } } }
+            }
+          }
+        },
         members: {
-          include: { user: { select: { id: true, username: true, avatarUrl: true } } }
+          include: { user: { select: { id: true, username: true, email: true, avatarUrl: true } } }
         }
       }
     });
   },
+
+  async createProjectShare(projectId: string, userId: string, expiresAt?: Date) {
+    const crypto = await import('crypto');
+    const token = crypto.randomBytes(32).toString('hex');
+    
+    return await prisma.projectShare.create({
+      data: {
+        projectId,
+        createdBy: userId,
+        token,
+        expiresAt,
+      }
+    });
+  },
+
+  async getProjectShares(projectId: string) {
+    return await prisma.projectShare.findMany({
+      where: { projectId },
+      orderBy: { createdAt: 'desc' }
+    });
+  },
+
+  async revokeProjectShare(shareId: string) {
+    return await prisma.projectShare.delete({
+      where: { id: shareId }
+    });
+  },
 };
+

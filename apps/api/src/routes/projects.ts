@@ -8,9 +8,7 @@ import { successResponse } from '../lib/apiResponse.js';
 
 const router = Router({ mergeParams: true });
 
-router.use(requireAuth);
-
-router.post('/', requireWorkspaceAdmin, asyncHandler(async (req, res) => {
+router.post('/', requireAuth, requireWorkspaceAdmin, asyncHandler(async (req, res) => {
   const parseResult = createProjectSchema.parse(req.body);
   const workspaceId = req.params.workspaceId as string;
   const userId = req.user!.id;
@@ -19,13 +17,16 @@ router.post('/', requireWorkspaceAdmin, asyncHandler(async (req, res) => {
   return successResponse(res, project, 201);
 }));
 
-router.get('/', requireWorkspaceMember, asyncHandler(async (req, res) => {
+router.get('/', requireAuth, requireWorkspaceMember, asyncHandler(async (req, res) => {
   const workspaceId = req.params.workspaceId as string;
   const projects = await projectService.getProjectsByWorkspace(workspaceId);
   return successResponse(res, projects);
 }));
 
-router.get('/:projectId', requireWorkspaceMember, asyncHandler(async (req, res) => {
+import { viewerAuth } from '../middleware/viewerAuth.js';
+import { requireProjectViewer } from '../middleware/projectAuth.js';
+
+router.get('/:projectId', viewerAuth, requireProjectViewer, asyncHandler(async (req, res) => {
   const projectId = req.params.projectId as string;
   const project = await projectService.getProjectById(projectId);
   
@@ -34,6 +35,25 @@ router.get('/:projectId', requireWorkspaceMember, asyncHandler(async (req, res) 
   }
 
   return successResponse(res, project);
+}));
+
+router.post('/:projectId/shares', requireAuth, requireWorkspaceAdmin, asyncHandler(async (req, res) => {
+  const projectId = req.params.projectId as string;
+  const userId = req.user!.id;
+  const share = await projectService.createProjectShare(projectId, userId);
+  return successResponse(res, share, 201);
+}));
+
+router.get('/:projectId/shares', requireAuth, requireWorkspaceAdmin, asyncHandler(async (req, res) => {
+  const projectId = req.params.projectId as string;
+  const shares = await projectService.getProjectShares(projectId);
+  return successResponse(res, shares);
+}));
+
+router.delete('/:projectId/shares/:shareId', requireAuth, requireWorkspaceAdmin, asyncHandler(async (req, res) => {
+  const shareId = req.params.shareId as string;
+  await projectService.revokeProjectShare(shareId);
+  return successResponse(res, { success: true });
 }));
 
 export default router;

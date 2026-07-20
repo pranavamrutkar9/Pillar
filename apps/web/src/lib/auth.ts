@@ -29,12 +29,13 @@ export const authOptions: NextAuthOptions = {
           });
           
           if (res.ok) {
-            const data = await res.json();
-            if (data.user) {
+            const json = await res.json();
+            const userData = json.data || json.user; // Fallback just in case
+            if (userData) {
               return {
-                id: data.user.id,
-                email: data.user.email,
-                name: data.user.username,
+                id: userData.id,
+                email: userData.email,
+                name: userData.username,
               };
             }
           }
@@ -81,9 +82,10 @@ export const authOptions: NextAuthOptions = {
           });
           
           if (res.ok) {
-            const data = await res.json();
+            const json = await res.json();
+            const userData = json.data || json.user;
             // Set the token.sub to the database cuid(), NOT the github ID
-            token.sub = data.user.id;
+            token.sub = userData.id;
           } else {
             console.error('Failed to upsert user on backend', await res.text());
           }

@@ -10,6 +10,7 @@ type ProjectStoreContextType = {
   setIssues: React.Dispatch<React.SetStateAction<any[]>>;
   updateIssueStatusAndPosition: (issueId: string, newStatusId: string, position: number) => Promise<void>;
   activeUsers: any[];
+  isViewer?: boolean;
 };
 
 const ProjectStoreContext = createContext<ProjectStoreContextType | null>(null);
@@ -18,15 +19,21 @@ export function ProjectStoreProvider({
   project, 
   initialIssues,
   currentUser,
+  isViewer,
   children 
 }: { 
   project: any, 
   initialIssues: any[],
   currentUser?: any,
+  isViewer?: boolean,
   children: React.ReactNode 
 }) {
   const [issues, setIssues] = useState(initialIssues);
   const [activeUsers, setActiveUsers] = useState<any[]>([]);
+
+  useEffect(() => {
+    setIssues(initialIssues);
+  }, [initialIssues]);
 
   useEffect(() => {
     // Connect to Socket.io server with credentials for JWT auth
@@ -98,8 +105,18 @@ export function ProjectStoreProvider({
     
     socket.on('issue.created', (data) => {
       console.log('Realtime issue created:', data);
-      // Wait for revalidation or prepend optimistically if we have the full issue object
-      // For now, revalidation handles it
+      if (data.issue) {
+        setIssues(current => {
+          if (current.find(i => i.id === data.issue.id)) return current;
+          return [
+            {
+              ...data.issue,
+              status: project.issueStatuses?.find((s:any) => s.id === data.issue.statusId)
+            },
+            ...current
+          ].sort((a, b) => (a.position || 0) - (b.position || 0));
+        });
+      }
     });
 
     return () => {
@@ -137,7 +154,8 @@ export function ProjectStoreProvider({
       issues,
       setIssues,
       updateIssueStatusAndPosition,
-      activeUsers
+      activeUsers,
+      isViewer
     }}>
       {children}
     </ProjectStoreContext.Provider>

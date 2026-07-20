@@ -7,9 +7,9 @@ import { successResponse } from '../lib/apiResponse.js';
 
 const router = Router({ mergeParams: true });
 
-router.use(requireAuth);
+import { viewerAuth } from '../middleware/viewerAuth.js';
 
-router.get('/:projectId', requireProjectViewer, asyncHandler(async (req, res) => {
+router.get('/:projectId', viewerAuth, requireProjectViewer, asyncHandler(async (req, res) => {
   const projectId = req.params.projectId as string;
   const project = await projectService.getProjectById(projectId);
   
