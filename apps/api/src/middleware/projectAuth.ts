@@ -23,8 +23,9 @@ const ROLE_WEIGHT = {
 async function resolveProjectId(req: Request): Promise<string | undefined> {
   let projectId = req.params.projectId || req.body?.projectId;
   if (!projectId && req.params.issueId) {
+    const issueIdStr = req.params.issueId as string;
     const issue = await prisma.issue.findUnique({
-      where: { id: req.params.issueId },
+      where: { id: issueIdStr },
       select: { projectId: true }
     });
     if (issue) projectId = issue.projectId;
@@ -98,11 +99,15 @@ export const requireProjectMember = async (req: Request, res: Response, next: Ne
 
 export const requireProjectViewer = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userId = req.user?.id;
     const projectId = await resolveProjectId(req);
-
-    if (!userId) throw new UnauthorizedError('Missing user');
     if (!projectId) throw new Error('Bad Request: Missing projectId parameter');
+
+    if (req.viewer && req.viewer.projectId === projectId) {
+      return next();
+    }
+
+    const userId = req.user?.id;
+    if (!userId) throw new UnauthorizedError('Missing user');
 
     const role = await getEffectiveRole(projectId, userId);
     

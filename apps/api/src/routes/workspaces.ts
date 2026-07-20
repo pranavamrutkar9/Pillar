@@ -3,6 +3,7 @@ import { requireAuth } from '../middleware/requireAuth.js';
 import { workspaceService } from '../services/workspaceService.js';
 import { requireWorkspaceAdmin, requireWorkspaceMember } from '../middleware/workspaceAuth.js';
 import { inviteService } from '../services/inviteService.js';
+import { searchService } from '../services/searchService.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
 import { successResponse } from '../lib/apiResponse.js';
 
@@ -39,6 +40,23 @@ router.get('/:workspaceId', requireWorkspaceMember, asyncHandler(async (req, res
   }
 
   return successResponse(res, workspace);
+}));
+
+router.get('/:workspaceId/dashboard', requireWorkspaceMember, asyncHandler(async (req, res) => {
+  const workspaceId = req.params.workspaceId as string;
+  const userId = req.user!.id;
+  const dashboard = await workspaceService.getDashboard(workspaceId, userId);
+  return successResponse(res, dashboard);
+}));
+
+router.get('/:workspaceId/search', requireWorkspaceMember, asyncHandler(async (req, res) => {
+  const workspaceId = req.params.workspaceId as string;
+  const userId = req.user!.id;
+  const query = req.query.q as string || '';
+  const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 10;
+  
+  const results = await searchService.searchWorkspace(workspaceId, userId, query, limit);
+  return successResponse(res, results);
 }));
 
 router.post('/:workspaceId/invites', requireWorkspaceAdmin, asyncHandler(async (req, res) => {

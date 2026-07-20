@@ -59,6 +59,12 @@ enum RfcStatus {
   IMPLEMENTED
 }
 
+enum NotificationType {
+  ISSUE_ASSIGNED
+  COMMENT_MENTION
+  STATUS_CHANGED
+}
+
 model User {
   id             String   @id @default(cuid())
   email          String   @unique
@@ -84,6 +90,9 @@ model User {
   rfcVotes         RfcVote[]
   rfcComments      RfcComment[]      @relation("RfcCommentAuthor")
   events           Event[]           @relation("EventActor")
+  notifications    Notification[]    @relation("UserNotifications")
+  notificationsActed Notification[]  @relation("NotificationActor")
+  projectShares    ProjectShare[]
 
   @@map("users")
 }
@@ -166,6 +175,7 @@ model Project {
   adrs          Adr[]
   rfcs          Rfc[]
   events        Event[]
+  projectShares ProjectShare[]
 
   @@unique([workspaceId, slug])
   @@index([workspaceId])
@@ -458,4 +468,39 @@ model Event {
   @@index([actorId, createdAt])
   @@index([eventType])
   @@map("events")
+}
+
+model ProjectShare {
+  id         String    @id @default(cuid())
+  token      String    @unique
+  projectId  String
+  createdBy  String
+  expiresAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  creator User    @relation(fields: [createdBy], references: [id])
+
+  @@index([projectId])
+  @@map("project_shares")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  actorId   String?
+  type      NotificationType
+  
+  title     String
+  body      String
+  
+  metadata  Json
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  user  User  @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  actor User? @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@map("notifications")
 }

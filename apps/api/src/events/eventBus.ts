@@ -29,11 +29,14 @@ export async function emit(eventType: string, payload: any) {
   }
 
   // Fan-out: push the same event data to all queues
-  await Promise.all([
-    activityQueue!.add(eventType, payload, jobOptions),
-    realtimeQueue!.add(eventType, payload, jobOptions),
-    notificationQueue!.add(eventType, payload, jobOptions),
-  ])
-  
-  console.log(`[EventBus] Emitted event: ${eventType}`)
+  try {
+    await Promise.all([
+      activityQueue!.add(eventType, payload, jobOptions),
+      realtimeQueue!.add(eventType, payload, jobOptions),
+      notificationQueue!.add(eventType, payload, jobOptions),
+    ]);
+    console.log(`[EventBus] Emitted event: ${eventType}`);
+  } catch (error: any) {
+    console.error(`[EventBus] Failed to emit event ${eventType}:`, error.message);
+  }
 }

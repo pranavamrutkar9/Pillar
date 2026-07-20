@@ -4,31 +4,41 @@ import { authOptions } from "@/lib/auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import ProjectForm from "../../../components/ProjectForm";
+import NotificationCenter from "../../../components/NotificationCenter";
+import GlobalSearch from "../../../components/Search/GlobalSearch";
 
-async function getWorkspace(workspaceId: string) {
-  const cookieStore = await cookies();
-  const sessionToken = 
-    cookieStore.get("next-auth.session-token")?.value || 
-    cookieStore.get("__Secure-next-auth.session-token")?.value;
-
+async function getWorkspace(workspaceId: string, sessionToken: string | undefined) {
   const apiUrl = process.env.API_URL || 'http://localhost:4000';
-  
   try {
     const res = await fetch(`${apiUrl}/api/workspaces/${workspaceId}`, {
-      headers: {
-        ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
-      },
+      headers: { ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }) },
       cache: "no-store",
     });
-    
     if (res.ok) {
       const data = await res.json();
-      return data.data; // because we wrapped in successResponse -> { success: true, data: { ... } }
+      return data.data;
     } else if (res.status === 404 || res.status === 403) {
       return null;
     }
   } catch (err) {
     console.error("Failed to fetch workspace:", err);
+  }
+  return null;
+}
+
+async function getDashboard(workspaceId: string, sessionToken: string | undefined) {
+  const apiUrl = process.env.API_URL || 'http://localhost:4000';
+  try {
+    const res = await fetch(`${apiUrl}/api/workspaces/${workspaceId}/dashboard`, {
+      headers: { ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }) },
+      cache: "no-store",
+    });
+    if (res.ok) {
+      const json = await res.json();
+      return json.data;
+    }
+  } catch (err) {
+    console.error("Failed to fetch dashboard:", err);
   }
   return null;
 }
@@ -41,7 +51,13 @@ export default async function WorkspacePage(props: { params: Promise<{ workspace
     redirect("/");
   }
 
-  const workspace = await getWorkspace(params.workspaceId);
+  const cookieStore = await cookies();
+  const sessionToken = 
+    cookieStore.get("next-auth.session-token")?.value || 
+    cookieStore.get("__Secure-next-auth.session-token")?.value;
+
+  const workspace = await getWorkspace(params.workspaceId, sessionToken);
+  const dashboard = await getDashboard(params.workspaceId, sessionToken);
 
   if (!workspace) {
     return (
@@ -72,43 +88,115 @@ export default async function WorkspacePage(props: { params: Promise<{ workspace
               </span>
             </div>
           </div>
-          <Link href="/" className="text-sm font-medium text-zinc-500 hover:text-black dark:hover:text-white transition-colors">
-            ← Back to Workspaces
-          </Link>
+          <div className="flex items-center gap-6">
+            <GlobalSearch workspaceId={workspace.id} sessionToken={sessionToken} />
+            <NotificationCenter sessionToken={sessionToken} />
+            <Link href="/" className="text-sm font-medium text-zinc-500 hover:text-black dark:hover:text-white transition-colors">
+              ← Back to Workspaces
+            </Link>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           
           <div className="md:col-span-2 flex flex-col gap-10">
-            {/* Projects */}
+            {/* Project Health */}
             <section className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-black dark:text-white">Projects</h2>
+                <h2 className="text-xl font-semibold text-black dark:text-white">Project Health</h2>
               </div>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {workspace.projects?.length === 0 ? (
-                  <p className="text-zinc-500 italic text-sm">No projects yet.</p>
+                {dashboard?.projectHealth?.length === 0 ? (
+                  <div className="col-span-full py-8 text-center border border-dashed border-zinc-300 dark:border-zinc-800 rounded-lg bg-zinc-50/50 dark:bg-zinc-900/30">
+                    <p className="text-zinc-500 text-sm">No projects found. Create one below.</p>
+                  </div>
                 ) : (
-                  workspace.projects?.map((project: any) => (
+                  dashboard?.projectHealth?.map((ph: any) => (
                     <Link
-                      key={project.id}
-                      href={`/projects/${project.id}/issues`}
-                      className="p-4 border border-zinc-200 dark:border-zinc-800 rounded-lg flex flex-col gap-2 bg-white dark:bg-zinc-950 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors group"
+                      key={ph.projectId}
+                      href={`/projects/${ph.projectId}/issues`}
+                      className="p-5 border border-zinc-200 dark:border-zinc-800 rounded-lg flex flex-col gap-4 bg-white dark:bg-zinc-950 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors group"
                     >
-                      <h3 className="font-medium text-black dark:text-white group-hover:underline">
-                        {project.name}
-                      </h3>
-                      <p className="text-sm text-zinc-500 line-clamp-2">
-                        {project.description || "No description provided."}
-                      </p>
+                      <div className="flex justify-between items-start">
+                        <h3 className="font-semibold text-black dark:text-white group-hover:underline">
+                          {ph.name}
+                        </h3>
+                        {ph.isHackathonMode && (
+                          <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
+                            Hackathon
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-y-3 gap-x-4">
+                        <div className="flex flex-col">
+                          <span className="text-2xl font-bold text-black dark:text-white">{ph.totalIssues}</span>
+                          <span className="text-xs font-medium text-zinc-500 uppercase tracking-wide">Total</span>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-500">{ph.doneIssues}</span>
+                          <span className="text-xs font-medium text-zinc-500 uppercase tracking-wide">Done</span>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-2xl font-bold text-amber-600 dark:text-amber-500">{ph.inProgressIssues}</span>
+                          <span className="text-xs font-medium text-zinc-500 uppercase tracking-wide">In Progress</span>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className={`text-2xl font-bold ${ph.overdue ? 'text-red-600 dark:text-red-500' : 'text-zinc-400 dark:text-zinc-600'}`}>
+                            {ph.overdue ? 'Yes' : 'No'}
+                          </span>
+                          <span className="text-xs font-medium text-zinc-500 uppercase tracking-wide">Overdue</span>
+                        </div>
+                      </div>
                     </Link>
                   ))
                 )}
               </div>
               
-              <div className="mt-4 p-4 border border-dashed border-zinc-300 dark:border-zinc-800 rounded-lg bg-zinc-50/50 dark:bg-zinc-900/30">
+              <div className="mt-2 p-4 border border-dashed border-zinc-300 dark:border-zinc-800 rounded-lg bg-zinc-50/50 dark:bg-zinc-900/30">
                  <ProjectForm workspaceId={workspace.id} />
+              </div>
+            </section>
+
+            {/* My Tasks */}
+            <section className="flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-black dark:text-white">My Tasks</h2>
+                <span className="text-sm font-medium text-zinc-500">{dashboard?.myTasks?.length || 0} assigned</span>
+              </div>
+              
+              <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden bg-white dark:bg-zinc-950">
+                {dashboard?.myTasks?.length === 0 ? (
+                  <div className="p-8 text-center text-zinc-500 text-sm">
+                    No tasks assigned to you right now. You're all caught up!
+                  </div>
+                ) : (
+                  <ul className="divide-y divide-zinc-200 dark:divide-zinc-800">
+                    {dashboard?.myTasks?.map((task: any) => (
+                      <li key={task.id} className="p-4 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors">
+                        <div className="flex items-center gap-3">
+                          <span 
+                            className="w-2.5 h-2.5 rounded-full" 
+                            style={{ backgroundColor: task.status?.color || '#a1a1aa' }} 
+                            title={task.status?.name}
+                          />
+                          <div className="flex flex-col">
+                            <span className="text-sm font-medium text-black dark:text-white">
+                              {task.title}
+                            </span>
+                            <span className="text-xs text-zinc-500">
+                              {task.project?.name} · {task.project?.slug}-{task.sequenceId}
+                            </span>
+                          </div>
+                        </div>
+                        <span className="text-xs font-semibold px-2 py-1 rounded bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800">
+                          {task.status?.name}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </section>
 
@@ -145,6 +233,55 @@ export default async function WorkspacePage(props: { params: Promise<{ workspace
           </div>
 
           <div className="md:col-span-1 flex flex-col gap-10">
+            {/* Upcoming Deadlines */}
+            <section className="flex flex-col gap-4">
+              <h2 className="text-lg font-semibold text-black dark:text-white">Upcoming Deadlines</h2>
+              {dashboard?.upcomingDeadlines?.length === 0 ? (
+                <p className="text-zinc-500 text-sm">No upcoming deadlines.</p>
+              ) : (
+                <ul className="flex flex-col gap-3">
+                  {dashboard?.upcomingDeadlines?.map((item: any) => {
+                    const daysLeft = Math.ceil((new Date(item.deadline).getTime() - new Date().getTime()) / (1000 * 3600 * 24));
+                    const isUrgent = daysLeft <= 3;
+                    return (
+                      <li key={item.id} className="p-3 border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 flex flex-col gap-2">
+                        <div className="flex justify-between items-start">
+                          <div className="flex flex-col gap-1">
+                            <span className="text-sm font-medium text-black dark:text-white flex items-center gap-2">
+                              {item.title}
+                            </span>
+                            {item.type === 'ISSUE' && (
+                              <span className="text-[10px] text-zinc-500 bg-zinc-100 dark:bg-zinc-900 px-1.5 py-0.5 rounded w-fit">
+                                {item.projectSlug}-{item.sequenceId}
+                              </span>
+                            )}
+                          </div>
+                          {item.type === 'PROJECT' && item.isHackathonMode && (
+                            <span className="text-[9px] uppercase font-bold text-blue-600 dark:text-blue-400">
+                              Hackathon
+                            </span>
+                          )}
+                          {item.type === 'ISSUE' && (
+                            <span className="text-[9px] uppercase font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/30 px-1.5 py-0.5 rounded-sm bg-emerald-50 dark:bg-emerald-950/30">
+                              Task
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex justify-between items-center text-xs">
+                          <span className="text-zinc-500">
+                            {new Date(item.deadline).toLocaleDateString()}
+                          </span>
+                          <span className={`font-semibold ${isUrgent ? 'text-red-600 dark:text-red-500' : 'text-emerald-600 dark:text-emerald-500'}`}>
+                            {daysLeft > 0 ? `${daysLeft} days left` : 'Today'}
+                          </span>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </section>
+
             {/* Invites */}
             <section className="flex flex-col gap-4">
               <h2 className="text-lg font-semibold text-black dark:text-white">Pending Invites</h2>
@@ -174,20 +311,21 @@ export default async function WorkspacePage(props: { params: Promise<{ workspace
             {/* Activity Feed */}
             <section className="flex flex-col gap-4">
               <h2 className="text-lg font-semibold text-black dark:text-white">Activity</h2>
-              <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 bg-white dark:bg-zinc-950 h-96 overflow-y-auto">
-                {workspace.events?.length === 0 ? (
+              <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 bg-white dark:bg-zinc-950 max-h-96 overflow-y-auto">
+                {dashboard?.recentActivity?.length === 0 ? (
                   <p className="text-zinc-500 text-sm">No recent activity.</p>
                 ) : (
                   <ul className="flex flex-col gap-4 relative border-l border-zinc-200 dark:border-zinc-800 ml-2 pl-4">
-                    {workspace.events?.map((event: any) => (
+                    {dashboard?.recentActivity?.map((event: any) => (
                       <li key={event.id} className="relative">
                         <div className="absolute w-2 h-2 rounded-full bg-zinc-400 dark:bg-zinc-600 -left-[21px] top-1.5" />
                         <div className="flex flex-col">
                           <span className="text-sm text-black dark:text-white capitalize">
                             {event.eventType?.replace(/\./g, ' ')}
+                            {event.project?.name ? ` in ${event.project.name}` : ''}
                           </span>
                           <span className="text-xs text-zinc-500">
-                            {new Date(event.createdAt).toLocaleString()}
+                            {new Date(event.createdAt).toLocaleString()} by {event.actor?.username || event.actor?.email || 'System'}
                           </span>
                         </div>
                       </li>

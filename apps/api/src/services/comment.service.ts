@@ -29,7 +29,20 @@ export const commentService = {
       return comment;
     });
 
-    await eventService.emit('issue.commented', { issueId, comment: result }, { projectId: issue.projectId, actorId: authorId });
+    const bodyString = typeof data.body === 'string' ? data.body : JSON.stringify(data.body);
+    const usernames = Array.from(bodyString.matchAll(/@([a-zA-Z0-9_-]+)/g)).map(m => m[1]);
+    const uniqueUsernames = [...new Set(usernames)];
+    let mentionedUserIds: string[] = [];
+
+    if (uniqueUsernames.length > 0) {
+      const users = await prisma.user.findMany({
+        where: { username: { in: uniqueUsernames } },
+        select: { id: true }
+      });
+      mentionedUserIds = users.map(u => u.id);
+    }
+
+    await eventService.emit('issue.commented', { issueId, comment: result, mentionedUserIds }, { projectId: issue.projectId, actorId: authorId });
 
     return result;
   },

@@ -91,7 +91,7 @@ export default function IssueDetail({ issue, project }: { issue: any, project: a
             disabled={loading}
           >
             <option value="">Unassigned</option>
-            {project.members?.map((m: any) => (
+            {(project.workspace?.members || project.members)?.map((m: any) => (
               <option key={m.userId} value={m.userId}>{m.user?.username || m.user?.email}</option>
             ))}
           </select>

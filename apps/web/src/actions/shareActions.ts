@@ -3,14 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
-export async function createProjectAction(
-  workspaceId: string, 
-  name: string, 
-  slug: string, 
-  description?: string,
-  isHackathonMode?: boolean,
-  deadline?: string
-) {
+export async function createProjectShareAction(workspaceId: string, projectId: string) {
   const cookieStore = await cookies();
   const sessionToken = 
     cookieStore.get("next-auth.session-token")?.value || 
@@ -18,27 +11,25 @@ export async function createProjectAction(
     
   const apiUrl = process.env.API_URL || 'http://localhost:4000';
   
-  const res = await fetch(`${apiUrl}/api/workspaces/${workspaceId}/projects`, {
+  const res = await fetch(`${apiUrl}/api/workspaces/${workspaceId}/projects/${projectId}/shares`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
     },
-    body: JSON.stringify({ name, slug, description, isHackathonMode, deadline }),
+    body: JSON.stringify({}),
   });
 
   const data = await res.json();
-
   if (!res.ok || !data.success) {
-    console.error(`API Error:`, data);
-    throw new Error(data.error?.message || "Failed to create project");
+    throw new Error(data.error?.message || data.message || "Failed to create share link");
   }
 
-  revalidatePath(`/workspaces/${workspaceId}/projects`);
+  // we can revalidate the project page if needed
   return data.data;
 }
 
-export async function getProjectsAction(workspaceId: string) {
+export async function getProjectSharesAction(workspaceId: string, projectId: string) {
   const cookieStore = await cookies();
   const sessionToken = 
     cookieStore.get("next-auth.session-token")?.value || 
@@ -46,22 +37,18 @@ export async function getProjectsAction(workspaceId: string) {
     
   const apiUrl = process.env.API_URL || 'http://localhost:4000';
   
-  const res = await fetch(`${apiUrl}/api/workspaces/${workspaceId}/projects`, {
+  const res = await fetch(`${apiUrl}/api/workspaces/${workspaceId}/projects/${projectId}/shares`, {
     method: "GET",
     headers: {
       ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
     },
   });
 
-  if (!res.ok) {
-    return [];
-  }
-
   const data = await res.json();
   return data.success ? data.data : [];
 }
 
-export async function getProjectByIdAction(projectId: string, viewerToken?: string) {
+export async function revokeProjectShareAction(workspaceId: string, projectId: string, shareId: string) {
   const cookieStore = await cookies();
   const sessionToken = 
     cookieStore.get("next-auth.session-token")?.value || 
@@ -69,24 +56,17 @@ export async function getProjectByIdAction(projectId: string, viewerToken?: stri
     
   const apiUrl = process.env.API_URL || 'http://localhost:4000';
   
-  const headers: any = {
-    ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
-  };
-  
-  if (viewerToken) {
-    headers['x-viewer-token'] = viewerToken;
-  }
-  
-  const res = await fetch(`${apiUrl}/api/projects/${projectId}`, {
-    method: "GET",
-    headers,
+  const res = await fetch(`${apiUrl}/api/workspaces/${workspaceId}/projects/${projectId}/shares/${shareId}`, {
+    method: "DELETE",
+    headers: {
+      ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
+    },
   });
 
-  if (!res.ok) {
-    return null;
+  const data = await res.json();
+  if (!res.ok || !data.success) {
+    throw new Error(data.error?.message || data.message || "Failed to revoke share link");
   }
 
-  const data = await res.json();
-  return data.success ? data.data : null;
+  return true;
 }
-

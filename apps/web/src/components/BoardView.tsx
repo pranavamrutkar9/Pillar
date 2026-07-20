@@ -9,9 +9,11 @@ import { useDroppable } from '@dnd-kit/core';
 import Link from 'next/link';
 
 function SortableIssueCard({ issue, projectSlug }: { issue: any, projectSlug: string }) {
+  const { isViewer } = useProjectStore();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ 
     id: issue.id,
-    data: { type: 'Issue', issue }
+    data: { type: 'Issue', issue },
+    disabled: isViewer
   });
   
   const style = { 
@@ -26,7 +28,7 @@ function SortableIssueCard({ issue, projectSlug }: { issue: any, projectSlug: st
       style={style} 
       {...attributes} 
       {...listeners} 
-      className="p-3 mb-2 bg-white dark:bg-zinc-900 rounded-md shadow-sm border border-zinc-200 dark:border-zinc-800 cursor-grab active:cursor-grabbing hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
+      className={`p-3 mb-2 bg-white dark:bg-zinc-900 rounded-md shadow-sm border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors ${isViewer ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}`}
     >
       <div className="flex justify-between items-start">
         <span className="text-xs font-medium text-zinc-500">{projectSlug}-{issue.sequenceId}</span>

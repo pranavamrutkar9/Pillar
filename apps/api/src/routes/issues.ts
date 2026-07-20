@@ -8,9 +8,9 @@ import { successResponse } from '../lib/apiResponse.js';
 
 const router = Router({ mergeParams: true });
 
-router.use(requireAuth);
+import { viewerAuth } from '../middleware/viewerAuth.js';
 
-router.post('/', requireProjectMember, asyncHandler(async (req, res) => {
+router.post('/', requireAuth, requireProjectMember, asyncHandler(async (req, res) => {
   const parseResult = createIssueSchema.parse(req.body);
   const projectId = req.params.projectId as string;
   const userId = req.user!.id;
@@ -19,13 +19,13 @@ router.post('/', requireProjectMember, asyncHandler(async (req, res) => {
   return successResponse(res, issue, 201);
 }));
 
-router.get('/', requireProjectViewer, asyncHandler(async (req, res) => {
+router.get('/', viewerAuth, requireProjectViewer, asyncHandler(async (req, res) => {
   const projectId = req.params.projectId as string;
   const issues = await issueService.getIssuesByProject(projectId);
   return successResponse(res, issues);
 }));
 
-router.get('/seq/:sequenceId', requireProjectViewer, asyncHandler(async (req, res) => {
+router.get('/seq/:sequenceId', viewerAuth, requireProjectViewer, asyncHandler(async (req, res) => {
   const projectId = req.params.projectId as string;
   const sequenceId = parseInt(req.params.sequenceId as string, 10);
   
@@ -42,7 +42,7 @@ router.get('/seq/:sequenceId', requireProjectViewer, asyncHandler(async (req, re
   return successResponse(res, issue);
 }));
 
-router.get('/:issueId', requireProjectViewer, asyncHandler(async (req, res) => {
+router.get('/:issueId', viewerAuth, requireProjectViewer, asyncHandler(async (req, res) => {
   const issueId = req.params.issueId as string;
   const issue = await issueService.getIssueById(issueId);
   
@@ -53,7 +53,7 @@ router.get('/:issueId', requireProjectViewer, asyncHandler(async (req, res) => {
   return successResponse(res, issue);
 }));
 
-router.patch('/:issueId', requireProjectMember, asyncHandler(async (req, res) => {
+router.patch('/:issueId', requireAuth, requireProjectMember, asyncHandler(async (req, res) => {
   const parseResult = updateIssueSchema.parse(req.body);
   const issueId = req.params.issueId as string;
   const userId = req.user!.id;
@@ -69,7 +69,7 @@ router.patch('/:issueId', requireProjectMember, asyncHandler(async (req, res) =>
   }
 }));
 
-router.post('/:issueId/move', requireProjectMember, asyncHandler(async (req, res) => {
+router.post('/:issueId/move', requireAuth, requireProjectMember, asyncHandler(async (req, res) => {
   const parseResult = moveIssueSchema.parse(req.body);
   const issueId = req.params.issueId as string;
   const userId = req.user!.id;

@@ -31,7 +31,7 @@ export async function createIssueAction(projectId: string, data: any) {
   return resData.data;
 }
 
-export async function getIssuesAction(projectId: string) {
+export async function getIssuesAction(projectId: string, viewerToken?: string) {
   const cookieStore = await cookies();
   const sessionToken = 
     cookieStore.get("next-auth.session-token")?.value || 
@@ -39,11 +39,17 @@ export async function getIssuesAction(projectId: string) {
     
   const apiUrl = process.env.API_URL || 'http://localhost:4000';
   
+  const headers: any = {
+    ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
+  };
+  
+  if (viewerToken) {
+    headers['x-viewer-token'] = viewerToken;
+  }
+  
   const res = await fetch(`${apiUrl}/api/projects/${projectId}/issues`, {
     method: "GET",
-    headers: {
-      ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
-    },
+    headers,
   });
 
   if (!res.ok) return [];
