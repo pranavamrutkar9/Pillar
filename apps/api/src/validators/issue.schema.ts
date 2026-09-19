@@ -11,6 +11,8 @@ export const createIssueSchema = z.object({
   dueDate: z.string().datetime().nullable().optional(),
   estimate: z.number().int().min(0).nullable().optional(),
   labelIds: z.array(z.string()).optional(),
+  cycleId: z.string().nullable().optional(),
+  moduleId: z.string().nullable().optional(),
 });
 
 export const updateIssueSchema = z.object({
@@ -22,6 +24,8 @@ export const updateIssueSchema = z.object({
   dueDate: z.string().datetime().nullable().optional(),
   estimate: z.number().int().min(0).nullable().optional(),
   labelIds: z.array(z.string()).optional(),
+  cycleId: z.string().nullable().optional(),
+  moduleId: z.string().nullable().optional(),
 });
 
 export const moveIssueSchema = z.object({

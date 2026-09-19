@@ -7,7 +7,7 @@ import HackathonTimer from "./HackathonTimer";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
-export default function ClientIssuesPage() {
+export default function ClientIssuesPage({ cycles = [], modules = [] }: { cycles?: any[], modules?: any[] }) {
   const { project, issues, activeUsers } = useProjectStore();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -18,6 +18,8 @@ export default function ClientIssuesPage() {
   const view = searchParams.get('view') || 'board';
   const searchQuery = searchParams.get('search') || '';
   const statusFilter = searchParams.getAll('status');
+  const cycleFilter = searchParams.get('cycleId') || '';
+  const moduleFilter = searchParams.get('moduleId') || '';
 
   const updateUrl = (key: string, value: string | null) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -40,6 +42,8 @@ export default function ClientIssuesPage() {
   const filteredIssues = issues.filter(issue => {
     if (searchQuery && !issue.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     if (statusFilter.length > 0 && !statusFilter.includes(issue.statusId)) return false;
+    if (cycleFilter && issue.cycleId !== cycleFilter) return false;
+    if (moduleFilter && issue.moduleId !== moduleFilter) return false;
     
     if (isCrunchMode && !showAllCrunch) {
       // Crunch Mode filter: Only show Critical/High/Urgent priority issues that are not Done
@@ -111,6 +115,32 @@ export default function ClientIssuesPage() {
                 <option key={s.id} value={s.id}>{s.name}</option>
               ))}
             </select>
+
+            {cycles && cycles.length > 0 && (
+              <select 
+                value={cycleFilter}
+                onChange={(e) => updateUrl('cycleId', e.target.value)}
+                className="text-sm px-3 py-1.5 border border-zinc-200 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-950 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">All Cycles</option>
+                {cycles.map((c: any) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            )}
+
+            {modules && modules.length > 0 && (
+              <select 
+                value={moduleFilter}
+                onChange={(e) => updateUrl('moduleId', e.target.value)}
+                className="text-sm px-3 py-1.5 border border-zinc-200 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-950 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">All Modules</option>
+                {modules.map((m: any) => (
+                  <option key={m.id} value={m.id}>{m.name}</option>
+                ))}
+              </select>
+            )}
           </div>
           
           {activeUsers.length > 0 && (

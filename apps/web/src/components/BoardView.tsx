@@ -38,7 +38,26 @@ function SortableIssueCard({ issue, projectSlug }: { issue: any, projectSlug: st
         <span className="text-xs px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
           {issue.priority || 'No Priority'}
         </span>
+        {issue.estimate !== null && issue.estimate !== undefined && (
+          <span className="text-xs font-semibold text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">
+            {issue.estimate}
+          </span>
+        )}
       </div>
+      {(issue.cycle || issue.module) && (
+        <div className="mt-2 flex flex-wrap gap-1">
+          {issue.cycle && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded border border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-900/50 dark:bg-blue-900/20 dark:text-blue-300 truncate max-w-[120px]" title={issue.cycle.name}>
+              ○ {issue.cycle.name}
+            </span>
+          )}
+          {issue.module && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded border border-purple-200 bg-purple-50 text-purple-700 dark:border-purple-900/50 dark:bg-purple-900/20 dark:text-purple-300 truncate max-w-[120px]" title={issue.module.name}>
+              {issue.module.name}
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 }

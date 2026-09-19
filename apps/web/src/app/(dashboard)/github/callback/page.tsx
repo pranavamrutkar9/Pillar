@@ -19,7 +19,7 @@ function GithubCallbackContent() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!session?.user?.token) return;
+    if (!(session?.user as any)?.token) return;
 
     // Fetch all workspaces and projects to let the user select where to link
     const fetchProjects = async () => {
