@@ -16,6 +16,7 @@ import labelsRouter from './routes/labels.js'
 import notificationsRouter from './routes/notifications.js'
 import healthRouter from './routes/health.js'
 import usersRouter from './routes/users.js'
+import { githubRouter } from './routes/github.js'
 import { errorHandler } from './middleware/errorHandler.js'
 
 const app = express()
@@ -25,6 +26,7 @@ app.use(cors({
   credentials: true,
 }))
 
+app.use('/api/github/webhook', express.raw({ type: 'application/json' }))
 app.use(express.json())
 
 app.use('/api', healthRouter)
@@ -39,6 +41,7 @@ app.use('/api/projects/:projectId/labels', labelsRouter)
 app.use('/api/issues/:issueId/comments', commentsRouter)
 app.use('/api/invites', invitesRouter)
 app.use('/api/notifications', notificationsRouter)
+app.use('/api/github', githubRouter)
 
 app.use(errorHandler)
 

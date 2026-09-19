@@ -31,6 +31,6 @@ export const errorHandler = (
     return errorResponse(res, err.message || 'Forbidden', 403);
   }
 
-  const message = process.env.NODE_ENV === 'development' ? err.message : 'Internal server error';
-  return errorResponse(res, message, 500);
+  const message = err.message || 'Internal server error';
+  return res.status(500).json({ success: false, error: { message, stack: err.stack } });
 };

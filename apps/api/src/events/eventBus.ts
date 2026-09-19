@@ -7,6 +7,7 @@ const redisEnabled = !!process.env.REDIS_URL;
 export const activityQueue = redisEnabled ? new Queue('pillar-activity', { connection: redis as any }) : null;
 export const realtimeQueue = redisEnabled ? new Queue('pillar-realtime', { connection: redis as any }) : null;
 export const notificationQueue = redisEnabled ? new Queue('pillar-notification', { connection: redis as any }) : null;
+export const githubQueue = redisEnabled ? new Queue('pillar-github', { connection: redis as any }) : null;
 
 const suppressEconnreset = (err: any) => {
   if (err.message && err.message.includes('ECONNRESET')) return;
@@ -16,6 +17,7 @@ const suppressEconnreset = (err: any) => {
 if (activityQueue) activityQueue.on('error', suppressEconnreset);
 if (realtimeQueue) realtimeQueue.on('error', suppressEconnreset);
 if (notificationQueue) notificationQueue.on('error', suppressEconnreset);
+if (githubQueue) githubQueue.on('error', suppressEconnreset);
 
 export async function emit(eventType: string, payload: any) {
   if (!redisEnabled) {
@@ -34,6 +36,7 @@ export async function emit(eventType: string, payload: any) {
       activityQueue!.add(eventType, payload, jobOptions),
       realtimeQueue!.add(eventType, payload, jobOptions),
       notificationQueue!.add(eventType, payload, jobOptions),
+      githubQueue!.add(eventType, payload, jobOptions),
     ]);
     console.log(`[EventBus] Emitted event: ${eventType}`);
   } catch (error: any) {
