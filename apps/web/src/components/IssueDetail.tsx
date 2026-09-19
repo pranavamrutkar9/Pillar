@@ -6,13 +6,16 @@ import TiptapEditor from "./TiptapEditor";
 import { format } from "date-fns";
 import { PullRequestCard } from "./PullRequestCard";
 
-export default function IssueDetail({ issue, project }: { issue: any, project: any }) {
+export default function IssueDetail({ issue, project, cycles = [], modules = [] }: { issue: any, project: any, cycles?: any[], modules?: any[] }) {
   const [title, setTitle] = useState(issue.title);
   const [description, setDescription] = useState(issue.description);
   const [statusId, setStatusId] = useState(issue.statusId);
   const [priority, setPriority] = useState(issue.priority);
   const [assigneeId, setAssigneeId] = useState(issue.assigneeId || "");
   const [dueDate, setDueDate] = useState(issue.dueDate ? new Date(issue.dueDate).toISOString().split('T')[0] : "");
+  const [estimate, setEstimate] = useState<number | "">(issue.estimate ?? "");
+  const [cycleId, setCycleId] = useState(issue.cycleId || "");
+  const [moduleId, setModuleId] = useState(issue.moduleId || "");
   const [labelIds, setLabelIds] = useState<string[]>(issue.labels?.map((l: any) => l.label.id) || []);
   const [isEditingDesc, setIsEditingDesc] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -115,6 +118,60 @@ export default function IssueDetail({ issue, project }: { issue: any, project: a
         <div>
           <label className="text-xs text-gray-500 uppercase">Created</label>
           <div className="mt-2 text-sm">{format(new Date(issue.createdAt), 'MMM d, yyyy')}</div>
+        </div>
+      </div>
+
+      <div className="flex gap-4 border-b border-gray-200 dark:border-zinc-800 pb-4">
+        <div>
+          <label className="text-xs text-gray-500 uppercase">Estimate (Pts)</label>
+          <input 
+            type="number"
+            min="0"
+            value={estimate}
+            onChange={(e) => {
+              const val = e.target.value === "" ? "" : parseInt(e.target.value, 10);
+              setEstimate(val);
+              handleUpdate("estimate", val === "" ? null : val);
+            }}
+            className="block mt-1 bg-gray-50 dark:bg-zinc-900 border-transparent rounded text-sm focus:ring-blue-500 w-24"
+            disabled={loading}
+          />
+        </div>
+
+        <div>
+          <label className="text-xs text-gray-500 uppercase">Cycle</label>
+          <select 
+            value={cycleId}
+            onChange={(e) => {
+              setCycleId(e.target.value);
+              handleUpdate("cycleId", e.target.value || null);
+            }}
+            className="block mt-1 bg-gray-50 dark:bg-zinc-900 border-transparent rounded text-sm focus:ring-blue-500"
+            disabled={loading}
+          >
+            <option value="">No Cycle</option>
+            {cycles.map((c: any) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="text-xs text-gray-500 uppercase">Module</label>
+          <select 
+            value={moduleId}
+            onChange={(e) => {
+              setModuleId(e.target.value);
+              handleUpdate("moduleId", e.target.value || null);
+            }}
+            className="block mt-1 bg-gray-50 dark:bg-zinc-900 border-transparent rounded text-sm focus:ring-blue-500"
+            disabled={loading}
+          >
+            <option value="">No Module</option>
+            {modules.map((m: any) => (
+              <option key={m.id} value={m.id}>{m.name}</option>
+            ))}
+          </select>
         </div>
       </div>
 

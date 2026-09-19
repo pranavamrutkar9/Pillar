@@ -42,6 +42,11 @@ app.use('/api/issues/:issueId/comments', commentsRouter)
 app.use('/api/invites', invitesRouter)
 app.use('/api/notifications', notificationsRouter)
 app.use('/api/github', githubRouter)
+import cyclesRouter from './routes/cycles.js'
+import modulesRouter from './routes/modules.js'
+
+app.use('/api/projects/:projectId/cycles', cyclesRouter)
+app.use('/api/projects/:projectId/modules', modulesRouter)
 
 app.use(errorHandler)
 

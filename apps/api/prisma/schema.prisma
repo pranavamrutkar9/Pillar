@@ -34,9 +34,10 @@ enum ProjectStatus {
 }
 
 enum CycleStatus {
-  DRAFT
+  PLANNED
   ACTIVE
   COMPLETED
+  CANCELLED
 }
 
 enum ModuleStatus {
@@ -122,7 +123,6 @@ model User {
   issuesCreated      Issue[]           @relation("IssueCreator")
   issueActivities    IssueActivity[]   @relation("ActivityActor")
   comments           Comment[]         @relation("CommentAuthor")
-  cycleIssuesAdded   CycleIssue[]      @relation("CycleIssueAddedBy")
   adrsAuthored       Adr[]             @relation("AdrAuthor")
   rfcsAuthored       Rfc[]             @relation("RfcAuthor")
   rfcVotes           RfcVote[]
@@ -269,24 +269,29 @@ model Issue {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
+  cycleId     String?
+  moduleId    String?
+
   project  Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
   status   IssueStatus @relation(fields: [statusId], references: [id])
   assignee User?       @relation("IssueAssignee", fields: [assigneeId], references: [id])
   creator  User        @relation("IssueCreator", fields: [creatorId], references: [id])
+  cycle    Cycle?      @relation(fields: [cycleId], references: [id], onDelete: SetNull)
+  module   Module?     @relation(fields: [moduleId], references: [id], onDelete: SetNull)
 
   labels           IssueLabelMap[]
   relations        IssueRelation[]    @relation("IssueRelations")
   relatedTo        IssueRelation[]    @relation("RelatedIssues")
   activities       IssueActivity[]
   comments         Comment[]
-  moduleIssues     ModuleIssue[]
-  cycleIssues      CycleIssue[]
   PullRequestIssue PullRequestIssue[]
 
   @@unique([projectId, sequenceId])
   @@index([projectId, statusId, position])
   @@index([assigneeId])
   @@index([createdAt])
+  @@index([cycleId])
+  @@index([moduleId])
   @@map("issues")
 }
 
@@ -362,63 +367,41 @@ model Comment {
 }
 
 model Module {
-  id          String       @id @default(cuid())
+  id          String   @id @default(cuid())
   projectId   String
   name        String
   description String?
-  status      ModuleStatus @default(PLANNED)
-  startDate   DateTime?
-  endDate     DateTime?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
 
-  project Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  issues  ModuleIssue[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  issues  Issue[]
 
   @@index([projectId])
   @@map("modules")
 }
 
-model ModuleIssue {
-  moduleId String
-  issueId  String
-
-  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  issue  Issue  @relation(fields: [issueId], references: [id], onDelete: Cascade)
-
-  @@id([moduleId, issueId])
-  @@map("module_issues")
-}
-
 model Cycle {
-  id        String      @id @default(cuid())
-  projectId String
-  name      String
-  startDate DateTime
-  endDate   DateTime
-  status    CycleStatus @default(DRAFT)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id          String      @id @default(cuid())
+  projectId   String
+  name        String
+  description String?
 
-  project Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  issues  CycleIssue[]
+  startsAt    DateTime
+  endsAt      DateTime
 
-  @@index([projectId])
+  status      CycleStatus @default(PLANNED)
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  issues  Issue[]
+
+  @@index([projectId, startsAt])
+  @@index([projectId, status])
   @@map("cycles")
-}
-
-model CycleIssue {
-  cycleId String
-  issueId String
-  addedBy String
-  addedAt DateTime @default(now())
-
-  cycle Cycle @relation(fields: [cycleId], references: [id], onDelete: Cascade)
-  issue Issue @relation(fields: [issueId], references: [id], onDelete: Cascade)
-  user  User  @relation("CycleIssueAddedBy", fields: [addedBy], references: [id])
-
-  @@id([cycleId, issueId])
-  @@map("cycle_issues")
 }
 
 model Adr {

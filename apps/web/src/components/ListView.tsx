@@ -17,6 +17,9 @@ export default function ListView({ issues }: { issues: any[] }) {
             <th className="px-4 py-3 font-medium">Title</th>
             <th className="px-4 py-3 font-medium">Status</th>
             <th className="px-4 py-3 font-medium">Priority</th>
+            <th className="px-4 py-3 font-medium">Estimate</th>
+            <th className="px-4 py-3 font-medium">Cycle</th>
+            <th className="px-4 py-3 font-medium">Module</th>
           </tr>
         </thead>
         <tbody>
@@ -52,6 +55,33 @@ export default function ListView({ issues }: { issues: any[] }) {
                   <span className="text-xs px-2 py-1 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
                     {issue.priority || 'No Priority'}
                   </span>
+                </td>
+                <td className="px-4 py-3">
+                  {issue.estimate !== null && issue.estimate !== undefined ? (
+                    <span className="text-xs font-semibold text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded">
+                      {issue.estimate}
+                    </span>
+                  ) : (
+                    <span className="text-xs text-zinc-400">-</span>
+                  )}
+                </td>
+                <td className="px-4 py-3">
+                  {issue.cycle ? (
+                    <span className="text-[10px] px-2 py-1 rounded border border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-900/50 dark:bg-blue-900/20 dark:text-blue-300 truncate max-w-[150px] inline-block" title={issue.cycle.name}>
+                      ○ {issue.cycle.name}
+                    </span>
+                  ) : (
+                    <span className="text-xs text-zinc-400">-</span>
+                  )}
+                </td>
+                <td className="px-4 py-3">
+                  {issue.module ? (
+                    <span className="text-[10px] px-2 py-1 rounded border border-purple-200 bg-purple-50 text-purple-700 dark:border-purple-900/50 dark:bg-purple-900/20 dark:text-purple-300 truncate max-w-[150px] inline-block" title={issue.module.name}>
+                      {issue.module.name}
+                    </span>
+                  ) : (
+                    <span className="text-xs text-zinc-400">-</span>
+                  )}
                 </td>
               </tr>
             ))

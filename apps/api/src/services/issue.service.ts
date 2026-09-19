@@ -6,6 +6,15 @@ import { eventService } from "./event.service.js";
 export const issueService = {
   async createIssue(projectId: string, creatorId: string, data: CreateIssueInput) {
     const issue = await prisma.$transaction(async (tx) => {
+      if (data.cycleId) {
+        const cycle = await tx.cycle.findUnique({ where: { id: data.cycleId } });
+        if (!cycle || cycle.projectId !== projectId) throw new Error("Invalid cycle or cross-project assignment not allowed");
+      }
+      if (data.moduleId) {
+        const module = await tx.module.findUnique({ where: { id: data.moduleId } });
+        if (!module || module.projectId !== projectId) throw new Error("Invalid module or cross-project assignment not allowed");
+      }
+
       // Atomically increment the sequence ID for this project
       const project = await tx.project.update({
         where: { id: projectId },
@@ -27,6 +36,8 @@ export const issueService = {
           dueDate: data.dueDate,
           estimate: data.estimate,
           sequenceId: nextSequenceId,
+          cycleId: data.cycleId,
+          moduleId: data.moduleId,
           ...(data.labelIds && data.labelIds.length > 0 && {
             labels: {
               create: data.labelIds.map((labelId) => ({
@@ -48,6 +59,14 @@ export const issueService = {
     // Emit event outside transaction
     await eventService.emit('issue.created', { issue }, { projectId, actorId: creatorId });
 
+    if (issue.cycleId) {
+      await eventService.emit('issue.added_to_cycle', { 
+        issueId: issue.id, 
+        cycleId: issue.cycleId, 
+        estimate: issue.estimate 
+      }, { projectId, actorId: creatorId });
+    }
+
     return issue;
   },
 
@@ -55,6 +74,16 @@ export const issueService = {
     const result = await prisma.$transaction(async (tx) => {
       const oldIssue = await tx.issue.findUnique({ where: { id: issueId } });
       if (!oldIssue) throw new Error("Issue not found");
+      const projectId = oldIssue.projectId;
+
+      if (data.cycleId !== undefined && data.cycleId !== null) {
+        const cycle = await tx.cycle.findUnique({ where: { id: data.cycleId } });
+        if (!cycle || cycle.projectId !== projectId) throw new Error("Invalid cycle or cross-project assignment not allowed");
+      }
+      if (data.moduleId !== undefined && data.moduleId !== null) {
+        const module = await tx.module.findUnique({ where: { id: data.moduleId } });
+        if (!module || module.projectId !== projectId) throw new Error("Invalid module or cross-project assignment not allowed");
+      }
 
       const newIssue = await tx.issue.update({
         where: { id: issueId },
@@ -66,6 +95,8 @@ export const issueService = {
           assigneeId: data.assigneeId,
           dueDate: data.dueDate,
           estimate: data.estimate,
+          cycleId: data.cycleId,
+          moduleId: data.moduleId,
         },
       });
 
@@ -113,10 +144,42 @@ export const issueService = {
         changedValues[key] = (result.newIssue as any)[key];
       });
       
+      const projectId = result.newIssue.projectId;
+
       await eventService.emit('issue.updated', { 
         issueId, 
         changes: changedValues 
-      }, { projectId: result.newIssue.projectId, actorId });
+      }, { projectId, actorId });
+
+      // Cycle added/removed tracking
+      const oldCycleId = result.oldIssue.cycleId;
+      const newCycleId = result.newIssue.cycleId;
+      const newEstimate = result.newIssue.estimate;
+
+      if (oldCycleId !== newCycleId) {
+        if (oldCycleId) {
+          await eventService.emit('issue.removed_from_cycle', {
+            issueId,
+            cycleId: oldCycleId,
+            estimate: result.oldIssue.estimate // Historical snapshot of estimate at removal
+          }, { projectId, actorId });
+        }
+        if (newCycleId) {
+          await eventService.emit('issue.added_to_cycle', {
+            issueId,
+            cycleId: newCycleId,
+            estimate: newEstimate // Historical snapshot of estimate at addition
+          }, { projectId, actorId });
+        }
+      }
+
+      if (result.oldIssue.moduleId !== result.newIssue.moduleId) {
+        await eventService.emit('issue.module_changed', {
+          issueId,
+          oldModuleId: result.oldIssue.moduleId,
+          newModuleId: result.newIssue.moduleId,
+        }, { projectId, actorId });
+      }
     }
 
     return result.newIssue;
@@ -157,6 +220,8 @@ export const issueService = {
         assignee: { select: { id: true, username: true, avatarUrl: true } },
         status: true,
         labels: { include: { label: true } },
+        cycle: true,
+        module: true,
       },
       orderBy: { sequenceId: 'desc' },
     });
@@ -170,6 +235,8 @@ export const issueService = {
         creator: { select: { id: true, username: true, avatarUrl: true } },
         status: true,
         labels: { include: { label: true } },
+        cycle: true,
+        module: true,
         project: { select: { id: true, name: true, slug: true, githubRepositoryId: true, githubMergedStatusId: true } },
         activities: {
           include: { actor: { select: { id: true, username: true, avatarUrl: true } } },
@@ -188,6 +255,8 @@ export const issueService = {
         creator: { select: { id: true, username: true, avatarUrl: true } },
         status: true,
         labels: { include: { label: true } },
+        cycle: true,
+        module: true,
         project: { select: { id: true, name: true, slug: true, githubRepositoryId: true, githubMergedStatusId: true } },
         activities: {
           include: { actor: { select: { id: true, username: true, avatarUrl: true } } },

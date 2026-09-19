@@ -4,13 +4,16 @@ import { useState } from "react";
 import { createIssueAction } from "../actions/issueActions";
 import TiptapEditor from "./TiptapEditor";
 
-export default function IssueForm({ projectId, statuses, members = [], labels = [] }: { projectId: string, statuses: any[], members?: any[], labels?: any[] }) {
+export default function IssueForm({ projectId, statuses, members = [], labels = [], cycles = [], modules = [] }: { projectId: string, statuses: any[], members?: any[], labels?: any[], cycles?: any[], modules?: any[] }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState<any>(null);
   const [statusId, setStatusId] = useState(statuses[0]?.id || "");
   const [priority, setPriority] = useState("NONE");
   const [assigneeId, setAssigneeId] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const [estimate, setEstimate] = useState<number | "">("");
+  const [cycleId, setCycleId] = useState("");
+  const [moduleId, setModuleId] = useState("");
   const [labelIds, setLabelIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -30,6 +33,9 @@ export default function IssueForm({ projectId, statuses, members = [], labels = 
         priority,
         assigneeId: assigneeId || undefined,
         dueDate: dueDate ? new Date(dueDate).toISOString() : undefined,
+        estimate: estimate === "" ? undefined : estimate,
+        cycleId: cycleId || undefined,
+        moduleId: moduleId || undefined,
         labelIds,
       });
       setTitle("");
@@ -38,6 +44,9 @@ export default function IssueForm({ projectId, statuses, members = [], labels = 
       setPriority("NONE");
       setAssigneeId("");
       setDueDate("");
+      setEstimate("");
+      setCycleId("");
+      setModuleId("");
       setLabelIds([]);
       
       setSuccess(true);
@@ -128,6 +137,48 @@ export default function IssueForm({ projectId, statuses, members = [], labels = 
             onChange={(e) => setDueDate(e.target.value)}
             className="mt-1 block w-full bg-transparent dark:bg-zinc-900 rounded-md border-gray-300 dark:border-zinc-700 shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500"
           />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-4 mt-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Estimate (Pts)</label>
+          <input
+            type="number"
+            min="0"
+            value={estimate}
+            onChange={(e) => setEstimate(e.target.value === "" ? "" : parseInt(e.target.value, 10))}
+            className="mt-1 block w-full bg-transparent dark:bg-zinc-900 rounded-md border-gray-300 dark:border-zinc-700 shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500"
+            placeholder="e.g. 5"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Cycle</label>
+          <select
+            value={cycleId}
+            onChange={(e) => setCycleId(e.target.value)}
+            className="mt-1 block w-full bg-transparent dark:bg-zinc-900 rounded-md border-gray-300 dark:border-zinc-700 shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">No Cycle</option>
+            {cycles.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Module</label>
+          <select
+            value={moduleId}
+            onChange={(e) => setModuleId(e.target.value)}
+            className="mt-1 block w-full bg-transparent dark:bg-zinc-900 rounded-md border-gray-300 dark:border-zinc-700 shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">No Module</option>
+            {modules.map((m) => (
+              <option key={m.id} value={m.id}>{m.name}</option>
+            ))}
+          </select>
         </div>
       </div>
 
