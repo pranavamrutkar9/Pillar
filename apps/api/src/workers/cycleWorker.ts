@@ -5,8 +5,8 @@ import { eventService } from "../services/event.service.js";
 
 export const cycleWorker = new Worker("pillar-cycle", async (job) => {
   const eventType = job.name;
-  const payload = job.data;
-  const projectId = payload.projectId;
+  const payload = job.data.payload || job.data;
+  const projectId = job.data.projectId;
 
   if (eventType === 'cycle.completed' && payload.cycleId) {
     const cycleId = payload.cycleId;

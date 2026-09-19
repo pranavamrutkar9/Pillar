@@ -148,7 +148,9 @@ export const issueService = {
 
       await eventService.emit('issue.updated', { 
         issueId, 
-        changes: changedValues 
+        changes: changedValues,
+        cycleId: result.newIssue.cycleId,
+        estimate: result.newIssue.estimate
       }, { projectId, actorId });
 
       // Cycle added/removed tracking
@@ -207,7 +209,9 @@ export const issueService = {
 
     await eventService.emit('issue.moved', { 
       issueId, 
-      changes: { statusId, position } 
+      changes: { statusId, position },
+      cycleId: result.newIssue.cycleId,
+      estimate: result.newIssue.estimate
     }, { projectId: result.newIssue.projectId, actorId });
 
     return result.newIssue;
