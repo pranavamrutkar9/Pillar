@@ -27,7 +27,9 @@ router.post('/', asyncHandler(async (req, res) => {
 
 router.get('/', asyncHandler(async (req, res) => {
   const userId = req.user!.id;
+  console.log('Fetching workspaces for userId:', userId);
   const workspaces = await workspaceService.getByUser(userId);
+  console.log(`Found ${workspaces.length} workspaces for userId:`, userId);
   return successResponse(res, workspaces);
 }));
 

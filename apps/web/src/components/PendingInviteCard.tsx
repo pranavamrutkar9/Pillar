@@ -23,25 +23,25 @@ export function PendingInviteCard({ invite }: { invite: any }) {
   };
 
   return (
-    <div className="p-4 border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/30 rounded-lg flex flex-col sm:flex-row items-center justify-between gap-4 mb-3">
-      <div className="flex flex-col items-center sm:items-start text-center sm:text-left gap-1">
+    <div className="p-4 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111] rounded-md flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2">
-          <span className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 text-xs font-semibold px-2 py-0.5 rounded-full">
-            New Invite
+          <span className="text-black dark:text-white font-medium text-sm">
+            Workspace Invitation
           </span>
-          {error && <span className="text-red-500 text-xs">{error}</span>}
+          {error && <span className="text-red-500 text-xs font-medium">{error}</span>}
         </div>
-        <p className="text-sm text-zinc-700 dark:text-zinc-300">
-          <strong className="text-black dark:text-white">{invite.sender?.username || invite.sender?.email}</strong> invited you to join <strong className="text-black dark:text-white">{invite.workspace?.name}</strong> as a <strong className="text-black dark:text-white">{invite.role.toLowerCase()}</strong>.
+        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+          <strong className="text-black dark:text-white font-semibold">{invite.sender?.username || invite.sender?.email}</strong> has invited you to join <strong className="text-black dark:text-white font-semibold">{invite.workspace?.name}</strong> as a <span className="capitalize">{invite.role.toLowerCase()}</span>.
         </p>
       </div>
 
       <button
         onClick={handleAccept}
         disabled={loading}
-        className="w-full sm:w-auto shrink-0 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
+        className="w-full sm:w-auto shrink-0 bg-black hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black px-4 py-2 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
       >
-        {loading ? 'Accepting...' : 'Accept Invite'}
+        {loading ? 'Accepting...' : 'Accept'}
       </button>
     </div>
   );

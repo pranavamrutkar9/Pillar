@@ -4,6 +4,7 @@ import { useState } from "react";
 import { updateIssueAction } from "../actions/issueActions";
 import TiptapEditor from "./TiptapEditor";
 import { format } from "date-fns";
+import { PullRequestCard } from "./PullRequestCard";
 
 export default function IssueDetail({ issue, project }: { issue: any, project: any }) {
   const [title, setTitle] = useState(issue.title);
@@ -146,6 +147,17 @@ export default function IssueDetail({ issue, project }: { issue: any, project: a
           {(!project.issueLabels || project.issueLabels.length === 0) && <span className="text-xs text-gray-400">No labels available</span>}
         </div>
       </div>
+
+      {issue.PullRequestIssue && issue.PullRequestIssue.length > 0 && (
+        <div className="border-b border-gray-200 dark:border-zinc-800 pb-4">
+          <label className="text-xs text-gray-500 uppercase block mb-3">Pull Requests</label>
+          <div className="space-y-3">
+            {issue.PullRequestIssue.map((prIssue: any) => (
+              <PullRequestCard key={prIssue.pullRequest.id} pr={prIssue.pullRequest} />
+            ))}
+          </div>
+        </div>
+      )}
 
       <div>
         <div className="flex justify-between items-center mb-2">

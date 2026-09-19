@@ -170,11 +170,12 @@ export const issueService = {
         creator: { select: { id: true, username: true, avatarUrl: true } },
         status: true,
         labels: { include: { label: true } },
-        project: { select: { id: true, name: true, slug: true } },
+        project: { select: { id: true, name: true, slug: true, githubRepositoryId: true, githubMergedStatusId: true } },
         activities: {
           include: { actor: { select: { id: true, username: true, avatarUrl: true } } },
           orderBy: { createdAt: 'desc' },
         },
+        PullRequestIssue: { include: { pullRequest: true } }
       },
     });
   },
@@ -187,11 +188,12 @@ export const issueService = {
         creator: { select: { id: true, username: true, avatarUrl: true } },
         status: true,
         labels: { include: { label: true } },
-        project: { select: { id: true, name: true, slug: true } },
+        project: { select: { id: true, name: true, slug: true, githubRepositoryId: true, githubMergedStatusId: true } },
         activities: {
           include: { actor: { select: { id: true, username: true, avatarUrl: true } } },
           orderBy: { createdAt: 'desc' },
         },
+        PullRequestIssue: { include: { pullRequest: true } }
       },
     });
   }

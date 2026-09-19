@@ -136,5 +136,56 @@ export const projectService = {
       where: { id: shareId }
     });
   },
+
+  async getPullRequests(projectId: string) {
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
+      select: { githubRepositoryId: true }
+    });
+    if (!project?.githubRepositoryId) return [];
+
+    return await prisma.pullRequest.findMany({
+      where: { repositoryId: project.githubRepositoryId },
+      include: {
+        issues: {
+          include: { issue: { select: { sequenceId: true } } }
+        }
+      },
+      orderBy: { updatedAt: 'desc' }
+    });
+  },
+
+  async updateGithubSettings(projectId: string, data: { githubRepositoryId?: string | null, githubMergedStatusId?: string | null }) {
+    return await prisma.project.update({
+      where: { id: projectId },
+      data
+    });
+  },
+
+  async triggerGithubSync(projectId: string) {
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
+      include: { 
+        workspace: true 
+      }
+    });
+
+    if (!project?.githubRepositoryId) throw new Error("No repository linked");
+
+    const repo = await prisma.githubRepository.findUnique({
+      where: { id: project.githubRepositoryId }
+    });
+
+    if (!repo) throw new Error("Repository not found");
+
+    await eventService.emit('github.repo.connected', {
+      repositoryId: repo.githubRepoId,
+      installationId: repo.installationId,
+      owner: repo.owner,
+      repo: repo.name
+    });
+
+    return { success: true };
+  }
 };
 

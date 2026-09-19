@@ -65,6 +65,44 @@ enum NotificationType {
   STATUS_CHANGED
 }
 
+enum GithubCheckState {
+  SUCCESS
+  FAILURE
+  PENDING
+  CANCELLED
+}
+
+enum PullRequestState {
+  DRAFT
+  OPEN
+  READY_FOR_REVIEW
+  MERGED
+  CLOSED
+}
+
+enum GithubReviewDecision {
+  APPROVED
+  CHANGES_REQUESTED
+  REVIEW_REQUIRED
+}
+
+enum SyncJobStatus {
+  RUNNING
+  SUCCESS
+  FAILED
+}
+
+enum SyncJobType {
+  MANUAL
+  WEBHOOK
+  INITIAL
+}
+
+enum LinkType {
+  AUTO
+  MANUAL
+}
+
 model User {
   id             String   @id @default(cuid())
   email          String   @unique
@@ -75,24 +113,24 @@ model User {
   githubUsername String?
   createdAt      DateTime @default(now())
 
-  ownedWorkspaces  Workspace[]       @relation("WorkspaceOwner")
-  workspaceMembers WorkspaceMember[]
-  invitesSent      Invite[]          @relation("InviteSender")
-  projectsCreated  Project[]         @relation("ProjectCreator")
-  projectMembers   ProjectMember[]
-  issuesAssigned   Issue[]           @relation("IssueAssignee")
-  issuesCreated    Issue[]           @relation("IssueCreator")
-  issueActivities  IssueActivity[]   @relation("ActivityActor")
-  comments         Comment[]         @relation("CommentAuthor")
-  cycleIssuesAdded CycleIssue[]      @relation("CycleIssueAddedBy")
-  adrsAuthored     Adr[]             @relation("AdrAuthor")
-  rfcsAuthored     Rfc[]             @relation("RfcAuthor")
-  rfcVotes         RfcVote[]
-  rfcComments      RfcComment[]      @relation("RfcCommentAuthor")
-  events           Event[]           @relation("EventActor")
-  notifications    Notification[]    @relation("UserNotifications")
-  notificationsActed Notification[]  @relation("NotificationActor")
-  projectShares    ProjectShare[]
+  ownedWorkspaces    Workspace[]       @relation("WorkspaceOwner")
+  workspaceMembers   WorkspaceMember[]
+  invitesSent        Invite[]          @relation("InviteSender")
+  projectsCreated    Project[]         @relation("ProjectCreator")
+  projectMembers     ProjectMember[]
+  issuesAssigned     Issue[]           @relation("IssueAssignee")
+  issuesCreated      Issue[]           @relation("IssueCreator")
+  issueActivities    IssueActivity[]   @relation("ActivityActor")
+  comments           Comment[]         @relation("CommentAuthor")
+  cycleIssuesAdded   CycleIssue[]      @relation("CycleIssueAddedBy")
+  adrsAuthored       Adr[]             @relation("AdrAuthor")
+  rfcsAuthored       Rfc[]             @relation("RfcAuthor")
+  rfcVotes           RfcVote[]
+  rfcComments        RfcComment[]      @relation("RfcCommentAuthor")
+  events             Event[]           @relation("EventActor")
+  notifications      Notification[]    @relation("UserNotifications")
+  notificationsActed Notification[]    @relation("NotificationActor")
+  projectShares      ProjectShare[]
 
   @@map("users")
 }
@@ -149,19 +187,21 @@ model Invite {
 }
 
 model Project {
-  id              String        @id @default(cuid())
-  workspaceId     String
-  name            String
-  slug            String
-  description     String?
-  status          ProjectStatus @default(ACTIVE)
-  isHackathonMode Boolean       @default(false)
-  deadline        DateTime?
-  githubRepoId    String?
-  nextIssueSequence Int         @default(1)
-  createdBy       String
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  id                   String        @id @default(cuid())
+  workspaceId          String
+  name                 String
+  slug                 String
+  description          String?
+  status               ProjectStatus @default(ACTIVE)
+  isHackathonMode      Boolean       @default(false)
+  deadline             DateTime?
+  githubRepoId         String?
+  githubRepositoryId   String?
+  githubMergedStatusId String?
+  nextIssueSequence    Int           @default(1)
+  createdBy            String
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   creator   User      @relation("ProjectCreator", fields: [createdBy], references: [id])
@@ -234,13 +274,14 @@ model Issue {
   assignee User?       @relation("IssueAssignee", fields: [assigneeId], references: [id])
   creator  User        @relation("IssueCreator", fields: [creatorId], references: [id])
 
-  labels       IssueLabelMap[]
-  relations    IssueRelation[] @relation("IssueRelations")
-  relatedTo    IssueRelation[] @relation("RelatedIssues")
-  activities   IssueActivity[]
-  comments     Comment[]
-  moduleIssues ModuleIssue[]
-  cycleIssues  CycleIssue[]
+  labels           IssueLabelMap[]
+  relations        IssueRelation[]    @relation("IssueRelations")
+  relatedTo        IssueRelation[]    @relation("RelatedIssues")
+  activities       IssueActivity[]
+  comments         Comment[]
+  moduleIssues     ModuleIssue[]
+  cycleIssues      CycleIssue[]
+  PullRequestIssue PullRequestIssue[]
 
   @@unique([projectId, sequenceId])
   @@index([projectId, statusId, position])
@@ -471,12 +512,12 @@ model Event {
 }
 
 model ProjectShare {
-  id         String    @id @default(cuid())
-  token      String    @unique
-  projectId  String
-  createdBy  String
-  expiresAt  DateTime?
-  createdAt  DateTime  @default(now())
+  id        String    @id @default(cuid())
+  token     String    @unique
+  projectId String
+  createdBy String
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   creator User    @relation(fields: [createdBy], references: [id])
@@ -486,21 +527,142 @@ model ProjectShare {
 }
 
 model Notification {
-  id        String           @id @default(cuid())
-  userId    String
-  actorId   String?
-  type      NotificationType
-  
-  title     String
-  body      String
-  
+  id      String           @id @default(cuid())
+  userId  String
+  actorId String?
+  type    NotificationType
+
+  title String
+  body  String
+
   metadata  Json
   readAt    DateTime?
-  createdAt DateTime         @default(now())
+  createdAt DateTime  @default(now())
 
   user  User  @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
   actor User? @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
 
   @@index([userId, createdAt])
   @@map("notifications")
+}
+
+model GithubWebhookEvent {
+  id          String    @id @default(cuid())
+  deliveryId  String    @unique
+  event       String
+  payload     Json
+  receivedAt  DateTime  @default(now())
+  processedAt DateTime?
+  error       String?
+  retryCount  Int       @default(0)
+
+  @@index([event, receivedAt])
+  @@map("github_webhook_events")
+}
+
+model GithubInstallation {
+  id             String @id @default(cuid())
+  installationId String @unique
+  accountName    String
+  accountType    String
+  ownerId        String
+
+  repositories GithubRepository[]
+
+  @@map("github_installations")
+}
+
+model GithubRepository {
+  id             String  @id @default(cuid())
+  installationId String
+  githubRepoId   String  @unique
+  ownerId        String
+  owner          String
+  name           String
+  fullName       String
+  description    String?
+  language       String?
+  defaultBranch  String?
+  visibility     String?
+  fork           Boolean @default(false)
+  archived       Boolean @default(false)
+  icon           String?
+
+  lastCommitSha     String?
+  lastCommitMessage String?
+  lastCommitAuthor  String?
+  lastCommitAt      DateTime?
+
+  updatedAt DateTime @updatedAt
+
+  installation GithubInstallation  @relation(fields: [installationId], references: [id], onDelete: Cascade)
+  pullRequests PullRequest[]
+  syncJobs     RepositorySyncJob[]
+
+  @@map("github_repositories")
+}
+
+model RepositorySyncJob {
+  id           String        @id @default(cuid())
+  repositoryId String
+  type         SyncJobType
+  status       SyncJobStatus
+  startedAt    DateTime      @default(now())
+  finishedAt   DateTime?
+  error        String?
+  stats        Json?
+
+  repository GithubRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+
+  @@index([repositoryId, startedAt])
+  @@map("repository_sync_jobs")
+}
+
+model PullRequest {
+  id                String                @id @default(cuid())
+  githubId          String                @unique
+  number            Int
+  repositoryId      String
+  branch            String?
+  baseBranch        String?
+  headBranch        String?
+  headSha           String?
+  baseSha           String?
+  title             String
+  body              String?
+  url               String
+  state             PullRequestState
+  authorGithubId    String
+  authorGithubLogin String?
+  authorAvatarUrl   String?
+  merged            Boolean               @default(false)
+  mergedAt          DateTime?
+  mergedBy          String?
+  draft             Boolean               @default(false)
+  reviewDecision    GithubReviewDecision?
+  commitCount       Int                   @default(0)
+  changedFiles      Int                   @default(0)
+  additions         Int                   @default(0)
+  deletions         Int                   @default(0)
+  ciState           GithubCheckState?
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+
+  repository GithubRepository   @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  issues     PullRequestIssue[]
+
+  @@index([repositoryId])
+  @@map("pull_requests")
+}
+
+model PullRequestIssue {
+  pullRequestId String
+  issueId       String
+  linkedBy      LinkType @default(AUTO)
+
+  pullRequest PullRequest @relation(fields: [pullRequestId], references: [id], onDelete: Cascade)
+  issue       Issue       @relation(fields: [issueId], references: [id], onDelete: Cascade)
+
+  @@id([pullRequestId, issueId])
+  @@map("pull_request_issues")
 }

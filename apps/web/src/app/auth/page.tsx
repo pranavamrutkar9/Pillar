@@ -15,15 +15,8 @@ export default async function AuthPage() {
   return (
     <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-black font-sans relative">
       <div className="p-8 absolute top-0 left-0">
-        <Link href="/">
-          <Image
-            className="dark:invert hover:opacity-80 transition-opacity"
-            src="/next.svg"
-            alt="Pillar Logo"
-            width={100}
-            height={20}
-            priority
-          />
+        <Link href="/" className="flex items-center gap-2">
+          <span className="text-xl font-bold tracking-tighter text-black dark:text-white">Pillar</span>
         </Link>
       </div>
       <main className="flex flex-1 flex-col items-center justify-center p-8">
