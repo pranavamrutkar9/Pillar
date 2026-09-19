@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../../../../lib/auth";
 import ClientIssuesPage from "../../../../../components/ClientIssuesPage";
+import CycleAnalytics from "../../../../../components/CycleAnalytics";
 import { ProjectStoreProvider } from "../../../../../components/ProjectStore";
 import Link from "next/link";
 import { format } from "date-fns";
@@ -62,6 +63,9 @@ export default async function CycleDetailPage(props: { params: Promise<{ project
           )}
         </div>
       </div>
+
+      <CycleAnalytics summary={analytics?.summary} burndown={analytics?.burndown} />
+
 
       <div>
         <ProjectStoreProvider project={project} initialIssues={cycle.issues || []} currentUser={session?.user} isViewer={isViewer}>

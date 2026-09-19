@@ -5,12 +5,11 @@ export const cycleAnalyticsService = {
   async getCycleSummary(cycleId: string, projectId: string) {
     const cycle = await cycleService.getCycleById(cycleId, projectId);
 
-    // Initial scope and scope changes based on events
     const events = await prisma.event.findMany({
       where: {
         projectId,
         eventType: {
-          in: ['issue.added_to_cycle', 'issue.removed_from_cycle', 'issue.carried_forward']
+          in: ['issue.added_to_cycle', 'issue.removed_from_cycle', 'issue.updated', 'issue.moved']
         }
       },
       orderBy: { createdAt: 'asc' }
@@ -19,32 +18,49 @@ export const cycleAnalyticsService = {
     let initialScopePoints = 0;
     let addedScopePoints = 0;
     let removedScopePoints = 0;
-    let carriedForwardPoints = 0;
 
-    // A Set to track issues currently in scope for this cycle during playback
+    // Track the estimate of each issue while it is in the cycle
     const currentScope = new Map<string, number>();
 
     events.forEach(event => {
       const payload: any = event.payload;
-      if (payload.cycleId === cycleId) {
-        const estimate = payload.estimate || 0; // fallback to 0
-
-        if (event.eventType === 'issue.added_to_cycle') {
-          // If added before cycle started, it's initial scope. Otherwise added scope.
-          if (cycle.startsAt && event.createdAt < cycle.startsAt) {
-            initialScopePoints += estimate;
+      const issueId = payload.issueId;
+      
+      if (event.eventType === 'issue.added_to_cycle' && payload.cycleId === cycleId) {
+        const estimate = payload.estimate || 0;
+        currentScope.set(issueId, estimate);
+        
+        if (cycle.startsAt && event.createdAt < cycle.startsAt) {
+          initialScopePoints += estimate;
+        } else if (cycle.startsAt && event.createdAt >= cycle.startsAt) {
+          addedScopePoints += estimate;
+        }
+      } 
+      else if (event.eventType === 'issue.removed_from_cycle' && payload.cycleId === cycleId) {
+        const estimate = payload.estimate || 0;
+        if (currentScope.has(issueId)) {
+          if (cycle.startsAt && event.createdAt >= cycle.startsAt) {
+            removedScopePoints += estimate;
           } else {
-            addedScopePoints += estimate;
+            // It was added and removed before cycle started, so it's not initial scope anymore
+            initialScopePoints -= estimate;
           }
-          currentScope.set(payload.issueId, estimate);
-        } else if (event.eventType === 'issue.removed_from_cycle') {
-          removedScopePoints += estimate;
-          currentScope.delete(payload.issueId);
-        } else if (event.eventType === 'issue.carried_forward') {
-          // Here payload.cycleId might be the new cycle (added) or old cycle (removed) depending on how carry forward emitted it.
-          // Let's assume `issue.carried_forward` event payload has { oldCycleId, newCycleId, estimate }
-          // Actually, our cycleWorker will emit `issue.carried_forward` which might just be a notification.
-          // We also emit `added` and `removed` via the standard updateIssue inside cycleWorker.
+          currentScope.delete(issueId);
+        }
+      }
+      else if (event.eventType === 'issue.updated' && currentScope.has(issueId)) {
+        if (payload.changes?.estimate !== undefined) {
+          const oldEstimate = currentScope.get(issueId) || 0;
+          const newEstimate = payload.changes.estimate || 0;
+          const diff = newEstimate - oldEstimate;
+          
+          if (cycle.startsAt && event.createdAt >= cycle.startsAt) {
+            if (diff > 0) addedScopePoints += diff;
+            if (diff < 0) removedScopePoints += Math.abs(diff);
+          } else {
+            initialScopePoints += diff;
+          }
+          currentScope.set(issueId, newEstimate);
         }
       }
     });
@@ -57,7 +73,6 @@ export const cycleAnalyticsService = {
     if (finalScopePoints > 0) {
       completionRate = Math.round((velocity / finalScopePoints) * 100);
     } else {
-      // Fallback to issue count if no estimates are used anywhere
       const totalIssues = cycle.issues.length;
       if (totalIssues > 0) {
         completionRate = Math.round((completedIssues.length / totalIssues) * 100);
@@ -76,26 +91,125 @@ export const cycleAnalyticsService = {
 
   async getCycleBurndown(cycleId: string, projectId: string) {
     const cycle = await cycleService.getCycleById(cycleId, projectId);
-    
-    // Simplistic burndown: remaining estimate over time
-    // In a real app we'd construct a daily snapshot array from `cycle.startsAt` to `cycle.endsAt`
-    // using event history of issues entering, leaving, and being marked done.
-    
-    // For Week 9, we'll construct a mock-like or simplified daily progression:
-    const days = [];
-    const start = new Date(cycle.startsAt).getTime();
-    const end = new Date(cycle.endsAt).getTime();
+    if (!cycle.startsAt || !cycle.endsAt) return [];
+
+    const events = await prisma.event.findMany({
+      where: {
+        projectId,
+        eventType: {
+          in: ['issue.added_to_cycle', 'issue.removed_from_cycle', 'issue.updated', 'issue.moved']
+        }
+      },
+      orderBy: { createdAt: 'asc' }
+    });
+
+    // We need to know which statuses are 'done'
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
+      include: { issueStatuses: true }
+    });
+    const doneStatusIds = new Set(project?.issueStatuses.filter(s => s.isDone).map(s => s.id));
+
+    // Day by day simulation
+    const days: any[] = [];
+    const startMs = new Date(cycle.startsAt).getTime();
+    const endMs = new Date(cycle.endsAt).getTime();
     const dayMs = 1000 * 60 * 60 * 24;
+    const totalDays = Math.ceil((endMs - startMs) / dayMs);
 
-    const totalDays = Math.ceil((end - start) / dayMs);
-    let remaining = cycle.issues.reduce((acc, iss) => acc + (iss.estimate || 0), 0); // Starting point proxy
+    // Playback state
+    let remaining = 0; // Total points not done
+    const issueState = new Map<string, { estimate: number, isDone: boolean, inCycle: boolean }>();
+    
+    // 1. Process all events before cycle start to build initial state
+    let eventIdx = 0;
+    while (eventIdx < events.length && events[eventIdx].createdAt.getTime() < startMs) {
+      const event = events[eventIdx];
+      const payload: any = event.payload;
+      const issueId = payload.issueId;
 
-    for (let i = 0; i <= totalDays; i++) {
+      if (!issueState.has(issueId)) {
+        issueState.set(issueId, { estimate: 0, isDone: false, inCycle: false });
+      }
+      const state = issueState.get(issueId)!;
+
+      if (event.eventType === 'issue.added_to_cycle' && payload.cycleId === cycleId) {
+        state.inCycle = true;
+        state.estimate = payload.estimate || 0;
+      } else if (event.eventType === 'issue.removed_from_cycle' && payload.cycleId === cycleId) {
+        state.inCycle = false;
+      } else if (event.eventType === 'issue.updated' && payload.changes) {
+        if (payload.changes.estimate !== undefined) state.estimate = payload.changes.estimate || 0;
+        if (payload.changes.statusId !== undefined) state.isDone = doneStatusIds.has(payload.changes.statusId);
+      } else if (event.eventType === 'issue.moved' && payload.changes) {
+        if (payload.changes.statusId !== undefined) state.isDone = doneStatusIds.has(payload.changes.statusId);
+      }
+      eventIdx++;
+    }
+
+    // Calculate initial remaining
+    for (const [id, state] of issueState.entries()) {
+      if (state.inCycle && !state.isDone) {
+        remaining += state.estimate;
+      }
+    }
+
+    // 2. Process day by day
+    for (let day = 0; day <= totalDays; day++) {
+      const dayEndMs = startMs + (day * dayMs);
+      
+      // Process events that happened on this day
+      while (eventIdx < events.length && events[eventIdx].createdAt.getTime() <= dayEndMs) {
+        const event = events[eventIdx];
+        const payload: any = event.payload;
+        const issueId = payload.issueId;
+
+        if (!issueState.has(issueId)) {
+          issueState.set(issueId, { estimate: 0, isDone: false, inCycle: false });
+        }
+        const state = issueState.get(issueId)!;
+        const wasInScopeAndNotDone = state.inCycle && !state.isDone;
+        const oldEstimate = state.estimate;
+
+        if (event.eventType === 'issue.added_to_cycle' && payload.cycleId === cycleId) {
+          state.inCycle = true;
+          state.estimate = payload.estimate || 0;
+        } else if (event.eventType === 'issue.removed_from_cycle' && payload.cycleId === cycleId) {
+          state.inCycle = false;
+        } else if (event.eventType === 'issue.updated' && payload.changes) {
+          if (payload.changes.estimate !== undefined) state.estimate = payload.changes.estimate || 0;
+          if (payload.changes.statusId !== undefined) state.isDone = doneStatusIds.has(payload.changes.statusId);
+        } else if (event.eventType === 'issue.moved' && payload.changes) {
+          if (payload.changes.statusId !== undefined) state.isDone = doneStatusIds.has(payload.changes.statusId);
+        }
+
+        const isInScopeAndNotDone = state.inCycle && !state.isDone;
+        
+        // Adjust remaining
+        if (wasInScopeAndNotDone && !isInScopeAndNotDone) {
+          remaining -= oldEstimate;
+        } else if (!wasInScopeAndNotDone && isInScopeAndNotDone) {
+          remaining += state.estimate;
+        } else if (wasInScopeAndNotDone && isInScopeAndNotDone) {
+          remaining += (state.estimate - oldEstimate);
+        }
+
+        eventIdx++;
+      }
+
+      // Record end of day snapshot
       days.push({
-        day: i + 1,
-        remaining,
-        ideal: Math.max(0, remaining - (remaining / totalDays) * i)
+        day: day + 1, // 1-indexed for display
+        remaining: Math.max(0, remaining),
+        ideal: 0 // Will calculate below
       });
+    }
+
+    // 3. Set ideal burndown line
+    // Ideal starts at the first day's remaining, and linearly goes to 0 by the last day
+    const startRemaining = days[0]?.remaining || 0;
+    for (let i = 0; i <= totalDays; i++) {
+      days[i].ideal = Math.max(0, startRemaining - (startRemaining / totalDays) * i);
     }
 
     return days;
