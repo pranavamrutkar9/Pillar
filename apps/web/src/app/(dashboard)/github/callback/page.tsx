@@ -25,7 +25,7 @@ function GithubCallbackContent() {
     const fetchProjects = async () => {
       try {
         const workspacesRes = await fetch(`${API_URL}/workspaces`, {
-          headers: { Authorization: `Bearer ${session.user.token}` }
+          headers: { Authorization: `Bearer ${(session?.user as any)?.token}` }
         });
         const workspaces = await workspacesRes.json();
         
