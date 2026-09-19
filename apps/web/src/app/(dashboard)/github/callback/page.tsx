@@ -32,7 +32,7 @@ function GithubCallbackContent() {
         let allProjects: any[] = [];
         for (const ws of workspaces) {
           const prjRes = await fetch(`${API_URL}/workspaces/${ws.id}/projects`, {
-            headers: { Authorization: `Bearer ${session.user.token}` }
+            headers: { Authorization: `Bearer ${(session?.user as any)?.token}` }
           });
           const prjs = await prjRes.json();
           allProjects = [...allProjects, ...prjs.map((p: any) => ({ ...p, workspaceName: ws.name }))];
