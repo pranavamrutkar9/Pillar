@@ -8,17 +8,8 @@ export const activityWorker = new Worker('pillar-activity', async (job) => {
 
   console.log(`[ActivityWorker] Processing ${eventType}`)
 
-  const { workspaceId, projectId, actorId, ...rest } = payload
-
-  await prisma.event.create({
-    data: {
-      eventType,
-      workspaceId,
-      projectId,
-      actorId,
-      payload: rest
-    }
-  })
+  // TODO: In the future, this worker can be used to generate specific Audit Log records
+  // or aggregate notifications. The raw Event is already persisted synchronously by event.service.ts.
 }, { connection: redis as any })
 
 activityWorker.on('error', (err: any) => {

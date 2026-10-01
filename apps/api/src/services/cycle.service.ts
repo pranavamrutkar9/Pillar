@@ -84,7 +84,7 @@ export const cycleService = {
   },
 
   async startCycle(cycleId: string, projectId: string, actorId: string) {
-    return prisma.$transaction(async (tx) => {
+    const startedCycle = await prisma.$transaction(async (tx) => {
       const cycle = await tx.cycle.findUnique({ where: { id: cycleId } });
       if (!cycle || cycle.projectId !== projectId) throw new Error("Cycle not found");
 
@@ -101,16 +101,14 @@ export const cycleService = {
         throw new Error("Another cycle is already ACTIVE for this project");
       }
 
-      const startedCycle = await tx.cycle.update({
+      return tx.cycle.update({
         where: { id: cycleId },
         data: { status: "ACTIVE" }
       });
-
-      // Emit outside transaction in real app, but for simplicity we do it here or let caller do it
-      await eventService.emit('cycle.started', { cycle: startedCycle }, { projectId, actorId });
-
-      return startedCycle;
     });
+
+    await eventService.emit('cycle.started', { cycle: startedCycle }, { projectId, actorId });
+    return startedCycle;
   },
 
   async completeCycle(cycleId: string, projectId: string, actorId: string) {
@@ -127,10 +125,36 @@ export const cycleService = {
         data: { status: "COMPLETED" }
       });
 
+      // Carry-forward logic: Move unfinished issues to the next active/planned cycle
+      const unfinishedIssues = await tx.issue.findMany({
+        where: {
+          cycleId,
+          status: { isDone: false }
+        }
+      });
+
+      if (unfinishedIssues.length > 0) {
+        const nextCycle = await tx.cycle.findFirst({
+          where: {
+            projectId,
+            status: { in: ["ACTIVE", "PLANNED"] }
+          },
+          orderBy: { startsAt: 'asc' }
+        });
+
+        await tx.issue.updateMany({
+          where: {
+            id: { in: unfinishedIssues.map(i => i.id) }
+          },
+          data: {
+            cycleId: nextCycle ? nextCycle.id : null
+          }
+        });
+      }
+
       return completedCycle;
     });
 
-    // The cycleWorker listens to this event to perform carry-forward
     await eventService.emit('cycle.completed', { cycleId, projectId }, { projectId, actorId });
     return cycle;
   }
