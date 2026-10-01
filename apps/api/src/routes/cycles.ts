@@ -6,6 +6,22 @@ import { cycleAnalyticsService } from '../services/cycleAnalytics.service.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
 import { successResponse } from '../lib/apiResponse.js';
 
+import { z } from 'zod';
+
+const createCycleSchema = z.object({
+  name: z.string().min(1),
+  description: z.string().optional(),
+  startsAt: z.string().datetime(),
+  endsAt: z.string().datetime()
+});
+
+const updateCycleSchema = z.object({
+  name: z.string().min(1).optional(),
+  description: z.string().optional(),
+  startsAt: z.string().datetime().optional(),
+  endsAt: z.string().datetime().optional()
+});
+
 const router = Router({ mergeParams: true });
 
 router.get('/', requireAuth, requireProjectMember, asyncHandler(async (req, res) => {
@@ -17,11 +33,14 @@ router.get('/', requireAuth, requireProjectMember, asyncHandler(async (req, res)
 router.post('/', requireAuth, requireProjectMember, asyncHandler(async (req, res) => {
   const projectId = req.params.projectId as string;
   const actorId = req.user!.id;
+  
+  const parsed = createCycleSchema.parse(req.body);
   const data = {
-    ...req.body,
-    startsAt: new Date(req.body.startsAt),
-    endsAt: new Date(req.body.endsAt)
+    ...parsed,
+    startsAt: new Date(parsed.startsAt),
+    endsAt: new Date(parsed.endsAt)
   };
+
   const cycle = await cycleService.createCycle(projectId, actorId, data);
   return successResponse(res, cycle, 201);
 }));
@@ -35,7 +54,9 @@ router.get('/:cycleId', requireAuth, requireProjectMember, asyncHandler(async (r
 router.patch('/:cycleId', requireAuth, requireProjectMember, asyncHandler(async (req, res) => {
   const { projectId, cycleId } = req.params;
   const actorId = req.user!.id;
-  const data = { ...req.body };
+  
+  const parsed = updateCycleSchema.parse(req.body);
+  const data: any = { ...parsed };
   if (data.startsAt) data.startsAt = new Date(data.startsAt);
   if (data.endsAt) data.endsAt = new Date(data.endsAt);
   
