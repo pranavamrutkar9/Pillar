@@ -1,81 +1,51 @@
 <div align="center">
-  <img src="./apps/web/public/next.svg" alt="Pillar Logo" width="200" style="filter: invert(1);"/>
+  <img src="https://via.placeholder.com/150x150/09090b/ffffff?text=Pillar" alt="Pillar Logo" width="120" />
   <h1>Pillar</h1>
-  <p><strong>The memory layer for modern engineering teams.</strong></p>
-  <p>
-    Pillar is an open-source, blazing fast issue tracker designed to keep you in flow. Plan cycles, write technical specs, and ship faster without the clutter.
-  </p>
+  <p><b>The Memory Layer for Engineering Teams</b></p>
+  <p>Pillar is where your engineering decisions live. Every issue, pull request, and architectural decision is connected to the reasoning behind it.</p>
 </div>
 
----
+<br />
 
-## 📸 Screenshots
+## Why Pillar?
 
-*(Add screenshots here)*
-- **Dashboard:** `![Dashboard](./docs/dashboard.png)`
-- **Issue Board:** `![Board](./docs/board.png)`
-- **Command Palette:** `![Search](./docs/search.png)`
+Most tools track *what* was built and *who* built it. **Pillar tracks *why***—and makes that reasoning searchable, actionable, and intelligent. 
 
-## ✨ Features
+Engineering teams lose context constantly. A new developer joins and has no idea why the codebase is structured the way it is. A decision made six months ago gets reversed because nobody remembers the reasoning. Pillar solves this by acting as the unified layer between your planning, building, and execution.
 
-- **Keyboard-First Design:** Move fast without reaching for the mouse.
-- **Optimistic UI:** Instant UI updates that feel magical.
-- **Hackathon Mode:** Strip away the noise when you just need to ship.
-- **Global Search:** Find any issue, project, or comment instantly.
-- **Viewer Links:** Share read-only views with stakeholders effortlessly.
-- **Real-Time Sync:** WebSockets keep your whole team on the exact same page.
+## Core Features
 
-## 🏗️ Architecture
+- 🧠 **Architecture Decision Records (ADRs)**: A robust platform to propose, accept, and supersede technical decisions. Maintains a bidirectional history of all structural choices.
+- 💬 **Request for Comments (RFCs)**: Premium hero screens for technical proposals. Features sticky voting, section-based discussion threads, and strict lifecycle states.
+- ⚡ **1-Click Issue Spawner**: Stop duplicating work. Seamlessly convert accepted RFC implementation tasks directly into actionable project tickets with built-in idempotency.
+- 🔄 **Cycles & Modules**: Time-boxed work periods with automatic carry-forward for unfinished issues, paired with feature-based progress tracking.
+- 🛠️ **Real-Time Issues Engine**: Full kanban boards with optimistic drag-and-drop updates, rich-text markdown editors, and customizable project statuses.
+- ⏱️ **Hackathon & Crunch Mode**: Toggle strict project deadlines with live countdown timers, automatic critical-issue filtering, and read-only viewer links for presentations.
+- 🐙 **GitHub Integration**: Bi-directional syncing. Issues automatically update their statuses when linked Pull Requests are opened, merged, or closed.
 
-Pillar uses a decoupled monorepo architecture:
-1. **API Server (Express):** Handles business logic, database connections, and WebSocket broadcasting.
-2. **Web Client (Next.js):** App Router based frontend using Server Components and Client Components appropriately.
-3. **Worker (BullMQ):** Background jobs for webhooks, email notifications, and heavy data processing.
+## Tech Stack
 
-## 📁 Folder Structure
+Pillar is built for scale, speed, and clean separation of concerns.
 
-```text
-Pillar/
-├── apps/
-│   ├── api/                # Express backend + Socket.io + Workers
-│   │   ├── src/
-│   │   │   ├── routes/     # Express route handlers
-│   │   │   ├── services/   # Core business logic
-│   │   │   ├── db/         # Prisma client
-│   │   │   └── workers/    # BullMQ job processors
-│   └── web/                # Next.js frontend
-│       ├── src/
-│       │   ├── app/        # App Router pages (Server Components)
-│       │   └── components/ # Reusable React UI (Client Components)
-├── packages/               # Shared logic (if extracted later)
-├── e2e/                    # Playwright tests
-├── prisma/                 # Database schema and migrations
-└── railway.json            # Deployment config
-```
+- **Frontend**: Next.js 14 (App Router), React, Tailwind CSS, Zustand, React Query
+- **Backend**: Node.js, Express, TypeScript, Socket.io (Realtime)
+- **Database**: PostgreSQL (Neon), Prisma ORM
+- **Queue & Background Jobs**: BullMQ + Redis
+- **Architecture**: Strictly Event-Driven (Every action emits to an internal event bus for AI consumption and background processing).
 
-## 🛠️ Tech Stack
-
-- **Frontend:** Next.js 14, React, Tailwind CSS, TipTap (Rich Text)
-- **Backend:** Express, Node.js, Socket.io
-- **Database:** PostgreSQL, Prisma ORM
-- **Queue/Cache:** Redis, BullMQ
-- **Authentication:** NextAuth.js (GitHub OAuth + Credentials)
-- **Deployment:** Railway / Vercel
-
-## 🚀 Local Setup
+## Getting Started
 
 ### Prerequisites
-- Node.js (v18+)
-- pnpm (v8+)
-- PostgreSQL database
-- Redis server
+- Node.js (v20+)
+- pnpm
+- Docker Desktop (for local Postgres & Redis)
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/pranavamrutkar9/Pillar.git
-   cd Pillar
+   git clone https://github.com/yourusername/pillar.git
+   cd pillar
    ```
 
 2. **Install dependencies**
@@ -83,56 +53,29 @@ Pillar/
    pnpm install
    ```
 
-3. **Configure Environment Variables**
-   Copy the example config and fill in your details:
+3. **Start local infrastructure**
    ```bash
-   cp .env.example .env
-   ```
-   *(Be sure to update `DATABASE_URL` and `REDIS_URL`)*
-
-4. **Initialize Database**
-   ```bash
-   npx prisma migrate dev
+   docker-compose up -d
    ```
 
-5. **Start Development Servers**
+4. **Environment Configuration**
+   Copy the example environment files and fill in your keys (GitHub OAuth, Neon Database URL, etc.)
    ```bash
-   pnpm run dev
+   cp apps/api/.env.example apps/api/.env
+   cp apps/web/.env.example apps/web/.env.local
    ```
-   - Frontend runs on `http://localhost:3000`
-   - API runs on `http://localhost:4000`
 
-## ⚙️ Environment Variables
+5. **Database Setup**
+   ```bash
+   pnpm db:migrate
+   ```
 
-See `.env.example` for a complete list. Key variables include:
-- `DATABASE_URL`: Postgres connection string
-- `REDIS_URL`: Redis connection string
-- `NEXTAUTH_SECRET`: Secret for NextAuth session encryption
-- `GITHUB_CLIENT_ID` / `SECRET`: For OAuth login
-- `API_URL` & `FRONTEND_URL`: For CORS and API requests
+6. **Run the development servers**
+   ```bash
+   pnpm dev
+   ```
+   *The frontend will start on `localhost:3000` and the API will start on `localhost:4000`.*
 
-## 🚢 Deployment
+## License
 
-Pillar is designed to be easily deployed to PaaS providers like Railway.
-
-1. **Railway:** Connect your GitHub repo.
-2. Railway will read the `railway.json` file.
-3. Provision **PostgreSQL** and **Redis** plugins in your Railway project.
-4. Add all environment variables to the service.
-5. Deploy!
-
-## 🗺️ Roadmap
-
-- [x] Workspaces & Projects
-- [x] Kanban Boards
-- [x] Real-time Updates (Socket.io)
-- [x] Hackathon Mode
-- [x] Viewer Links
-- [ ] Built-in ADRs (Architecture Decision Records)
-- [ ] Built-in RFCs (Request for Comments)
-- [ ] Slack Integration
-- [ ] Webhooks API
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Pillar is proprietary software. All rights reserved.
