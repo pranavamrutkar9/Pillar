@@ -48,6 +48,12 @@ import modulesRouter from './routes/modules.js'
 app.use('/api/projects/:projectId/cycles', cyclesRouter)
 app.use('/api/projects/:projectId/modules', modulesRouter)
 
+import adrsRouter from './routes/adrs.js'
+import rfcsRouter from './routes/rfcs.js'
+
+app.use('/api/projects/:projectId/adrs', adrsRouter)
+app.use('/api/projects/:projectId/rfcs', rfcsRouter)
+
 app.use(errorHandler)
 
 import { createServer } from 'http'
