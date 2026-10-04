@@ -47,6 +47,12 @@ export default async function ProjectLayout(props: { params: Promise<{ projectId
             <Link href={`/projects/${projectId}/modules`} className="pb-3 text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 border-b-2 border-transparent hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
               Modules
             </Link>
+            <Link href={`/projects/${projectId}/adrs`} className="pb-3 text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 border-b-2 border-transparent hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
+              ADRs
+            </Link>
+            <Link href={`/projects/${projectId}/rfcs`} className="pb-3 text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 border-b-2 border-transparent hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
+              RFCs
+            </Link>
             {!isViewer && (
               <Link href={`/projects/${projectId}/settings`} className="pb-3 text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 border-b-2 border-transparent hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
                 Settings

@@ -60,6 +60,18 @@ enum RfcStatus {
   IMPLEMENTED
 }
 
+enum RfcVoteType {
+  APPROVE
+  REQUEST_CHANGES
+  ABSTAIN
+}
+
+enum RfcTaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
 enum NotificationType {
   ISSUE_ASSIGNED
   COMMENT_MENTION
@@ -114,22 +126,22 @@ model User {
   githubUsername String?
   createdAt      DateTime @default(now())
 
-  ownedWorkspaces    Workspace[]       @relation("WorkspaceOwner")
+  ownedWorkspaces    Workspace[]         @relation("WorkspaceOwner")
   workspaceMembers   WorkspaceMember[]
-  invitesSent        Invite[]          @relation("InviteSender")
-  projectsCreated    Project[]         @relation("ProjectCreator")
+  invitesSent        Invite[]            @relation("InviteSender")
+  projectsCreated    Project[]           @relation("ProjectCreator")
   projectMembers     ProjectMember[]
-  issuesAssigned     Issue[]           @relation("IssueAssignee")
-  issuesCreated      Issue[]           @relation("IssueCreator")
-  issueActivities    IssueActivity[]   @relation("ActivityActor")
-  comments           Comment[]         @relation("CommentAuthor")
-  adrsAuthored       Adr[]             @relation("AdrAuthor")
-  rfcsAuthored       Rfc[]             @relation("RfcAuthor")
+  issuesAssigned     Issue[]             @relation("IssueAssignee")
+  issuesCreated      Issue[]             @relation("IssueCreator")
+  issueActivities    IssueActivity[]     @relation("ActivityActor")
+  comments           Comment[]           @relation("CommentAuthor")
+  adrsAuthored       Adr[]               @relation("AdrAuthor")
+  rfcsAuthored       Rfc[]               @relation("RfcAuthor")
   rfcVotes           RfcVote[]
-  rfcComments        RfcComment[]      @relation("RfcCommentAuthor")
-  events             Event[]           @relation("EventActor")
-  notifications      Notification[]    @relation("UserNotifications")
-  notificationsActed Notification[]    @relation("NotificationActor")
+  rfcSectionComments RfcSectionComment[] @relation("RfcSectionCommentAuthor")
+  events             Event[]             @relation("EventActor")
+  notifications      Notification[]      @relation("UserNotifications")
+  notificationsActed Notification[]      @relation("NotificationActor")
   projectShares      ProjectShare[]
 
   @@map("users")
@@ -269,8 +281,8 @@ model Issue {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  cycleId     String?
-  moduleId    String?
+  cycleId  String?
+  moduleId String?
 
   project  Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
   status   IssueStatus @relation(fields: [statusId], references: [id])
@@ -279,12 +291,14 @@ model Issue {
   cycle    Cycle?      @relation(fields: [cycleId], references: [id], onDelete: SetNull)
   module   Module?     @relation(fields: [moduleId], references: [id], onDelete: SetNull)
 
-  labels           IssueLabelMap[]
-  relations        IssueRelation[]    @relation("IssueRelations")
-  relatedTo        IssueRelation[]    @relation("RelatedIssues")
-  activities       IssueActivity[]
-  comments         Comment[]
-  PullRequestIssue PullRequestIssue[]
+  labels                IssueLabelMap[]
+  relations             IssueRelation[]         @relation("IssueRelations")
+  relatedTo             IssueRelation[]         @relation("RelatedIssues")
+  activities            IssueActivity[]
+  comments              Comment[]
+  PullRequestIssue      PullRequestIssue[]
+  AdrIssue              AdrIssue[]
+  RfcImplementationTask RfcImplementationTask[]
 
   @@unique([projectId, sequenceId])
   @@index([projectId, statusId, position])
@@ -367,34 +381,36 @@ model Comment {
 }
 
 model Module {
-  id          String   @id @default(cuid())
+  id          String  @id @default(cuid())
   projectId   String
   name        String
   description String?
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  issues  Issue[]
+  project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  issues    Issue[]
+  AdrModule AdrModule[]
+  RfcModule RfcModule[]
 
   @@index([projectId])
   @@map("modules")
 }
 
 model Cycle {
-  id          String      @id @default(cuid())
+  id          String  @id @default(cuid())
   projectId   String
   name        String
   description String?
 
-  startsAt    DateTime
-  endsAt      DateTime
+  startsAt DateTime
+  endsAt   DateTime
 
-  status      CycleStatus @default(PLANNED)
+  status CycleStatus @default(PLANNED)
 
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   issues  Issue[]
@@ -423,35 +439,132 @@ model Adr {
   supersededBy Adr?    @relation("AdrSupersededBy", fields: [supersededById], references: [id], onDelete: SetNull)
   supersedes   Adr[]   @relation("AdrSupersededBy")
 
+  issues       AdrIssue[]
+  modules      AdrModule[]
+  pullRequests AdrPullRequest[]
+
   @@index([projectId])
   @@map("adrs")
 }
 
-model Rfc {
-  id         String    @id @default(cuid())
-  projectId  String
-  title      String
-  body       Json
-  status     RfcStatus @default(DRAFT)
-  authorId   String
-  voteCounts Json?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+model AdrIssue {
+  id        String   @id @default(cuid())
+  adrId     String
+  issueId   String
+  createdAt DateTime @default(now())
 
-  project  Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  author   User         @relation("RfcAuthor", fields: [authorId], references: [id])
+  adr   Adr   @relation(fields: [adrId], references: [id], onDelete: Cascade)
+  issue Issue @relation(fields: [issueId], references: [id], onDelete: Cascade)
+
+  @@unique([adrId, issueId])
+  @@map("adr_issues")
+}
+
+model AdrModule {
+  id        String   @id @default(cuid())
+  adrId     String
+  moduleId  String
+  createdAt DateTime @default(now())
+
+  adr    Adr    @relation(fields: [adrId], references: [id], onDelete: Cascade)
+  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([adrId, moduleId])
+  @@map("adr_modules")
+}
+
+model AdrPullRequest {
+  id            String   @id @default(cuid())
+  adrId         String
+  pullRequestId String
+  createdAt     DateTime @default(now())
+
+  adr         Adr         @relation(fields: [adrId], references: [id], onDelete: Cascade)
+  pullRequest PullRequest @relation(fields: [pullRequestId], references: [id], onDelete: Cascade)
+
+  @@unique([adrId, pullRequestId])
+  @@map("adr_pull_requests")
+}
+
+model Rfc {
+  id        String    @id @default(cuid())
+  projectId String
+  title     String
+  summary   String?
+  status    RfcStatus @default(DRAFT)
+  authorId  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  author  User    @relation("RfcAuthor", fields: [authorId], references: [id])
+
+  sections RfcSection[]
   votes    RfcVote[]
-  comments RfcComment[]
+  tasks    RfcImplementationTask[]
+  modules  RfcModule[]
 
   @@index([projectId])
   @@map("rfcs")
 }
 
+model RfcSection {
+  id        String   @id @default(cuid())
+  rfcId     String
+  title     String
+  content   String
+  position  Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  rfc      Rfc                 @relation(fields: [rfcId], references: [id], onDelete: Cascade)
+  comments RfcSectionComment[]
+
+  @@index([rfcId])
+  @@map("rfc_sections")
+}
+
+model RfcSectionComment {
+  id        String   @id @default(cuid())
+  sectionId String
+  authorId  String
+  content   String
+  parentId  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  section RfcSection          @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  author  User                @relation("RfcSectionCommentAuthor", fields: [authorId], references: [id])
+  parent  RfcSectionComment?  @relation("RfcCommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies RfcSectionComment[] @relation("RfcCommentReplies")
+
+  @@index([sectionId])
+  @@map("rfc_section_comments")
+}
+
+model RfcImplementationTask {
+  id               String        @id @default(cuid())
+  rfcId            String
+  description      String
+  status           RfcTaskStatus @default(PENDING)
+  generatedIssueId String?       @unique
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  rfc            Rfc    @relation(fields: [rfcId], references: [id], onDelete: Cascade)
+  generatedIssue Issue? @relation(fields: [generatedIssueId], references: [id], onDelete: SetNull)
+
+  @@index([rfcId])
+  @@map("rfc_implementation_tasks")
+}
+
 model RfcVote {
-  id     String @id @default(cuid())
-  rfcId  String
-  userId String
-  vote   String
+  id        String      @id @default(cuid())
+  rfcId     String
+  userId    String
+  vote      RfcVoteType
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 
   rfc  Rfc  @relation(fields: [rfcId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -460,19 +573,17 @@ model RfcVote {
   @@map("rfc_votes")
 }
 
-model RfcComment {
-  id         String   @id @default(cuid())
-  rfcId      String
-  sectionKey String
-  authorId   String
-  body       String
-  createdAt  DateTime @default(now())
+model RfcModule {
+  id        String   @id @default(cuid())
+  rfcId     String
+  moduleId  String
+  createdAt DateTime @default(now())
 
-  rfc    Rfc  @relation(fields: [rfcId], references: [id], onDelete: Cascade)
-  author User @relation("RfcCommentAuthor", fields: [authorId], references: [id])
+  rfc    Rfc    @relation(fields: [rfcId], references: [id], onDelete: Cascade)
+  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
 
-  @@index([rfcId])
-  @@map("rfc_comments")
+  @@unique([rfcId, moduleId])
+  @@map("rfc_modules")
 }
 
 model Event {
@@ -631,8 +742,9 @@ model PullRequest {
   createdAt         DateTime              @default(now())
   updatedAt         DateTime              @updatedAt
 
-  repository GithubRepository   @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
-  issues     PullRequestIssue[]
+  repository     GithubRepository   @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  issues         PullRequestIssue[]
+  AdrPullRequest AdrPullRequest[]
 
   @@index([repositoryId])
   @@map("pull_requests")

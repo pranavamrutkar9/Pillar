@@ -1,3 +1,4 @@
+
 # Logs
 logs
 *.log
@@ -134,3 +135,7 @@ revisit.md
 
 # Documentation
 docs/
+
+# Env files
+.env
+.env.*
