@@ -91,6 +91,9 @@ export default async function WorkspacePage(props: { params: Promise<{ workspace
           <div className="flex items-center gap-6">
             <GlobalSearch workspaceId={workspace.id} sessionToken={sessionToken} />
             <NotificationCenter sessionToken={sessionToken} />
+            <Link href={`/workspaces/${workspace.id}/standups`} className="text-sm font-medium px-3 py-1.5 rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors">
+              Standups
+            </Link>
             <Link href="/" className="text-sm font-medium text-zinc-500 hover:text-black dark:hover:text-white transition-colors">
               ← Back to Workspaces
             </Link>

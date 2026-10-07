@@ -50,9 +50,11 @@ app.use('/api/projects/:projectId/modules', modulesRouter)
 
 import adrsRouter from './routes/adrs.js'
 import rfcsRouter from './routes/rfcs.js'
+import standupsRouter from './routes/standups.js'
 
 app.use('/api/projects/:projectId/adrs', adrsRouter)
 app.use('/api/projects/:projectId/rfcs', rfcsRouter)
+app.use('/api/workspaces/:workspaceId/standups', standupsRouter)
 
 app.use(errorHandler)
 

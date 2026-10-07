@@ -143,6 +143,7 @@ model User {
   notifications      Notification[]      @relation("UserNotifications")
   notificationsActed Notification[]      @relation("NotificationActor")
   projectShares      ProjectShare[]
+  standups           Standup[]
 
   @@map("users")
 }
@@ -153,6 +154,7 @@ model Workspace {
   slug      String   @unique
   ownerId   String
   plan      String   @default("free")
+  timezone  String   @default("UTC")
   createdAt DateTime @default(now())
 
   owner    User              @relation("WorkspaceOwner", fields: [ownerId], references: [id])
@@ -160,6 +162,7 @@ model Workspace {
   invites  Invite[]
   projects Project[]
   events   Event[]
+  standups Standup[]
 
   @@index([ownerId])
   @@map("workspaces")
@@ -760,4 +763,40 @@ model PullRequestIssue {
 
   @@id([pullRequestId, issueId])
   @@map("pull_request_issues")
+}
+
+enum StandupStatus {
+  DRAFT
+  POSTED
+}
+
+enum GenerationStatus {
+  PENDING
+  GENERATING
+  GENERATED
+  FAILED
+}
+
+model Standup {
+  id               String           @id @default(cuid())
+  workspaceId      String
+  userId           String
+  date             DateTime         @db.Date
+  
+  yesterday        Json          
+  today            Json
+  attention        Json
+  
+  status           StandupStatus    @default(DRAFT)
+  generationStatus GenerationStatus @default(PENDING)
+  
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  postedAt         DateTime?
+
+  workspace        Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId, date])
+  @@map("standups")
 }
