@@ -37,6 +37,8 @@ Identify items needing attention (stale issues, aging PRs, review workloads) wit
 Format the output EXACTLY as this JSON object: 
 { "yesterday": string[], "today": string[], "attention": string[] }
 
+Return ONLY the raw JSON object. No markdown. No code blocks. No explanation. Start your response with { and end with }.
+
 Strict constraints:
 - Do not hallucinate.
 - Every statement must be directly supported by the supplied facts.
@@ -50,11 +52,27 @@ ${JSON.stringify(payload, null, 2)}
 `;
 
     try {
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
-      const parsed = JSON.parse(text);
-      return standupSchema.parse(parsed);
+      let parsed;
+      try {
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        let text = response.text().trim();
+        if (text.startsWith("```")) {
+          text = text.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
+        }
+        parsed = standupSchema.parse(JSON.parse(text));
+      } catch (parseError) {
+        console.warn("First parse failed, retrying with stricter prompt...", parseError);
+        const retryPrompt = prompt + "\n\nCRITICAL: Your previous response was invalid. Return ONLY valid JSON, no markdown, no code blocks, no explanation.";
+        const retryResult = await model.generateContent(retryPrompt);
+        const retryResponse = await retryResult.response;
+        let retryText = retryResponse.text().trim();
+        if (retryText.startsWith("```")) {
+          retryText = retryText.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
+        }
+        parsed = standupSchema.parse(JSON.parse(retryText));
+      }
+      return parsed;
     } catch (e) {
       console.warn("Gemini API failed, falling back to mock generation:", e);
       

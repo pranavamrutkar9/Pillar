@@ -27,8 +27,9 @@ const worker = new Worker("standup-generation", async (job) => {
     });
 
     for (const ws of workspaces) {
-      const localTime = toZonedTime(nowUtc, ws.timezone);
-      const hour = parseInt(format(localTime, "HH", { timeZone: ws.timezone }), 10);
+      const timezone = ws.timezone || "UTC";
+      const localTime = toZonedTime(nowUtc, timezone);
+      const hour = parseInt(format(localTime, "HH", { timeZone: timezone }), 10);
       
       // If it's 8 AM local time
       if (hour === 8) {
@@ -38,7 +39,7 @@ const worker = new Worker("standup-generation", async (job) => {
           select: { userId: true }
         });
 
-        const dateStr = format(localTime, "yyyy-MM-dd", { timeZone: ws.timezone });
+        const dateStr = format(localTime, "yyyy-MM-dd", { timeZone: timezone });
         
         for (const member of members) {
           // Check for existing standup
@@ -58,7 +59,7 @@ const worker = new Worker("standup-generation", async (job) => {
               workspaceId: ws.id,
               userId: member.userId,
               dateStr,
-              timezone: ws.timezone,
+              timezone: timezone,
             }, {
               attempts: 3,
               backoff: { type: "exponential", delay: 60000 }, // 1m, 2m, 4m

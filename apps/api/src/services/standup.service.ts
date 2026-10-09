@@ -87,10 +87,7 @@ export const standupService = {
         prisma.event.findMany({
           where: {
             actorId: userId,
-            OR: [
-              { workspaceId },
-              { project: { workspaceId } }
-            ],
+            workspaceId: workspaceId,
             createdAt: { gte: yesterdayStartUtc, lt: todayStartUtc },
           },
           select: { eventType: true, payload: true, createdAt: true },
