@@ -98,16 +98,22 @@ export default function PrdInputHero({
 }: PrdInputHeroProps) {
   const [prdText, setPrdText] = useState(initialText);
   const [activePresetBadge, setActivePresetBadge] = useState<string | null>(null);
+  const [inputError, setInputError] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!prdText.trim()) return;
+    if (!prdText.trim()) {
+      setInputError("Please enter PRD text or select a demo preset before analyzing.");
+      return;
+    }
+    setInputError(null);
     onAnalyze({ prdText: prdText.trim() });
   };
 
   const handleSelectPreset = (preset: typeof DEMO_PRESETS[0]) => {
     setPrdText(preset.text);
     setActivePresetBadge(preset.title);
+    setInputError(null);
   };
 
   return (
@@ -183,11 +189,20 @@ export default function PrdInputHero({
               id="prdText"
               rows={12}
               value={prdText}
-              onChange={(e) => setPrdText(e.target.value)}
+              onChange={(e) => {
+                setPrdText(e.target.value);
+                if (inputError) setInputError(null);
+              }}
               placeholder="Paste requirements here... e.g. # Authentication System&#10;- Support GitHub OAuth and email magic links&#10;- Session tokens must expire in 7 days&#10;- Organization RBAC roles: Owner, Admin, Member"
-              className="w-full p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm font-mono leading-relaxed resize-y"
-              required
+              className={`w-full p-4 rounded-xl border ${
+                inputError ? "border-rose-400 dark:border-rose-700 bg-rose-50/30 dark:bg-rose-950/20" : "border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950"
+              } focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm font-mono leading-relaxed resize-y`}
             />
+            {inputError && (
+              <p className="text-xs text-rose-600 dark:text-rose-400 font-medium flex items-center gap-1.5 mt-1">
+                <span>⚠️</span> {inputError}
+              </p>
+            )}
           </div>
 
           {/* V2 Notion OAuth Note */}
@@ -202,7 +217,7 @@ export default function PrdInputHero({
           <div className="flex justify-end pt-2">
             <button
               type="submit"
-              disabled={isLoading || !prdText.trim()}
+              disabled={isLoading}
               className="flex items-center gap-2 px-6 py-3 rounded-xl bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white font-medium text-sm shadow-md transition-all cursor-pointer"
             >
               {isLoading ? (
@@ -212,7 +227,7 @@ export default function PrdInputHero({
                 </>
               ) : (
                 <>
-                  <span>Analyze with Gemini</span>
+                  <span>Analyze PRD</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}

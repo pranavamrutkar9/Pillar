@@ -47,45 +47,58 @@ export const prdProjectBreakdownService = {
     }
 
     // 2. Server-side Idempotency Check: Prevent duplicate submissions
-    if (idempotencyKey) {
-      try {
-        const cachedProjectId = await redisGetSafe(
-          `idempotency:breakdown:${workspaceId}:${idempotencyKey}`
-        );
-        if (cachedProjectId) {
-          const existingProject = await prisma.project.findUnique({
-            where: { id: cachedProjectId },
-          });
-          if (existingProject) {
-            console.log(`[Idempotency] Returning existing project ${existingProject.id} from Redis cache`);
-            return existingProject;
-          }
-        }
-      } catch (redisErr) {
-        console.warn("[Idempotency] Redis cache check failed, falling back to database check:", redisErr);
-      }
+    const keyToCheck = idempotencyKey || `name:${workspaceId}:${data.projectName.trim().toLowerCase().replace(/\s+/g, "-")}`;
 
-      // Check PostgreSQL event table for prior commit with this idempotencyKey
-      const existingEvent = await prisma.event.findFirst({
-        where: {
-          workspaceId,
-          eventType: "project.breakdown_imported",
-          payload: {
-            path: ["idempotencyKey"],
-            equals: idempotencyKey,
-          },
-        },
-      });
-
-      if (existingEvent?.projectId) {
+    try {
+      const cachedProjectId = await redisGetSafe(
+        `idempotency:breakdown:${workspaceId}:${keyToCheck}`
+      );
+      if (cachedProjectId) {
         const existingProject = await prisma.project.findUnique({
-          where: { id: existingEvent.projectId },
+          where: { id: cachedProjectId },
         });
         if (existingProject) {
-          console.log(`[Idempotency] Returning existing project ${existingProject.id} from PostgreSQL event outbox`);
+          console.log(`[Idempotency] Key [${keyToCheck}]: Returning existing project ${existingProject.id} (${existingProject.name}) from Redis cache`);
           return existingProject;
         }
       }
+    } catch (redisErr) {
+      console.warn("[Idempotency] Redis cache check failed, falling back to database check:", redisErr);
+    }
+
+    // Check PostgreSQL event table for prior commit with this idempotencyKey
+    const existingEvent = await prisma.event.findFirst({
+      where: {
+        workspaceId,
+        eventType: { in: ["project.created_from_prd", "project.breakdown_imported", "project.created"] },
+        payload: {
+          path: ["idempotencyKey"],
+          equals: keyToCheck,
+        },
+      },
+    });
+
+    if (existingEvent?.projectId) {
+      const existingProject = await prisma.project.findUnique({
+        where: { id: existingEvent.projectId },
+      });
+      if (existingProject) {
+        console.log(`[Idempotency] Key [${keyToCheck}]: Returning existing project ${existingProject.id} (${existingProject.name}) from PostgreSQL event outbox`);
+        return existingProject;
+      }
+    }
+
+    // Check if project with exact same name already exists in this workspace
+    const existingProjectByName = await prisma.project.findFirst({
+      where: {
+        workspaceId,
+        name: { equals: data.projectName.trim(), mode: "insensitive" },
+      },
+    });
+
+    if (existingProjectByName) {
+      console.log(`[Idempotency] Key [${keyToCheck}]: Existing project with name "${data.projectName}" found (${existingProjectByName.id}). Preventing duplicate creation.`);
+      return existingProjectByName;
     }
 
     // 3. Execute single atomic database transaction
@@ -316,7 +329,7 @@ export const prdProjectBreakdownService = {
 
       await tx.event.create({
         data: {
-          eventType: "project.breakdown_imported",
+          eventType: "project.created_from_prd",
           workspaceId,
           projectId: newProject.id,
           actorId: userId,
@@ -337,6 +350,11 @@ export const prdProjectBreakdownService = {
     });
 
     // 5. Cache Idempotency Key in Redis (24-hour expiration)
+    await redisSetSafe(
+      `idempotency:breakdown:${workspaceId}:${keyToCheck}`,
+      project.id,
+      86400
+    );
     if (idempotencyKey) {
       await redisSetSafe(
         `idempotency:breakdown:${workspaceId}:${idempotencyKey}`,

@@ -58,6 +58,7 @@ app.use('/api/projects/:projectId/adrs', adrsRouter)
 app.use('/api/projects/:projectId/rfcs', rfcsRouter)
 app.use('/api/workspaces/:workspaceId/standups', standupsRouter)
 app.use('/api/workspaces/:workspaceId/ai/breakdown', prdBreakdownRouter)
+app.use('/api/workspaces/:workspaceId/prd', prdBreakdownRouter)
 
 app.use(errorHandler)
 
