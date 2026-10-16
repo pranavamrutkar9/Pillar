@@ -90,6 +90,6 @@ export const notificationWorker = new Worker('pillar-notification', async (job) 
 }, { connection: redis as any });
 
 notificationWorker.on('error', (err: any) => {
-  if (err.message && err.message.includes('ECONNRESET')) return;
+  if (err.code === 'ECONNRESET' || err.code === 'ECONNABORTED' || (err.message && (err.message.includes('ECONNRESET') || err.message.includes('ECONNABORTED')))) return;
   console.error('[NotificationWorker Error]', err);
 });

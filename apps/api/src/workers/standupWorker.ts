@@ -9,6 +9,11 @@ const connection = new IORedis(process.env.REDIS_URL || "redis://localhost:6379"
   maxRetriesPerRequest: null,
 });
 
+connection.on("error", (err: any) => {
+  if (err.code === "ECONNRESET" || err.code === "ECONNABORTED" || (err.message && (err.message.includes("ECONNRESET") || err.message.includes("ECONNABORTED")))) return;
+  console.warn("[StandupWorker Redis Error]", err.message);
+});
+
 export const standupQueue = new Queue("standup-generation", { connection });
 
 // Schedule the cron job to run every hour
@@ -77,6 +82,11 @@ const worker = new Worker("standup-generation", async (job) => {
 
 worker.on("failed", (job, err) => {
   console.error(`Standup Worker Job ${job?.id} failed:`, err);
+});
+
+worker.on("error", (err: any) => {
+  if (err.code === "ECONNRESET" || err.code === "ECONNABORTED" || (err.message && (err.message.includes("ECONNRESET") || err.message.includes("ECONNABORTED")))) return;
+  console.warn("[StandupWorker Error]", err.message);
 });
 
 console.log("Standup Worker initialized.");

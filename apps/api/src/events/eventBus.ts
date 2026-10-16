@@ -11,7 +11,7 @@ export const githubQueue = redisEnabled ? new Queue('pillar-github', { connectio
 export const cycleQueue = redisEnabled ? new Queue('pillar-cycle', { connection: redis as any }) : null;
 
 const suppressEconnreset = (err: any) => {
-  if (err.message && err.message.includes('ECONNRESET')) return;
+  if (err.code === 'ECONNRESET' || err.code === 'ECONNABORTED' || (err.message && (err.message.includes('ECONNRESET') || err.message.includes('ECONNABORTED')))) return;
   console.error('[Queue Error]', err.message);
 };
 

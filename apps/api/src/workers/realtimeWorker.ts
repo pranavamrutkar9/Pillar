@@ -17,6 +17,6 @@ export const realtimeWorker = new Worker('pillar-realtime', async (job) => {
 }, { connection: redis as any })
 
 realtimeWorker.on('error', (err: any) => {
-  if (err.message && err.message.includes('ECONNRESET')) return;
+  if (err.code === 'ECONNRESET' || err.code === 'ECONNABORTED' || (err.message && (err.message.includes('ECONNRESET') || err.message.includes('ECONNABORTED')))) return;
   console.error('[RealtimeWorker Error]', err);
-})
+});
