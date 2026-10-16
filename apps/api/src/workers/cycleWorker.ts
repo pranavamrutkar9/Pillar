@@ -85,6 +85,6 @@ export const cycleWorker = new Worker("pillar-cycle", async (job) => {
 }, { connection: redis as any });
 
 cycleWorker.on("error", (err: any) => {
-  if (err.message && err.message.includes("ECONNRESET")) return;
+  if (err.code === "ECONNRESET" || err.code === "ECONNABORTED" || (err.message && (err.message.includes("ECONNRESET") || err.message.includes("ECONNABORTED")))) return;
   console.error("[CycleWorker Error]", err);
 });

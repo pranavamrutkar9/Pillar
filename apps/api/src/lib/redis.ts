@@ -7,7 +7,7 @@ export const redis = new Redis(env.REDIS_URL, {
 })
 
 redis.on('error', (err: any) => {
-  // Suppress ECONNRESET spam from ioredis
-  if (err.code === 'ECONNRESET' || err.message.includes('ECONNRESET')) return;
+  // Suppress ECONNRESET and ECONNABORTED spam from ioredis
+  if (err.code === 'ECONNRESET' || err.code === 'ECONNABORTED' || (err.message && (err.message.includes('ECONNRESET') || err.message.includes('ECONNABORTED')))) return;
   console.warn('[Redis Socket Error]', err.message);
 });

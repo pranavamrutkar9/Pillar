@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 // For the free tier, we run the worker inside the same process as the API.
@@ -51,10 +52,12 @@ app.use('/api/projects/:projectId/modules', modulesRouter)
 import adrsRouter from './routes/adrs.js'
 import rfcsRouter from './routes/rfcs.js'
 import standupsRouter from './routes/standups.js'
+import prdBreakdownRouter from './routes/prdBreakdown.js'
 
 app.use('/api/projects/:projectId/adrs', adrsRouter)
 app.use('/api/projects/:projectId/rfcs', rfcsRouter)
 app.use('/api/workspaces/:workspaceId/standups', standupsRouter)
+app.use('/api/workspaces/:workspaceId/ai/breakdown', prdBreakdownRouter)
 
 app.use(errorHandler)
 

@@ -18,6 +18,10 @@ export function initSocket(httpServer: HTTPServer) {
 
   const pubClient = redis;
   const subClient = redis.duplicate();
+  subClient.on('error', (err: any) => {
+    if (err.code === 'ECONNRESET' || err.code === 'ECONNABORTED' || (err.message && (err.message.includes('ECONNRESET') || err.message.includes('ECONNABORTED')))) return;
+    console.warn('[Socket Redis SubClient Error]', err.message);
+  });
   
   io.adapter(createAdapter(pubClient, subClient));
 

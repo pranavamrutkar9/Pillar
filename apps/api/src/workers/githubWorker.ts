@@ -19,6 +19,6 @@ export const githubWorker = new Worker("pillar-github", async (job) => {
 }, { connection: redis as any });
 
 githubWorker.on("error", (err: any) => {
-  if (err.message && err.message.includes("ECONNRESET")) return;
+  if (err.code === "ECONNRESET" || err.code === "ECONNABORTED" || (err.message && (err.message.includes("ECONNRESET") || err.message.includes("ECONNABORTED")))) return;
   console.error("[GithubWorker Error]", err);
 });
