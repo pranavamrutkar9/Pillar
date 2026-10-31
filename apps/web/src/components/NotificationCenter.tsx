@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Bell } from "lucide-react";
+import { Bell, CheckCheck } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/navigation";
 import { io, Socket } from "socket.io-client";
@@ -36,7 +36,6 @@ export default function NotificationCenter({ sessionToken }: { sessionToken?: st
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 30000);
     
-    // Connect to Socket.io for real-time notifications
     const socket: Socket = io({
       path: '/socket.io',
       withCredentials: true,
@@ -102,41 +101,49 @@ export default function NotificationCenter({ sessionToken }: { sessionToken?: st
     <div className="relative" ref={dropdownRef}>
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors relative"
+        className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors relative"
+        title="Notifications"
       >
-        <Bell className="w-5 h-5 text-zinc-600 dark:text-zinc-300" />
+        <Bell className="w-4 h-4" />
         {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-zinc-950"></span>
+          <span className="absolute top-1 right-1 w-2 h-2 bg-emerald-500 rounded-full" />
         )}
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-xl z-50 overflow-hidden">
-          <div className="p-3 border-b border-zinc-200 dark:border-zinc-800 flex justify-between items-center bg-zinc-50 dark:bg-zinc-950/50">
-            <h3 className="font-medium text-sm">Notifications</h3>
+        <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+          <div className="p-3 border-b border-zinc-100 dark:border-zinc-900 flex justify-between items-center bg-zinc-50/60 dark:bg-zinc-900/40">
+            <h3 className="font-semibold text-xs text-zinc-900 dark:text-zinc-100">Notifications</h3>
             {unreadCount > 0 && (
-              <button onClick={markAllAsRead} className="text-xs text-blue-600 dark:text-blue-400 hover:underline">
-                Mark all as read
+              <button 
+                onClick={markAllAsRead} 
+                className="text-[11px] font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors flex items-center gap-1"
+              >
+                <CheckCheck className="w-3 h-3" />
+                <span>Mark all read</span>
               </button>
             )}
           </div>
-          <div className="max-h-96 overflow-y-auto">
+          <div className="max-h-80 overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-900">
             {notifications.length === 0 ? (
-              <div className="p-8 text-center text-sm text-zinc-500 flex flex-col items-center gap-2">
-                <Bell className="w-8 h-8 text-zinc-300 dark:text-zinc-700 mb-2" />
-                <p>You're all caught up!</p>
-                <p className="text-xs text-zinc-400">No new notifications.</p>
+              <div className="p-8 text-center text-xs text-zinc-400 flex flex-col items-center gap-1">
+                <Bell className="w-6 h-6 text-zinc-300 dark:text-zinc-700 mb-1" />
+                <p className="font-medium text-zinc-700 dark:text-zinc-300">All caught up</p>
+                <p>No new notifications at this time.</p>
               </div>
             ) : (
               notifications.map((n) => (
                 <div 
                   key={n.id} 
                   onClick={() => handleNotificationClick(n)}
-                  className={`p-3 border-b border-zinc-100 dark:border-zinc-800/50 text-sm cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors ${!n.readAt ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}`}
+                  className={`p-3 text-xs cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors ${!n.readAt ? 'bg-zinc-50/70 dark:bg-zinc-900/30' : ''}`}
                 >
-                  <div className="font-medium text-zinc-900 dark:text-zinc-100">{n.title}</div>
-                  <div className="text-zinc-500 mt-1">{n.body}</div>
-                  <div className="text-zinc-400 text-xs mt-2">
+                  <div className="flex items-center justify-between mb-0.5">
+                    <span className="font-medium text-zinc-900 dark:text-zinc-100">{n.title}</span>
+                    {!n.readAt && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />}
+                  </div>
+                  <div className="text-zinc-500 text-[11px] leading-snug">{n.body}</div>
+                  <div className="text-zinc-400 font-mono text-[10px] mt-1.5">
                     {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
                   </div>
                 </div>

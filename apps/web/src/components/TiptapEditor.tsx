@@ -4,6 +4,7 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { useEffect } from 'react';
+import { Bold, Italic, Code, List, Heading2 } from 'lucide-react';
 
 interface TiptapEditorProps {
   value: any;
@@ -17,7 +18,7 @@ export default function TiptapEditor({ value, onChange, editable = true }: Tipta
     extensions: [
       StarterKit,
       Placeholder.configure({
-        placeholder: 'Add a description...',
+        placeholder: 'Add details, context, or reproduction steps...',
       }),
     ],
     content: value,
@@ -27,14 +28,13 @@ export default function TiptapEditor({ value, onChange, editable = true }: Tipta
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[150px] p-4 border border-zinc-200 dark:border-zinc-800 rounded-b-md bg-white dark:bg-zinc-950 text-black dark:text-white dark:prose-invert',
+        class: 'prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[120px] p-3 text-xs leading-relaxed text-zinc-900 dark:text-zinc-100',
       },
     },
   });
 
   useEffect(() => {
     if (editor && value && !editor.isFocused) {
-      // Only update content if it's vastly different and not focused to prevent cursor jumping
       const currentJson = editor.getJSON();
       if (JSON.stringify(currentJson) !== JSON.stringify(value)) {
         editor.commands.setContent(value);
@@ -47,22 +47,56 @@ export default function TiptapEditor({ value, onChange, editable = true }: Tipta
   }
 
   return (
-    <div className={`tiptap-wrapper ${!editable ? 'opacity-80' : ''}`}>
+    <div className={`rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 overflow-hidden bg-white dark:bg-zinc-950 ${!editable ? 'opacity-85' : ''}`}>
       {editable && (
-        <div className="flex gap-2 p-2 border-b border-zinc-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900 rounded-t-md">
+        <div className="flex items-center gap-1 p-1.5 border-b border-zinc-100 dark:border-zinc-900 bg-zinc-50/70 dark:bg-zinc-900/40">
           <button
             type="button"
             onClick={() => editor.chain().focus().toggleBold().run()}
-            className={`px-2 py-1 rounded text-sm font-medium transition-colors ${editor.isActive('bold') ? 'bg-gray-200 dark:bg-zinc-800 text-black dark:text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-800'}`}
+            className={`p-1.5 rounded-md text-xs transition-colors ${
+              editor.isActive('bold') 
+                ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100' 
+                : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+            }`}
+            title="Bold"
           >
-            Bold
+            <Bold className="w-3.5 h-3.5" />
           </button>
           <button
             type="button"
             onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={`px-2 py-1 rounded text-sm font-medium transition-colors ${editor.isActive('italic') ? 'bg-gray-200 dark:bg-zinc-800 text-black dark:text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-800'}`}
+            className={`p-1.5 rounded-md text-xs transition-colors ${
+              editor.isActive('italic') 
+                ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100' 
+                : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+            }`}
+            title="Italic"
           >
-            Italic
+            <Italic className="w-3.5 h-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => editor.chain().focus().toggleCode().run()}
+            className={`p-1.5 rounded-md text-xs transition-colors ${
+              editor.isActive('code') 
+                ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100' 
+                : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+            }`}
+            title="Code"
+          >
+            <Code className="w-3.5 h-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => editor.chain().focus().toggleBulletList().run()}
+            className={`p-1.5 rounded-md text-xs transition-colors ${
+              editor.isActive('bulletList') 
+                ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100' 
+                : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+            }`}
+            title="Bullet List"
+          >
+            <List className="w-3.5 h-3.5" />
           </button>
         </div>
       )}

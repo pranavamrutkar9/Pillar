@@ -1,9 +1,36 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createStatusAction, updateStatusAction, deleteStatusAction, createLabelAction, updateLabelAction, deleteLabelAction } from "../actions/settingsActions";
-import { createProjectShareAction, getProjectSharesAction, revokeProjectShareAction } from "../actions/shareActions";
-import { updateGithubSettingsAction, triggerGithubSyncAction } from "../actions/githubActions";
+import { 
+  createStatusAction, 
+  updateStatusAction, 
+  deleteStatusAction, 
+  createLabelAction, 
+  updateLabelAction, 
+  deleteLabelAction 
+} from "../actions/settingsActions";
+import { 
+  createProjectShareAction, 
+  getProjectSharesAction, 
+  revokeProjectShareAction 
+} from "../actions/shareActions";
+import { 
+  updateGithubSettingsAction, 
+  triggerGithubSyncAction 
+} from "../actions/githubActions";
+import { 
+  Share2, 
+  GitBranch, 
+  Tag, 
+  Layers, 
+  Plus, 
+  Copy, 
+  Check, 
+  Trash2, 
+  RefreshCw, 
+  AlertCircle,
+  ExternalLink
+} from "lucide-react";
 
 export default function ProjectSettings({ project }: { project: any }) {
   const [statuses, setStatuses] = useState<any[]>(project.issueStatuses || []);
@@ -11,7 +38,7 @@ export default function ProjectSettings({ project }: { project: any }) {
   
   const [newStatusName, setNewStatusName] = useState("");
   const [newLabelName, setNewLabelName] = useState("");
-  const [newLabelColor, setNewLabelColor] = useState("#3b82f6");
+  const [newLabelColor, setNewLabelColor] = useState("#71717a");
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -38,7 +65,7 @@ export default function ProjectSettings({ project }: { project: any }) {
 
   const handleAddStatus = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newStatusName) return;
+    if (!newStatusName.trim()) return;
     setLoading(true);
     setError("");
     try {
@@ -87,7 +114,7 @@ export default function ProjectSettings({ project }: { project: any }) {
 
   const handleAddLabel = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newLabelName) return;
+    if (!newLabelName.trim()) return;
     setLoading(true);
     setError("");
     try {
@@ -126,9 +153,8 @@ export default function ProjectSettings({ project }: { project: any }) {
     setLoading(true);
     try {
       await updateGithubSettingsAction(project.id, { githubMergedStatusId: githubMergedStatusId || null });
-      alert("GitHub settings updated");
     } catch (err: any) {
-      setError(err.message || "Failed to update Github settings");
+      setError(err.message || "Failed to update GitHub settings");
     } finally {
       setLoading(false);
     }
@@ -138,7 +164,6 @@ export default function ProjectSettings({ project }: { project: any }) {
     setIsSyncing(true);
     try {
       await triggerGithubSyncAction(project.id);
-      alert("Sync triggered successfully!");
     } catch (err: any) {
       setError(err.message || "Failed to trigger sync");
     } finally {
@@ -150,103 +175,141 @@ export default function ProjectSettings({ project }: { project: any }) {
   const installUrl = `https://github.com/apps/${GITHUB_APP_NAME}/installations/new`;
 
   return (
-    <div className="space-y-12">
-      {error && <div className="text-red-500 text-sm bg-red-50 p-3 rounded">{error}</div>}
-      <section className="bg-white dark:bg-zinc-950 p-6 rounded-lg shadow border border-gray-100 dark:border-zinc-800">
-        <h2 className="text-xl font-semibold mb-4">Statuses</h2>
-        <div className="space-y-4 mb-6">
+    <div className="space-y-8 max-w-4xl">
+      
+      {error && (
+        <div className="p-3 bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 border border-red-200/60 dark:border-red-900/40 rounded-xl text-xs flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
+
+      {/* Statuses Section */}
+      <section className="bg-white dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs space-y-4">
+        <div>
+          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+            <Layers className="w-4 h-4 text-zinc-500" />
+            <span>Workflow Statuses</span>
+          </h2>
+          <p className="text-xs text-zinc-500 mt-0.5">Customize the stages of your engineering pipeline.</p>
+        </div>
+
+        <div className="space-y-2">
           {statuses.map((status) => (
-            <div key={status.id} className="flex items-center justify-between p-3 border rounded-md dark:border-zinc-800">
-              <div className="flex items-center gap-4">
-                <input
-                  type="text"
-                  value={status.name}
-                  onChange={(e) => handleUpdateStatus(status.id, { name: e.target.value })}
-                  className="bg-transparent font-medium focus:outline-none focus:border-b border-gray-300"
-                  disabled={loading}
-                />
-              </div>
+            <div 
+              key={status.id} 
+              className="flex items-center justify-between p-3 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-900/30"
+            >
+              <input
+                type="text"
+                value={status.name}
+                onChange={(e) => handleUpdateStatus(status.id, { name: e.target.value })}
+                className="bg-transparent text-xs font-medium text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 rounded px-2 py-1"
+                disabled={loading}
+              />
               <button
                 onClick={() => handleDeleteStatus(status.id)}
                 disabled={loading}
-                className={`text-sm disabled:opacity-50 ${confirmDelete === status.id ? 'text-red-700 font-bold bg-red-100 px-2 py-1 rounded' : 'text-red-500 hover:text-red-700'}`}
+                className={`text-xs px-2.5 py-1 rounded-lg transition-colors ${
+                  confirmDelete === status.id 
+                    ? 'bg-red-600 text-white font-medium' 
+                    : 'text-zinc-400 hover:text-red-600'
+                }`}
               >
-                {confirmDelete === status.id ? 'Confirm?' : 'Delete'}
+                {confirmDelete === status.id ? 'Confirm Delete' : 'Delete'}
               </button>
             </div>
           ))}
         </div>
 
-        <form onSubmit={handleAddStatus} className="flex gap-2">
+        <form onSubmit={handleAddStatus} className="flex gap-2 pt-2">
           <input
             type="text"
             value={newStatusName}
             onChange={(e) => setNewStatusName(e.target.value)}
-            placeholder="New status name..."
-            className="flex-1 bg-transparent rounded-md border-gray-300 dark:border-zinc-700 shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Add new status (e.g. In QA)..."
+            className="flex-1 px-3 py-1.5 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors"
             disabled={loading}
           />
           <button
             type="submit"
-            disabled={loading || !newStatusName}
-            className="px-4 py-2 bg-blue-600 text-white rounded text-sm disabled:opacity-50"
+            disabled={loading || !newStatusName.trim()}
+            className="px-3.5 py-1.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-lg text-xs font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors disabled:opacity-50 shadow-2xs"
           >
-            Add
+            Add Status
           </button>
         </form>
       </section>
 
-      <section className="bg-white dark:bg-zinc-950 p-6 rounded-lg shadow border border-gray-100 dark:border-zinc-800">
-        <h2 className="text-xl font-semibold mb-4">Labels</h2>
-        <div className="flex flex-wrap gap-2 mb-6">
+      {/* Labels Section */}
+      <section className="bg-white dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs space-y-4">
+        <div>
+          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+            <Tag className="w-4 h-4 text-zinc-500" />
+            <span>Issue Labels</span>
+          </h2>
+          <p className="text-xs text-zinc-500 mt-0.5">Tag and categorize tickets across your repository.</p>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
           {labels.map((label) => (
-            <div key={label.id} className="flex items-center gap-2 px-3 py-1 bg-gray-100 dark:bg-zinc-900 border rounded-full text-sm">
-              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: label.color || "#000" }}></span>
-              <span>{label.name}</span>
+            <div 
+              key={label.id} 
+              className="inline-flex items-center gap-2 px-2.5 py-1 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/60 rounded-lg text-xs"
+            >
+              <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: label.color || "#71717a" }} />
+              <span className="font-medium text-zinc-800 dark:text-zinc-200">{label.name}</span>
               <button
                 onClick={() => handleDeleteLabel(label.id)}
                 disabled={loading}
-                className={`ml-2 text-sm disabled:opacity-50 ${confirmDelete === label.id ? 'text-red-600 font-bold' : 'text-gray-400 hover:text-red-500'}`}
+                className={`ml-1 text-xs transition-colors ${
+                  confirmDelete === label.id ? 'text-red-600 font-bold' : 'text-zinc-400 hover:text-red-500'
+                }`}
               >
-                {confirmDelete === label.id ? 'Sure?' : '\u00d7'}
+                {confirmDelete === label.id ? 'Sure?' : '×'}
               </button>
             </div>
           ))}
-          {labels.length === 0 && <span className="text-sm text-gray-500">No labels defined.</span>}
+          {labels.length === 0 && <span className="text-xs text-zinc-400 italic">No labels created yet.</span>}
         </div>
 
-        <form onSubmit={handleAddLabel} className="flex gap-2">
+        <form onSubmit={handleAddLabel} className="flex items-center gap-2 pt-2">
           <input
             type="text"
             value={newLabelName}
             onChange={(e) => setNewLabelName(e.target.value)}
             placeholder="New label name..."
-            className="flex-1 bg-transparent rounded-md border-gray-300 dark:border-zinc-700 shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500"
+            className="flex-1 px-3 py-1.5 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors"
             disabled={loading}
           />
           <input
             type="color"
             value={newLabelColor}
             onChange={(e) => setNewLabelColor(e.target.value)}
-            className="p-1 h-10 w-10 border rounded bg-transparent"
+            className="w-8 h-8 rounded-lg border border-zinc-200 dark:border-zinc-800 cursor-pointer bg-transparent"
             disabled={loading}
           />
           <button
             type="submit"
-            disabled={loading || !newLabelName}
-            className="px-4 py-2 bg-blue-600 text-white rounded text-sm disabled:opacity-50"
+            disabled={loading || !newLabelName.trim()}
+            className="px-3.5 py-1.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-lg text-xs font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors disabled:opacity-50 shadow-2xs"
           >
-            Add
+            Add Label
           </button>
         </form>
       </section>
 
-      <section className="bg-white dark:bg-zinc-950 p-6 rounded-lg shadow border border-gray-100 dark:border-zinc-800">
-        <h2 className="text-xl font-semibold mb-4">Public Sharing (Viewer Access)</h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-          Generate a read-only link to share the project board with viewers without requiring an account.
-        </p>
-        <div className="flex gap-2 mb-6">
+      {/* Public Share Links Section */}
+      <section className="bg-white dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+              <Share2 className="w-4 h-4 text-zinc-500" />
+              <span>Public Read-Only Sharing</span>
+            </h2>
+            <p className="text-xs text-zinc-500 mt-0.5">Generate tokens to share your live board without granting write permissions.</p>
+          </div>
+
           <button
             onClick={async () => {
               setLoading(true);
@@ -260,26 +323,35 @@ export default function ProjectSettings({ project }: { project: any }) {
               }
             }}
             disabled={loading}
-            className="px-4 py-2 bg-blue-600 text-white rounded text-sm disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-lg text-xs font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors disabled:opacity-50 shadow-2xs shrink-0 self-start sm:self-auto"
           >
-            Generate New Share Link
+            <Plus className="w-3.5 h-3.5" />
+            <span>New Share Link</span>
           </button>
         </div>
-        <div className="space-y-3">
+
+        <div className="space-y-2">
           {shares.length === 0 ? (
-            <p className="text-xs text-gray-500">No active share links. Generate one above.</p>
+            <p className="text-xs text-zinc-400 italic">No active share links.</p>
           ) : (
             shares.map((share) => (
-              <div key={share.id} className="flex items-center justify-between p-3 border rounded-md dark:border-zinc-800">
-                <div className="flex-1 truncate mr-4 text-sm font-mono text-gray-600 dark:text-gray-400">
-                  {`${window.location.origin}/projects/${project.id}/issues?viewerToken=${share.token}`}
+              <div 
+                key={share.id} 
+                className="flex items-center justify-between p-3 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-900/30 gap-4"
+              >
+                <div className="flex-1 truncate text-xs font-mono text-zinc-600 dark:text-zinc-400">
+                  {`${typeof window !== 'undefined' ? window.location.origin : ''}/projects/${project.id}/issues?viewerToken=${share.token}`}
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 shrink-0">
                   <button
                     onClick={() => handleCopyLink(share.token)}
-                    className="px-3 py-1 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded text-sm"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 transition-colors"
                   >
-                    {copiedLink === share.token ? 'Copied!' : 'Copy'}
+                    {copiedLink === share.token ? (
+                      <><Check className="w-3 h-3 text-emerald-500" /> Copied</>
+                    ) : (
+                      <><Copy className="w-3 h-3" /> Copy</>
+                    )}
                   </button>
                   <button
                     onClick={async () => {
@@ -294,7 +366,7 @@ export default function ProjectSettings({ project }: { project: any }) {
                       }
                     }}
                     disabled={loading}
-                    className="px-3 py-1 bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 rounded text-sm disabled:opacity-50"
+                    className="px-2.5 py-1 text-xs text-red-500 hover:text-red-700 dark:hover:text-red-400 transition-colors disabled:opacity-50"
                   >
                     Revoke
                   </button>
@@ -305,36 +377,44 @@ export default function ProjectSettings({ project }: { project: any }) {
         </div>
       </section>
 
-      <section className="bg-white dark:bg-zinc-950 p-6 rounded-lg shadow border border-gray-100 dark:border-zinc-800">
-        <h2 className="text-xl font-semibold mb-4">GitHub Integration</h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-          Connect a GitHub repository to automatically track pull requests and link them to your issues.
-        </p>
+      {/* GitHub Integration Section */}
+      <section className="bg-white dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs space-y-4">
+        <div>
+          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+            <GitBranch className="w-4 h-4 text-zinc-500" />
+            <span>GitHub Repository Connection</span>
+          </h2>
+          <p className="text-xs text-zinc-500 mt-0.5">Automate issue resolution when PRs are merged.</p>
+        </div>
 
         {project.githubRepositoryId ? (
-          <div className="space-y-6">
-            <div className="p-4 border border-green-500/20 bg-green-500/5 rounded-md flex items-center justify-between">
+          <div className="space-y-4">
+            <div className="p-4 rounded-xl border border-emerald-200/60 dark:border-emerald-900/40 bg-emerald-50/30 dark:bg-emerald-950/20 flex items-center justify-between">
               <div>
-                <p className="text-green-600 font-medium">Repository Linked</p>
-                <p className="text-sm text-gray-500">Your project is connected to a GitHub repository.</p>
+                <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5" /> Repository Synchronized
+                </p>
+                <p className="text-xs text-zinc-500 mt-0.5">Pull requests automatically associate with issues by sequence ID.</p>
               </div>
               <button 
                 onClick={handleSyncGithub} 
                 disabled={isSyncing}
-                className="px-4 py-2 bg-gray-100 dark:bg-zinc-800 rounded text-sm disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors shadow-2xs disabled:opacity-50"
               >
-                {isSyncing ? "Syncing..." : "Manual Sync"}
+                <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+                <span>{isSyncing ? "Syncing..." : "Sync Now"}</span>
               </button>
             </div>
 
             <form onSubmit={handleUpdateGithubStatus} className="space-y-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Target Status on PR Merge</label>
-                <p className="text-xs text-gray-500 mb-2">When a linked PR is merged, the issue will automatically transition to this status.</p>
+                <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                  Target Status on PR Merge
+                </label>
                 <select 
                   value={githubMergedStatusId}
                   onChange={e => setGithubMergedStatusId(e.target.value)}
-                  className="w-full max-w-sm p-2 bg-gray-50 dark:bg-zinc-900 border rounded"
+                  className="w-full max-w-sm px-3 py-1.5 text-xs bg-zinc-50/50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors cursor-pointer"
                   disabled={loading}
                 >
                   <option value="">-- No automatic transition --</option>
@@ -346,26 +426,28 @@ export default function ProjectSettings({ project }: { project: any }) {
               <button 
                 type="submit" 
                 disabled={loading}
-                className="px-4 py-2 bg-blue-600 text-white rounded text-sm disabled:opacity-50"
+                className="px-4 py-1.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-lg text-xs font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors disabled:opacity-50 shadow-2xs"
               >
-                Save Settings
+                Save Transition Rule
               </button>
             </form>
           </div>
         ) : (
-          <div className="p-6 border border-gray-200 dark:border-zinc-800 border-dashed rounded-md text-center">
-            <p className="mb-4 text-gray-500">No repository connected yet.</p>
+          <div className="p-8 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl text-center">
+            <p className="text-xs text-zinc-400 mb-3">No GitHub repository connected yet.</p>
             <a 
               href={installUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block px-4 py-2 bg-black text-white dark:bg-white dark:text-black font-medium rounded-md hover:opacity-90 transition-opacity"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 text-xs font-medium rounded-lg hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors shadow-xs"
             >
-              Install GitHub App
+              <span>Install GitHub Integration</span>
+              <ExternalLink className="w-3.5 h-3.5" />
             </a>
           </div>
         )}
       </section>
+
     </div>
   );
 }

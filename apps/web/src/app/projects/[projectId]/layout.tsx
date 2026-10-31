@@ -6,6 +6,9 @@ import { cookies } from "next/headers";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../../lib/auth";
 import NotificationCenter from "../../../components/NotificationCenter";
+import GlobalSearch from "../../../components/Search/GlobalSearch";
+import ProjectNav from "../../../components/ProjectNav";
+import { ArrowLeft, ChevronRight } from "lucide-react";
 
 export default async function ProjectLayout(props: { params: Promise<{ projectId: string }>, children: ReactNode }) {
   const { projectId } = await props.params;
@@ -22,46 +25,46 @@ export default async function ProjectLayout(props: { params: Promise<{ projectId
   const isViewer = !session?.user;
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans flex flex-col">
-      <header className="border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 sticky top-0 z-30">
+    <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#09090B] text-zinc-900 dark:text-zinc-100 font-sans flex flex-col transition-colors">
+      
+      {/* Sticky Glass Header */}
+      <header className="border-b border-zinc-200/80 dark:border-zinc-800/80 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md sticky top-0 z-30 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-4">
-              <Link href={`/workspaces/${project.workspaceId}/projects`} className="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-                &larr; Projects
+          
+          {/* Top Row: Breadcrumbs & Utilities */}
+          <div className="flex justify-between items-center h-14 border-b border-zinc-100 dark:border-zinc-900">
+            <div className="flex items-center gap-2 text-xs">
+              <Link 
+                href={`/workspaces/${project.workspaceId}`} 
+                className="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors flex items-center gap-1 font-medium"
+              >
+                <ArrowLeft className="w-3 h-3" />
+                <span>Workspace</span>
               </Link>
-              <h1 className="text-xl font-bold truncate">{project.name}</h1>
+              <ChevronRight className="w-3 h-3 text-zinc-300 dark:text-zinc-700" />
+              <div className="flex items-center gap-1.5">
+                <span className="font-semibold text-zinc-900 dark:text-zinc-100 text-sm tracking-tight">{project.name}</span>
+                <span className="text-[11px] font-mono text-zinc-400 px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/60">
+                  {project.slug}
+                </span>
+              </div>
             </div>
-            <div className="flex items-center gap-4">
+
+            <div className="flex items-center gap-3">
+              <GlobalSearch workspaceId={project.workspaceId} sessionToken={sessionToken} />
               <NotificationCenter sessionToken={sessionToken} />
             </div>
           </div>
           
-          <nav className="flex space-x-6 overflow-x-auto no-scrollbar">
-            <Link href={`/projects/${projectId}/issues`} className="pb-3 text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 border-b-2 border-transparent hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
-              Issues
-            </Link>
-            <Link href={`/projects/${projectId}/cycles`} className="pb-3 text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 border-b-2 border-transparent hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
-              Cycles
-            </Link>
-            <Link href={`/projects/${projectId}/modules`} className="pb-3 text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 border-b-2 border-transparent hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
-              Modules
-            </Link>
-            <Link href={`/projects/${projectId}/adrs`} className="pb-3 text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 border-b-2 border-transparent hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
-              ADRs
-            </Link>
-            <Link href={`/projects/${projectId}/rfcs`} className="pb-3 text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 border-b-2 border-transparent hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
-              RFCs
-            </Link>
-            {!isViewer && (
-              <Link href={`/projects/${projectId}/settings`} className="pb-3 text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 border-b-2 border-transparent hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
-                Settings
-              </Link>
-            )}
-          </nav>
+          {/* Bottom Row: Tab Navigation */}
+          <div className="py-1.5">
+            <ProjectNav projectId={projectId} isViewer={isViewer} />
+          </div>
+
         </div>
       </header>
 
+      {/* Main Content Area */}
       <main className="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
         {props.children}
       </main>

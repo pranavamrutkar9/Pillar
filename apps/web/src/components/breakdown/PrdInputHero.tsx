@@ -12,7 +12,7 @@ interface PrdInputHeroProps {
 const DEMO_PRESETS = [
   {
     title: "Stripe Billing & Webhook Engine",
-    badge: "Payments & SaaS",
+    badge: "Payments",
     description: "Multi-tier subscription billing with customer portal, webhook idempotent handler, and proration calculations.",
     text: `# Stripe Billing & Webhook Engine (PRD)
 
@@ -40,7 +40,7 @@ Build an enterprise-ready subscription billing infrastructure supporting self-se
   },
   {
     title: "Real-Time Collaboration Canvas",
-    badge: "WebSockets & CRDT",
+    badge: "CRDT & Sync",
     description: "Multiplayer whiteboarding canvas with optimistic local updates, conflict resolution, and live cursor presence.",
     text: `# Real-Time Collaboration Canvas (PRD)
 
@@ -58,56 +58,52 @@ Deliver a fluid, 60fps multiplayer whiteboard canvas allowing multiple engineers
 - Offline buffering: local IndexedDB cache that syncs changes when network reconnects.
 
 3. Multiplayer Presence & Awareness
-- Broadcast live cursor coordinates (x, y) with user avatars and localized name tags.
-- Ephemeral selection highlights showing which component another user is currently dragging.
-
-4. Export & Snapshot System
-- One-click export to PNG, SVG, and structured JSON.
-- Version history snapshotting allowing rollback to any past milestone state.
+- Broadcast live cursor positions at 30Hz throttled intervals.
+- Ephemeral selection boxes indicating what element another collaborator is modifying.
 `
   },
   {
-    title: "DevOps CI/CD Incident Pipeline",
-    badge: "Automation & GitHub",
-    description: "Autonomous canary deployment runner with rollback triggers, health checks, and Slack alerts.",
-    text: `# DevOps CI/CD Incident Pipeline (PRD)
+    title: "Zero-Downtime Migration Pipeline",
+    badge: "Infra & DB",
+    description: "Phased schema migration runner with dual-writing, verification backfill, and automatic rollback guardrails.",
+    text: `# Zero-Downtime Migration Pipeline (PRD)
 
 ## Objective
-Automate post-merge deployment validation with automated rollback triggers based on Prometheus metrics and incident alert triage.
+Enable continuous schema evolution on multi-gigabyte production databases without taking API endpoints offline or locking tables.
 
-## Core Scope
-1. Deployment Orchestrator
-- Webhook trigger on GitHub pull request merge to main.
-- Step executor: Build container -> Push to registry -> Deploy canary pod to Kubernetes cluster.
+## Requirements
+1. Expand and Contract Lifecycle
+- Tooling to enforce non-destructive backward-compatible migrations (nullable columns, default values).
+- Dual-write application triggers supporting old and new column representations concurrently.
 
-2. Automated Health Analyzer
-- 10-minute canary evaluation listening to error rate spikes (HTTP 5xx > 1%) and p99 latency regressions.
-- Automated rollback engine that restores previous replica set if SLO thresholds are violated.
+2. Verification & Historical Backfill
+- Background worker chunking historical table records in 500-row batches.
+- Checksum comparison validator verifying consistency between old and new columns.
 
-3. Incident Communication & Notification
-- Instant Slack and Discord dispatch with diff summary, commit author, and rollback reason.
-- Automatic creation of Pillar incident ticket with severity: URGENT and assignees.
+3. Cutover & Cleanup
+- Automated blue-green connection switcher pointing queries to new column definitions once backfill passes 100%.
+- Safe deferred cleanup migration to prune deprecated database artifacts.
 `
   }
 ];
 
-export default function PrdInputHero({
-  onAnalyze,
-  isLoading,
-  initialText = ""
-}: PrdInputHeroProps) {
+export default function PrdInputHero({ onAnalyze, isLoading, initialText = "" }: PrdInputHeroProps) {
   const [prdText, setPrdText] = useState(initialText);
-  const [activePresetBadge, setActivePresetBadge] = useState<string | null>(null);
   const [inputError, setInputError] = useState<string | null>(null);
+  const [activePresetBadge, setActivePresetBadge] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!prdText.trim()) {
-      setInputError("Please enter PRD text or select a demo preset before analyzing.");
+      setInputError("Please provide product requirements or select a preset below.");
+      return;
+    }
+    if (prdText.trim().length < 40) {
+      setInputError("Please enter a slightly more detailed specification (at least 40 characters).");
       return;
     }
     setInputError(null);
-    onAnalyze({ prdText: prdText.trim() });
+    onAnalyze({ prdText });
   };
 
   const handleSelectPreset = (preset: typeof DEMO_PRESETS[0]) => {
@@ -117,30 +113,30 @@ export default function PrdInputHero({
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 max-w-4xl mx-auto">
       {/* Hero Header */}
-      <div className="text-center max-w-2xl mx-auto space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-violet-100 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300 border border-violet-200 dark:border-violet-800">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>AI Feature 2 · The 90-Second Demo</span>
+      <div className="text-center max-w-xl mx-auto space-y-2">
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono text-zinc-500 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80">
+          <Sparkles className="w-3 h-3 text-zinc-400" />
+          <span>Requirements Decomposition</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
           PRD to Project Breakdown
         </h1>
-        <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400">
-          Paste any product spec, user stories, or unstructured notes. Pillar&apos;s Gemini engine decomposes it into modules, issues, estimates, and dependencies in seconds.
+        <p className="text-xs sm:text-sm text-zinc-500 leading-relaxed">
+          Paste any product brief, user stories, or architecture notes. Pillar breaks it down into structured modules, estimated issues, and dependencies.
         </p>
       </div>
 
       {/* Demo Presets Bar */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+          <span className="text-[11px] font-mono uppercase text-zinc-400 flex items-center gap-1.5">
             <BookOpen className="w-3.5 h-3.5" />
-            1-Click Demo Presets (Instant 90s Presentation)
+            Quick Presets
           </span>
           {activePresetBadge && (
-            <span className="text-xs text-violet-600 dark:text-violet-400 font-medium">
+            <span className="text-xs text-zinc-600 dark:text-zinc-400 font-mono">
               Loaded: {activePresetBadge}
             </span>
           )}
@@ -151,17 +147,17 @@ export default function PrdInputHero({
               key={preset.title}
               type="button"
               onClick={() => handleSelectPreset(preset)}
-              className="text-left p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 hover:border-violet-400 dark:hover:border-violet-600 hover:shadow-sm transition-all group cursor-pointer"
+              className="text-left p-3.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-2xs transition-all group cursor-pointer"
             >
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 group-hover:text-violet-600 dark:group-hover:text-violet-400">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs font-medium text-zinc-800 dark:text-zinc-200 group-hover:text-zinc-950 dark:group-hover:text-white">
                   {preset.title}
                 </span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-900 text-zinc-500">
                   {preset.badge}
                 </span>
               </div>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2">
+              <p className="text-xs text-zinc-400 line-clamp-2">
                 {preset.description}
               </p>
             </button>
@@ -170,65 +166,57 @@ export default function PrdInputHero({
       </div>
 
       {/* Main Form Container */}
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm overflow-hidden">
+      <form onSubmit={handleSubmit} className="bg-white dark:bg-zinc-950 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs overflow-hidden">
         {/* Form Header */}
-        <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/40 px-6 py-3.5">
-          <div className="flex items-center gap-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            <FileText className="w-4 h-4 text-violet-600 dark:text-violet-400" />
+        <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-900 bg-zinc-50/60 dark:bg-zinc-900/40 px-5 py-3">
+          <div className="flex items-center gap-2 text-xs font-medium text-zinc-700 dark:text-zinc-300">
+            <FileText className="w-3.5 h-3.5 text-zinc-400" />
             <span>PRD / Markdown Specification</span>
           </div>
-          <span className="text-xs text-zinc-500 font-mono">
-            {prdText.length} / 25,000 characters
+          <span className="text-[11px] text-zinc-400 font-mono">
+            {prdText.length} characters
           </span>
         </div>
 
         {/* Textarea Content */}
-        <div className="p-6 space-y-4">
-          <div className="space-y-2">
+        <div className="p-5 space-y-3.5">
+          <div className="space-y-1.5">
             <textarea
               id="prdText"
-              rows={12}
+              rows={10}
               value={prdText}
               onChange={(e) => {
                 setPrdText(e.target.value);
                 if (inputError) setInputError(null);
               }}
               placeholder="Paste requirements here... e.g. # Authentication System&#10;- Support GitHub OAuth and email magic links&#10;- Session tokens must expire in 7 days&#10;- Organization RBAC roles: Owner, Admin, Member"
-              className={`w-full p-4 rounded-xl border ${
-                inputError ? "border-rose-400 dark:border-rose-700 bg-rose-50/30 dark:bg-rose-950/20" : "border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950"
-              } focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm font-mono leading-relaxed resize-y`}
+              className={`w-full p-3.5 rounded-xl border ${
+                inputError ? "border-red-300 dark:border-red-800 bg-red-50/20" : "border-zinc-200 dark:border-zinc-800 bg-zinc-50/40 dark:bg-zinc-900/40"
+              } focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 text-xs font-mono leading-relaxed resize-y`}
             />
             {inputError && (
-              <p className="text-xs text-rose-600 dark:text-rose-400 font-medium flex items-center gap-1.5 mt-1">
-                <span>⚠️</span> {inputError}
+              <p className="text-xs text-red-600 dark:text-red-400 font-medium">
+                {inputError}
               </p>
             )}
           </div>
 
-          {/* V2 Notion OAuth Note */}
-          <div className="flex items-start gap-2.5 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-500 dark:text-zinc-400">
-            <Info className="w-4 h-4 flex-shrink-0 text-violet-500 mt-0.5" />
-            <div>
-              <strong>Working in Notion?</strong> Copy and paste your Notion document content or Markdown directly into the field above. Direct Notion workspace OAuth integration is scheduled for V2.
-            </div>
-          </div>
-
           {/* Submit Action */}
-          <div className="flex justify-end pt-2">
+          <div className="flex justify-end pt-1">
             <button
               type="submit"
               disabled={isLoading}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white font-medium text-sm shadow-md transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 disabled:opacity-50 text-white font-medium text-xs shadow-xs transition-all cursor-pointer"
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Analyzing Requirements...
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>Analyzing Requirements...</span>
                 </>
               ) : (
                 <>
                   <span>Analyze PRD</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </>
               )}
             </button>

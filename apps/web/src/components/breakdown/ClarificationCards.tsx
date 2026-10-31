@@ -28,7 +28,6 @@ export default function ClarificationCards({
   onBack,
   isLoading,
 }: ClarificationCardsProps) {
-  // Pre-seed answers with recommended options
   const [answers, setAnswers] = useState<Record<string, string>>(() => {
     const initial: Record<string, string> = {};
     for (const q of questions) {
@@ -43,7 +42,6 @@ export default function ClarificationCards({
 
   const [customAnswers, setCustomAnswers] = useState<Record<string, string>>({});
 
-  // Reset/sync answers whenever questions change
   useEffect(() => {
     const initial: Record<string, string> = {};
     for (const q of questions) {
@@ -83,40 +81,38 @@ export default function ClarificationCards({
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
       {/* Title & Context Banner */}
-      <div className="p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 space-y-2">
-        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-violet-600 dark:text-violet-400">
-          <HelpCircle className="w-4 h-4" />
-          <span>Stage 2 · Clarify Technical Ambiguities</span>
+      <div className="p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 space-y-1.5 shadow-xs">
+        <div className="flex items-center gap-1.5 text-xs font-mono text-zinc-400">
+          <HelpCircle className="w-3.5 h-3.5" />
+          <span>STAGE 02 · ARCHITECTURAL CLARIFICATIONS</span>
         </div>
-        <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">
+        <h2 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
           {projectTitle}
         </h2>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          {summary} Gemini spotted these key architectural decisions before constructing the issue graph.
+        <p className="text-xs text-zinc-500 leading-relaxed">
+          {summary} Confirm these technical decisions to produce well-scoped issues.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-4">
         {questions.map((q, idx) => (
           <div
             key={q.id}
-            className="p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm space-y-3"
+            className="p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 shadow-2xs space-y-2.5"
           >
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <span className="text-xs font-semibold text-zinc-400">Question {idx + 1} of {questions.length}</span>
-                <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-                  {q.question}
-                </h3>
-              </div>
+            <div>
+              <span className="text-[10px] font-mono uppercase text-zinc-400">Question {idx + 1} of {questions.length}</span>
+              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mt-0.5">
+                {q.question}
+              </h3>
             </div>
 
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            <p className="text-xs text-zinc-500">
               {q.context}
             </p>
 
             {/* Options List */}
-            <div className="space-y-2 pt-1">
+            <div className="space-y-1.5 pt-1">
               {q.options.map((option) => {
                 const isSelected = answers[q.id] === option;
                 const isRecommended = q.recommendedOption === option;
@@ -126,27 +122,27 @@ export default function ClarificationCards({
                     key={option}
                     type="button"
                     onClick={() => handleSelectOption(q.id, option)}
-                    className={`w-full text-left p-3 rounded-xl border text-sm flex items-center justify-between transition-all ${
+                    className={`w-full text-left p-3 rounded-xl border text-xs flex items-center justify-between transition-colors ${
                       isSelected
-                        ? "border-violet-600 bg-violet-50/50 dark:bg-violet-950/30 text-violet-900 dark:text-violet-200 font-medium"
-                        : "border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950 text-zinc-700 dark:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-700"
+                        ? "border-zinc-900 dark:border-zinc-100 bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium"
+                        : "border-zinc-200/70 dark:border-zinc-800/70 bg-white dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700"
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
                       <div
-                        className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                        className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center shrink-0 ${
                           isSelected
-                            ? "border-violet-600 bg-violet-600 text-white"
+                            ? "border-zinc-900 bg-zinc-900 dark:border-zinc-100 dark:bg-zinc-100"
                             : "border-zinc-300 dark:border-zinc-700"
                         }`}
                       >
-                        {isSelected && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                        {isSelected && <div className="w-1 h-1 bg-white dark:bg-zinc-900 rounded-full" />}
                       </div>
                       <span>{option}</span>
                     </div>
                     {isRecommended && (
-                      <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 font-medium flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3" />
+                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-900/40 flex items-center gap-1">
+                        <CheckCircle2 className="w-2.5 h-2.5" />
                         Recommended
                       </span>
                     )}
@@ -158,10 +154,10 @@ export default function ClarificationCards({
               <div className="pt-1">
                 <input
                   type="text"
-                  placeholder="Or write a custom answer..."
+                  placeholder="Or provide a custom technical choice..."
                   value={customAnswers[q.id] || ""}
                   onChange={(e) => handleCustomChange(q.id, e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-transparent text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-violet-500"
+                  className="w-full px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-xs text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors"
                 />
               </div>
             </div>
@@ -174,37 +170,37 @@ export default function ClarificationCards({
             type="button"
             onClick={onBack}
             disabled={isLoading}
-            className="flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" />
-            Back to PRD
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Back to PRD</span>
           </button>
 
-          <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="flex items-center gap-2.5 w-full sm:w-auto">
             <button
               type="button"
               onClick={handleProceedWithDefaults}
               disabled={isLoading}
-              className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-semibold text-zinc-700 dark:text-zinc-300 transition-colors cursor-pointer"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-xs font-medium text-zinc-700 dark:text-zinc-300 transition-colors shadow-2xs"
             >
-              <FastForward className="w-3.5 h-3.5" />
-              Proceed with Defaults (Speedrun)
+              <FastForward className="w-3 h-3" />
+              <span>Use Recommendations</span>
             </button>
 
             <button
               type="submit"
               disabled={isLoading}
-              className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-medium text-sm shadow-md transition-all cursor-pointer"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 text-white font-medium text-xs shadow-xs transition-colors"
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Generating Breakdown...
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>Generating Breakdown...</span>
                 </>
               ) : (
                 <>
                   <span>Generate Breakdown</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </>
               )}
             </button>

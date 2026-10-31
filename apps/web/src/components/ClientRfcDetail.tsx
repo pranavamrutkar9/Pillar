@@ -11,7 +11,20 @@ import {
 import Link from "next/link";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
-import { DocumentTextIcon, CheckIcon, HandThumbUpIcon, HandThumbDownIcon, MinusIcon, PlusIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
+import { 
+  ArrowLeft, 
+  Check, 
+  X, 
+  Minus, 
+  Plus, 
+  CheckCircle2, 
+  ListTodo, 
+  Sparkles,
+  AlertCircle,
+  ThumbsUp,
+  ThumbsDown,
+  Loader2
+} from "lucide-react";
 
 export default function ClientRfcDetail({ project, rfc, isViewer, currentUser }: { project: any, rfc: any, isViewer: boolean, currentUser: any }) {
   const [isUpdating, setIsUpdating] = useState(false);
@@ -33,7 +46,7 @@ export default function ClientRfcDetail({ project, rfc, isViewer, currentUser }:
       await updateRfcStatusAction(project.id, rfc.id, status);
       router.refresh();
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || "Failed to update status");
     } finally {
       setIsUpdating(false);
     }
@@ -46,7 +59,7 @@ export default function ClientRfcDetail({ project, rfc, isViewer, currentUser }:
       await castVoteAction(project.id, rfc.id, vote);
       router.refresh();
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || "Failed to cast vote");
     } finally {
       setIsUpdating(false);
     }
@@ -65,7 +78,7 @@ export default function ClientRfcDetail({ project, rfc, isViewer, currentUser }:
       setIsAddingSection(false);
       router.refresh();
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || "Failed to add section");
     } finally {
       setIsUpdating(false);
     }
@@ -80,7 +93,7 @@ export default function ClientRfcDetail({ project, rfc, isViewer, currentUser }:
       setIsAddingTask(false);
       router.refresh();
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || "Failed to add task");
     } finally {
       setIsUpdating(false);
     }
@@ -92,7 +105,7 @@ export default function ClientRfcDetail({ project, rfc, isViewer, currentUser }:
       await spawnIssuesAction(project.id, rfc.id);
       router.refresh();
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || "Failed to generate issues");
     } finally {
       setIsUpdating(false);
     }
@@ -121,81 +134,113 @@ export default function ClientRfcDetail({ project, rfc, isViewer, currentUser }:
   const generatedTasks = rfc.tasks?.filter((t: any) => t.generatedIssueId) || [];
 
   return (
-    <div className="max-w-5xl mx-auto p-6 pb-32">
-      <div className="mb-6">
-        <Link href={`/projects/${project.id}/rfcs`} className="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-          &larr; Back to RFCs
+    <div className="max-w-5xl mx-auto space-y-6 pb-28">
+      
+      {/* Back button */}
+      <div>
+        <Link 
+          href={`/projects/${project.id}/rfcs`} 
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>Back to RFCs</span>
         </Link>
       </div>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 rounded-lg text-sm">
-          {error}
+        <div className="p-3 bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 border border-red-200/60 dark:border-red-900/40 rounded-xl text-xs flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
-      {/* Hero Header */}
-      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm overflow-hidden mb-8">
-        <div className="p-6 md:p-8">
+      {/* Hero Header Card */}
+      <div className="bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl shadow-xs overflow-hidden">
+        <div className="p-6 sm:p-8">
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
             <div className="flex-1">
-              <div className="flex items-center gap-3 mb-3">
-                <span className={`text-xs px-2.5 py-1 rounded-full font-bold uppercase tracking-wider ${
-                  isAccepted ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' :
-                  isReview ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300' :
-                  isImplemented ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300' :
-                  'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-300'
+              <div className="flex items-center gap-2.5 mb-2.5">
+                <span className={`text-[10px] font-mono px-2 py-0.5 rounded border uppercase ${
+                  isAccepted ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-900/40' :
+                  isReview ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-300 border-amber-200/60 dark:border-amber-900/40' :
+                  isImplemented ? 'bg-purple-50 text-purple-700 dark:bg-purple-950/30 dark:text-purple-300 border-purple-200/60 dark:border-purple-900/40' :
+                  'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 border-zinc-200/60'
                 }`}>
                   {rfc.status.replace('_', ' ')}
                 </span>
-                <span className="text-zinc-500 text-sm">
+                <span className="text-zinc-400 text-xs font-mono">
                   {format(new Date(rfc.createdAt), "MMMM d, yyyy")}
                 </span>
               </div>
-              <h1 className="text-3xl md:text-4xl font-extrabold text-zinc-900 dark:text-white mb-3 leading-tight">{rfc.title}</h1>
-              <p className="text-lg text-zinc-600 dark:text-zinc-400 mb-4">{rfc.summary}</p>
-              <div className="flex items-center gap-2 text-sm text-zinc-500">
-                <span>Proposed by <span className="font-medium text-zinc-900 dark:text-white">{rfc.author?.username || 'Unknown'}</span></span>
-              </div>
+
+              <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mb-2">
+                {rfc.title}
+              </h1>
+              
+              {rfc.summary && (
+                <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed mb-4">
+                  {rfc.summary}
+                </p>
+              )}
+
+              <p className="text-xs text-zinc-400">
+                Proposed by <span className="font-medium text-zinc-700 dark:text-zinc-300">{rfc.author?.username || rfc.author?.email || 'Engineering Team'}</span>
+              </p>
             </div>
 
-            {/* Voting Stats */}
-            <div className="flex-shrink-0 flex gap-4 md:flex-col p-4 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-100 dark:border-zinc-800 text-center">
+            {/* Voting Score Pill */}
+            <div className="shrink-0 flex sm:flex-col gap-3 p-3 bg-zinc-50/70 dark:bg-zinc-900/40 rounded-xl border border-zinc-100 dark:border-zinc-900 text-center">
               <div>
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400">{approvals}</div>
-                <div className="text-xs font-medium text-zinc-500 uppercase tracking-wide">Approvals</div>
+                <div className="text-xl font-bold font-mono text-emerald-600 dark:text-emerald-400">{approvals}</div>
+                <div className="text-[10px] font-mono text-zinc-400 uppercase">Approvals</div>
               </div>
-              <div className="hidden md:block w-full h-px bg-zinc-200 dark:bg-zinc-800"></div>
+              <div className="hidden sm:block w-full h-px bg-zinc-200/60 dark:border-zinc-800" />
               <div>
-                <div className="text-2xl font-bold text-red-600 dark:text-red-400">{changes}</div>
-                <div className="text-xs font-medium text-zinc-500 uppercase tracking-wide">Changes Req</div>
+                <div className="text-xl font-bold font-mono text-red-600 dark:text-red-400">{changes}</div>
+                <div className="text-[10px] font-mono text-zinc-400 uppercase">Changes</div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Status Transitions */}
+        {/* Status Transitions Bar */}
         {!isViewer && (
-          <div className="px-6 py-4 bg-zinc-50 dark:bg-zinc-900/50 border-t border-zinc-200 dark:border-zinc-800 flex flex-wrap gap-2 items-center justify-between">
-            <div className="text-sm font-medium text-zinc-500">Lifecycle Management</div>
-            <div className="flex gap-2">
+          <div className="px-6 py-3 bg-zinc-50/70 dark:bg-zinc-900/40 border-t border-zinc-100 dark:border-zinc-900 flex flex-wrap gap-2 items-center justify-between">
+            <span className="text-xs text-zinc-400 font-mono">LIFECYCLE STATUS</span>
+            <div className="flex items-center gap-2">
               {isDraft && (
-                <button onClick={() => handleStatusChange("IN_REVIEW")} disabled={isUpdating} className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors">
+                <button 
+                  onClick={() => handleStatusChange("IN_REVIEW")} 
+                  disabled={isUpdating} 
+                  className="px-3 py-1.5 bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 rounded-lg text-xs font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors disabled:opacity-50 shadow-2xs"
+                >
                   Submit for Review
                 </button>
               )}
               {isReview && (
                 <>
-                  <button onClick={() => handleStatusChange("DRAFT")} disabled={isUpdating} className="px-4 py-2 bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white rounded-md text-sm font-medium hover:bg-zinc-300 dark:hover:bg-zinc-700 disabled:opacity-50 transition-colors">
+                  <button 
+                    onClick={() => handleStatusChange("DRAFT")} 
+                    disabled={isUpdating} 
+                    className="px-3 py-1.5 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-lg text-xs font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
+                  >
                     Return to Draft
                   </button>
-                  <button onClick={() => handleStatusChange("ACCEPTED")} disabled={isUpdating} className="px-4 py-2 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700 disabled:opacity-50 transition-colors">
+                  <button 
+                    onClick={() => handleStatusChange("ACCEPTED")} 
+                    disabled={isUpdating} 
+                    className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-medium transition-colors disabled:opacity-50 shadow-2xs"
+                  >
                     Accept RFC
                   </button>
                 </>
               )}
               {isAccepted && (
-                <button onClick={() => handleStatusChange("IMPLEMENTED")} disabled={isUpdating} className="px-4 py-2 bg-purple-600 text-white rounded-md text-sm font-medium hover:bg-purple-700 disabled:opacity-50 transition-colors">
+                <button 
+                  onClick={() => handleStatusChange("IMPLEMENTED")} 
+                  disabled={isUpdating} 
+                  className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-medium transition-colors disabled:opacity-50 shadow-2xs"
+                >
                   Mark as Implemented
                 </button>
               )}
@@ -204,67 +249,75 @@ export default function ClientRfcDetail({ project, rfc, isViewer, currentUser }:
         )}
       </div>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Main 2-Col Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Sections (Left 2/3) */}
-        <div className="lg:col-span-2 space-y-6">
-          <h2 className="text-2xl font-bold border-b border-zinc-200 dark:border-zinc-800 pb-2">RFC Sections</h2>
+        <div className="lg:col-span-2 space-y-4">
+          <div className="flex items-center justify-between pb-2 border-b border-zinc-200/80 dark:border-zinc-800/80">
+            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Specification Sections</h2>
+            <span className="text-xs font-mono text-zinc-400">{rfc.sections?.length || 0} sections</span>
+          </div>
           
           {rfc.sections?.length === 0 ? (
-            <div className="text-center p-8 bg-zinc-50 dark:bg-zinc-900/50 border border-dashed border-zinc-300 dark:border-zinc-700 rounded-xl">
-              <p className="text-zinc-500">No sections added yet.</p>
+            <div className="text-center p-8 bg-white dark:bg-zinc-950 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl">
+              <p className="text-xs text-zinc-400">No content sections added yet.</p>
             </div>
           ) : (
-            rfc.sections?.map((section: any) => (
-              <div key={section.id} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm">
-                <h3 className="text-xl font-bold mb-4 text-zinc-900 dark:text-white">{section.title}</h3>
-                <div className="prose dark:prose-invert max-w-none text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap">
+            rfc.sections?.map((section: any, idx: number) => (
+              <div key={section.id} className="bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl p-6 shadow-2xs">
+                <div className="text-[11px] font-mono text-zinc-400 mb-1">SECTION {idx + 1}</div>
+                <h3 className="text-base font-semibold mb-3 text-zinc-900 dark:text-zinc-100">{section.title}</h3>
+                <div className="text-sm leading-relaxed text-zinc-800 dark:text-zinc-200 whitespace-pre-wrap">
                   {section.content}
-                </div>
-                
-                {/* Per-section Comments (Simplified) */}
-                <div className="mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800 flex justify-between items-center text-sm">
-                  <span className="text-zinc-500 font-medium">{section._count?.comments || 0} comments</span>
-                  <button className="text-blue-600 dark:text-blue-400 font-medium hover:underline">Discuss Section</button>
                 </div>
               </div>
             ))
           )}
 
           {!isViewer && (isDraft || isReview) && (
-            <div className="mt-8">
+            <div className="pt-2">
               {!isAddingSection ? (
                 <button 
                   onClick={() => setIsAddingSection(true)}
-                  className="w-full py-4 border-2 border-dashed border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-500 font-medium hover:border-zinc-400 dark:hover:border-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-all flex items-center justify-center gap-2"
+                  className="w-full py-3 border border-dashed border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-500 text-xs font-medium hover:border-zinc-400 dark:hover:border-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors flex items-center justify-center gap-1.5"
                 >
-                  <PlusIcon className="w-5 h-5" /> Add Section
+                  <Plus className="w-4 h-4" /> Add Section
                 </button>
               ) : (
-                <form onSubmit={handleAddSection} className="p-6 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl">
-                  <h3 className="font-bold mb-4">New Section</h3>
-                  <div className="space-y-4">
-                    <input 
-                      type="text" 
-                      required 
-                      placeholder="Section Title (e.g. API Design)"
-                      value={sectionData.title}
-                      onChange={e => setSectionData({ ...sectionData, title: e.target.value })}
-                      className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-950 focus:ring-2 focus:ring-blue-500 outline-none"
-                    />
-                    <textarea 
-                      required 
-                      rows={6}
-                      placeholder="Section content in markdown..."
-                      value={sectionData.content}
-                      onChange={e => setSectionData({ ...sectionData, content: e.target.value })}
-                      className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-950 focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm"
-                    />
-                    <div className="flex justify-end gap-2">
-                      <button type="button" onClick={() => setIsAddingSection(false)} className="px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-md font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">Cancel</button>
-                      <button type="submit" disabled={isUpdating} className="px-4 py-2 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 disabled:opacity-50">Add Section</button>
-                    </div>
+                <form onSubmit={handleAddSection} className="p-5 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl space-y-3.5 shadow-2xs">
+                  <h3 className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Add New Section</h3>
+                  <input 
+                    type="text" 
+                    required 
+                    placeholder="Section Title (e.g. Protocol & Schema Design)"
+                    value={sectionData.title}
+                    onChange={e => setSectionData({ ...sectionData, title: e.target.value })}
+                    className="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors"
+                  />
+                  <textarea 
+                    required 
+                    rows={5}
+                    placeholder="Section details, technical considerations, and diagrams..."
+                    value={sectionData.content}
+                    onChange={e => setSectionData({ ...sectionData, content: e.target.value })}
+                    className="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors font-mono"
+                  />
+                  <div className="flex justify-end gap-2">
+                    <button 
+                      type="button" 
+                      onClick={() => setIsAddingSection(false)} 
+                      className="px-3 py-1.5 text-xs text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      type="submit" 
+                      disabled={isUpdating} 
+                      className="px-4 py-1.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-lg text-xs font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 disabled:opacity-50"
+                    >
+                      Save Section
+                    </button>
                   </div>
                 </form>
               )}
@@ -272,35 +325,35 @@ export default function ClientRfcDetail({ project, rfc, isViewer, currentUser }:
           )}
         </div>
 
-        {/* Sidebar (Right 1/3) */}
-        <div className="space-y-6">
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm sticky top-6">
-            <h3 className="text-lg font-bold mb-4 flex items-center gap-2 border-b border-zinc-200 dark:border-zinc-800 pb-2">
-              <CheckIcon className="w-5 h-5 text-blue-500" />
-              Implementation Tasks
+        {/* Implementation Tasks (Right 1/3) */}
+        <div className="space-y-4">
+          <div className="bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl p-5 shadow-2xs sticky top-20">
+            <h3 className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 pb-3 mb-3 border-b border-zinc-100 dark:border-zinc-900">
+              <ListTodo className="w-4 h-4 text-zinc-500" />
+              <span>Implementation Roadmap</span>
             </h3>
 
             {rfc.tasks?.length === 0 && (
-              <p className="text-zinc-500 text-sm italic mb-4">No tasks defined yet.</p>
+              <p className="text-xs text-zinc-400 italic mb-4">No tasks defined yet.</p>
             )}
 
-            <ul className="space-y-3 mb-6">
+            <ul className="space-y-2 mb-4">
               {generatedTasks.map((t: any) => (
-                <li key={t.id} className="flex items-start gap-2 text-sm text-zinc-500 line-through opacity-70">
-                  <CheckCircleIcon className="w-5 h-5 shrink-0 text-green-500" />
-                  <span>{t.description} (Generated Issue)</span>
+                <li key={t.id} className="flex items-start gap-2 text-xs text-zinc-400 line-through">
+                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-emerald-500 mt-0.5" />
+                  <span>{t.description}</span>
                 </li>
               ))}
               {ungeneratedTasks.map((t: any) => (
-                <li key={t.id} className="flex items-start gap-2 text-sm font-medium text-zinc-800 dark:text-zinc-200">
-                  <div className="w-5 h-5 shrink-0 rounded-full border-2 border-zinc-300 dark:border-zinc-600 flex items-center justify-center"></div>
+                <li key={t.id} className="flex items-start gap-2 text-xs text-zinc-700 dark:text-zinc-300">
+                  <div className="w-3.5 h-3.5 shrink-0 rounded-full border border-zinc-300 dark:border-zinc-700 mt-0.5" />
                   <span>{t.description}</span>
                 </li>
               ))}
             </ul>
 
             {!isViewer && (
-              <div className="space-y-4">
+              <div className="space-y-3 pt-2 border-t border-zinc-100 dark:border-zinc-900">
                 {isAddingTask ? (
                   <form onSubmit={handleAddTask} className="flex flex-col gap-2">
                     <input 
@@ -309,73 +362,98 @@ export default function ClientRfcDetail({ project, rfc, isViewer, currentUser }:
                       placeholder="Task description..."
                       value={taskDesc}
                       onChange={e => setTaskDesc(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-zinc-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-950 focus:ring-2 focus:ring-blue-500 outline-none"
+                      className="w-full px-3 py-1.5 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors"
                     />
                     <div className="flex gap-2">
-                      <button type="submit" disabled={isUpdating} className="flex-1 py-1.5 bg-blue-600 text-white rounded-md text-xs font-bold hover:bg-blue-700 disabled:opacity-50">Add</button>
-                      <button type="button" onClick={() => setIsAddingTask(false)} className="flex-1 py-1.5 border border-zinc-300 dark:border-zinc-700 rounded-md text-xs font-bold hover:bg-zinc-100 dark:hover:bg-zinc-800">Cancel</button>
+                      <button 
+                        type="submit" 
+                        disabled={isUpdating} 
+                        className="flex-1 py-1.5 bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 rounded-lg text-xs font-medium hover:bg-zinc-800 disabled:opacity-50"
+                      >
+                        Add
+                      </button>
+                      <button 
+                        type="button" 
+                        onClick={() => setIsAddingTask(false)} 
+                        className="flex-1 py-1.5 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                      >
+                        Cancel
+                      </button>
                     </div>
                   </form>
                 ) : (
                   <button 
                     onClick={() => setIsAddingTask(true)}
-                    className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+                    className="text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 flex items-center gap-1"
                   >
-                    <PlusIcon className="w-4 h-4" /> Add Task
+                    <Plus className="w-3.5 h-3.5" /> Add Task
                   </button>
                 )}
 
                 {isAccepted && ungeneratedTasks.length > 0 && (
-                  <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800">
+                  <div className="pt-2">
                     <button 
                       onClick={handleSpawnIssues}
                       disabled={isUpdating}
-                      className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg text-sm font-bold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+                      className="w-full py-2 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-lg text-xs font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors shadow-xs flex items-center justify-center gap-1.5 disabled:opacity-50"
                     >
-                      <span>🚀 Generate {ungeneratedTasks.length} Issues</span>
+                      {isUpdating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                      <span>Generate {ungeneratedTasks.length} Issues</span>
                     </button>
-                    <p className="text-xs text-center text-zinc-500 mt-2">1-Click Issue Generator</p>
+                    <p className="text-[11px] text-center text-zinc-400 mt-1.5">Convert tasks to project issues</p>
                   </div>
                 )}
               </div>
             )}
           </div>
         </div>
+
       </div>
 
-      {/* Sticky Action Bar */}
+      {/* Floating Glass Voting Bar */}
       {!isViewer && (isReview || isDraft || isAccepted) && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-t border-zinc-200 dark:border-zinc-800 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)] py-4 px-6">
-          <div className="max-w-5xl mx-auto flex items-center justify-between">
-            <div className="font-medium text-zinc-900 dark:text-white hidden sm:block">
-              {myVote ? `You voted: ${myVote}` : "Cast your vote:"}
-            </div>
-            <div className="flex items-center gap-3 w-full sm:w-auto justify-center">
-              <button 
-                onClick={() => handleVote("APPROVE")}
-                disabled={isUpdating}
-                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-full font-bold transition-all ${myVote === 'APPROVE' ? 'bg-green-600 text-white shadow-lg ring-2 ring-green-600 ring-offset-2 dark:ring-offset-zinc-950' : 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50'}`}
-              >
-                <HandThumbUpIcon className="w-5 h-5" /> Approve
-              </button>
-              <button 
-                onClick={() => handleVote("REQUEST_CHANGES")}
-                disabled={isUpdating}
-                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-full font-bold transition-all ${myVote === 'REQUEST_CHANGES' ? 'bg-red-600 text-white shadow-lg ring-2 ring-red-600 ring-offset-2 dark:ring-offset-zinc-950' : 'bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50'}`}
-              >
-                <HandThumbDownIcon className="w-5 h-5" /> Request Changes
-              </button>
-              <button 
-                onClick={() => handleVote("ABSTAIN")}
-                disabled={isUpdating}
-                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-full font-bold transition-all ${myVote === 'ABSTAIN' ? 'bg-zinc-600 text-white shadow-lg ring-2 ring-zinc-600 ring-offset-2 dark:ring-offset-zinc-950' : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700'}`}
-              >
-                <MinusIcon className="w-5 h-5" /> Abstain
-              </button>
-            </div>
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border border-zinc-200/80 dark:border-zinc-800/80 shadow-lg rounded-full px-5 py-2.5 flex items-center gap-4">
+          <div className="text-xs text-zinc-500 hidden sm:block font-mono">
+            {myVote ? `Your vote: ${myVote}` : "Cast vote:"}
+          </div>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => handleVote("APPROVE")}
+              disabled={isUpdating}
+              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                myVote === 'APPROVE' 
+                  ? 'bg-emerald-600 text-white shadow-2xs' 
+                  : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-emerald-50 hover:text-emerald-700 dark:hover:bg-emerald-950/40 dark:hover:text-emerald-300'
+              }`}
+            >
+              <ThumbsUp className="w-3 h-3" /> Approve
+            </button>
+            <button 
+              onClick={() => handleVote("REQUEST_CHANGES")}
+              disabled={isUpdating}
+              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                myVote === 'REQUEST_CHANGES' 
+                  ? 'bg-red-600 text-white shadow-2xs' 
+                  : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-950/40 dark:hover:text-red-300'
+              }`}
+            >
+              <ThumbsDown className="w-3 h-3" /> Changes Req
+            </button>
+            <button 
+              onClick={() => handleVote("ABSTAIN")}
+              disabled={isUpdating}
+              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                myVote === 'ABSTAIN' 
+                  ? 'bg-zinc-700 text-white shadow-2xs' 
+                  : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200'
+              }`}
+            >
+              <Minus className="w-3 h-3" /> Abstain
+            </button>
           </div>
         </div>
       )}
+
     </div>
   );
 }

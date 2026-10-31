@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { Search, Layers, CheckSquare, MessageSquare, Loader2 } from "lucide-react";
 
 interface SearchResult {
   projects: any[];
@@ -67,50 +68,63 @@ export default function GlobalSearch({ workspaceId, sessionToken }: { workspaceI
       }
     };
 
-    const debounce = setTimeout(fetchSearch, 300);
+    const debounce = setTimeout(fetchSearch, 250);
     return () => clearTimeout(debounce);
   }, [query, workspaceId, sessionToken]);
 
   const handleResultClick = (url: string) => {
     setIsOpen(false);
+    setQuery("");
     router.push(url);
   };
 
   const hasResults = results && (results.projects.length > 0 || results.issues.length > 0 || results.comments.length > 0);
 
   return (
-    <div className="relative w-64 md:w-80" ref={wrapperRef}>
-      <input
-        type="text"
-        placeholder="Search projects, issues..."
-        className="w-full px-3 py-1.5 text-sm bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-md focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-black dark:text-white"
-        value={query}
-        onChange={(e) => {
-          setQuery(e.target.value);
-          setIsOpen(true);
-        }}
-        onFocus={() => setIsOpen(true)}
-      />
+    <div className="relative w-48 sm:w-64" ref={wrapperRef}>
+      <div className="relative flex items-center">
+        <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 pointer-events-none" />
+        <input
+          type="text"
+          placeholder="Search..."
+          className="w-full pl-8 pr-3 py-1.5 text-xs bg-zinc-100/70 dark:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60 rounded-lg focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400"
+          value={query}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setIsOpen(true);
+          }}
+          onFocus={() => setIsOpen(true)}
+        />
+      </div>
       
       {isOpen && query.trim().length > 0 && (
-        <div className="absolute top-full right-0 mt-2 w-[350px] bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-xl overflow-hidden z-50 max-h-96 flex flex-col">
+        <div className="absolute top-full right-0 mt-2 w-80 bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl shadow-xl overflow-hidden z-50 max-h-96 flex flex-col animate-in fade-in zoom-in-95 duration-100">
           {isLoading ? (
-            <div className="p-4 text-center text-sm text-zinc-500">Searching...</div>
+            <div className="p-4 text-center text-xs text-zinc-400 flex items-center justify-center gap-1.5">
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              <span>Searching...</span>
+            </div>
           ) : !hasResults ? (
-            <div className="p-4 text-center text-sm text-zinc-500">No results found for "{query}"</div>
+            <div className="p-4 text-center text-xs text-zinc-400">
+              No results found for "{query}"
+            </div>
           ) : (
-            <div className="overflow-y-auto py-2">
+            <div className="overflow-y-auto py-2 divide-y divide-zinc-100 dark:divide-zinc-900">
+              
               {results.projects.length > 0 && (
-                <div className="mb-2">
-                  <div className="px-3 py-1 text-xs font-semibold text-zinc-500 uppercase tracking-wider">Projects</div>
+                <div className="py-1">
+                  <div className="px-3 py-1 text-[10px] font-mono font-medium text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <Layers className="w-3 h-3" /> Projects
+                  </div>
                   <ul className="flex flex-col">
                     {results.projects.map((p) => (
                       <li key={p.id}>
                         <button 
                           onClick={() => handleResultClick(`/projects/${p.id}/issues`)}
-                          className="w-full text-left px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-900 text-black dark:text-white"
+                          className="w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-800 dark:text-zinc-200 transition-colors flex items-center justify-between"
                         >
-                          <span className="font-medium">{p.name}</span>
+                          <span className="font-medium truncate">{p.name}</span>
+                          <span className="text-[10px] font-mono text-zinc-400">{p.slug}</span>
                         </button>
                       </li>
                     ))}
@@ -119,18 +133,20 @@ export default function GlobalSearch({ workspaceId, sessionToken }: { workspaceI
               )}
               
               {results.issues.length > 0 && (
-                <div className="mb-2">
-                  <div className="px-3 py-1 text-xs font-semibold text-zinc-500 uppercase tracking-wider">Issues</div>
+                <div className="py-1">
+                  <div className="px-3 py-1 text-[10px] font-mono font-medium text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <CheckSquare className="w-3 h-3" /> Issues
+                  </div>
                   <ul className="flex flex-col">
                     {results.issues.map((i) => (
                       <li key={i.id}>
                         <button 
                           onClick={() => handleResultClick(`/projects/${i.project.id}/issues/${i.sequenceId}`)}
-                          className="w-full text-left px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-900"
+                          className="w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-800 dark:text-zinc-200 transition-colors"
                         >
                           <div className="flex flex-col">
-                            <span className="font-medium text-black dark:text-white">{i.title}</span>
-                            <span className="text-xs text-zinc-500">{i.project.slug}-{i.sequenceId}</span>
+                            <span className="font-medium text-zinc-900 dark:text-zinc-100 truncate">{i.title}</span>
+                            <span className="text-[10px] font-mono text-zinc-400">{i.project?.slug}-{i.sequenceId}</span>
                           </div>
                         </button>
                       </li>
@@ -140,8 +156,10 @@ export default function GlobalSearch({ workspaceId, sessionToken }: { workspaceI
               )}
 
               {results.comments.length > 0 && (
-                <div>
-                  <div className="px-3 py-1 text-xs font-semibold text-zinc-500 uppercase tracking-wider">Comments</div>
+                <div className="py-1">
+                  <div className="px-3 py-1 text-[10px] font-mono font-medium text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <MessageSquare className="w-3 h-3" /> Comments
+                  </div>
                   <ul className="flex flex-col">
                     {results.comments.map((c) => {
                       const bodyText = extractTextFromTipTap(c.body).trim();
@@ -149,13 +167,13 @@ export default function GlobalSearch({ workspaceId, sessionToken }: { workspaceI
                         <li key={c.id}>
                           <button 
                             onClick={() => handleResultClick(`/projects/${c.project.id}/issues/${c.project.sequenceId}`)}
-                            className="w-full text-left px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-900"
+                            className="w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-800 dark:text-zinc-200 transition-colors"
                           >
                             <div className="flex flex-col">
-                              <span className="font-medium text-black dark:text-white truncate">
+                              <span className="text-zinc-700 dark:text-zinc-300 truncate">
                                 {bodyText ? bodyText.substring(0, 60) : 'Comment on issue'}...
                               </span>
-                              <span className="text-xs text-zinc-500">In {c.project.slug}-{c.project.sequenceId}: {c.issueTitle}</span>
+                              <span className="text-[10px] font-mono text-zinc-400">In {c.project?.slug}-{c.project?.sequenceId}</span>
                             </div>
                           </button>
                         </li>
@@ -164,6 +182,7 @@ export default function GlobalSearch({ workspaceId, sessionToken }: { workspaceI
                   </ul>
                 </div>
               )}
+
             </div>
           )}
         </div>

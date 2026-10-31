@@ -27,14 +27,14 @@ export default function AcceptInviteForm({ token }: { token: string }) {
   };
 
   return (
-    <div className="flex flex-col gap-4 w-full items-center">
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+    <div className="flex flex-col gap-3 w-full items-center">
+      {error && <p className="text-rose-500 text-xs">{error}</p>}
       <button 
         onClick={handleAccept} 
         disabled={loading}
-        className="w-full max-w-xs bg-black dark:bg-white text-white dark:text-black font-semibold py-2 px-4 rounded-md disabled:opacity-50"
+        className="w-full bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-medium py-2.5 px-4 rounded-xl text-xs disabled:opacity-50 transition-colors shadow-sm"
       >
-        {loading ? 'Accepting...' : 'Accept Invite'}
+        {loading ? 'Joining workspace...' : 'Accept Invitation & Continue'}
       </button>
     </div>
   );

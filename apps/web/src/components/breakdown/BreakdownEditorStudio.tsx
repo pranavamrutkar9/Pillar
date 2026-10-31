@@ -536,17 +536,17 @@ export default function BreakdownEditorStudio({
         <button
           type="submit"
           disabled={isCommitting || data.issues.length === 0}
-          className="flex items-center gap-2 px-8 py-3.5 rounded-xl bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white font-bold text-sm shadow-lg hover:shadow-violet-500/25 transition-all cursor-pointer"
+          className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 disabled:opacity-50 font-medium text-xs shadow-xs transition-all cursor-pointer"
         >
           {isCommitting ? (
             <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              <span>Creating Project in 1 Transaction...</span>
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              <span>Creating Project...</span>
             </>
           ) : (
             <>
-              <Sparkles className="w-4 h-4" />
-              <span>Create Project in Pillar (1-Click)</span>
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Commit Project & Issues</span>
             </>
           )}
         </button>

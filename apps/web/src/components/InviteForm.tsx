@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { createInviteAction } from '@/actions/workspaceActions';
+import { UserPlus } from 'lucide-react';
 
 export function InviteForm({ workspaceId }: { workspaceId: string }) {
   const [email, setEmail] = useState('');
@@ -19,7 +20,7 @@ export function InviteForm({ workspaceId }: { workspaceId: string }) {
     try {
       await createInviteAction(workspaceId, email, role);
       setStatus('success');
-      setMessage('Invite sent successfully!');
+      setMessage('Invitation sent successfully.');
       setEmail('');
     } catch (err: any) {
       setStatus('error');
@@ -28,21 +29,24 @@ export function InviteForm({ workspaceId }: { workspaceId: string }) {
   };
 
   return (
-    <form onSubmit={handleInvite} className="mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-800 flex flex-col gap-3">
-      <h4 className="text-sm font-medium text-black dark:text-white mb-1">Invite new member</h4>
+    <form onSubmit={handleInvite} className="mt-6 pt-6 border-t border-zinc-200/80 dark:border-zinc-800/80 flex flex-col gap-3">
+      <div className="flex items-center gap-2">
+        <UserPlus className="w-3.5 h-3.5 text-zinc-500" />
+        <h4 className="text-xs font-medium text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Invite new member</h4>
+      </div>
       <div className="flex flex-col sm:flex-row gap-2">
         <input
           type="email"
-          placeholder="Email address"
+          placeholder="colleague@company.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="flex-1 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-black dark:text-white"
+          className="flex-1 bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400"
           required
         />
         <select
           value={role}
           onChange={(e) => setRole(e.target.value)}
-          className="bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-black dark:text-white"
+          className="bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 text-zinc-900 dark:text-zinc-100"
         >
           <option value="ADMIN">Admin</option>
           <option value="MEMBER">Member</option>
@@ -51,13 +55,13 @@ export function InviteForm({ workspaceId }: { workspaceId: string }) {
         <button
           type="submit"
           disabled={status === 'loading'}
-          className="bg-black dark:bg-white text-white dark:text-black px-4 py-1.5 rounded-md text-sm font-medium disabled:opacity-50"
+          className="bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 px-4 py-1.5 rounded-lg text-xs font-medium disabled:opacity-50 transition-colors shadow-sm"
         >
-          {status === 'loading' ? 'Sending...' : 'Send'}
+          {status === 'loading' ? 'Sending...' : 'Send Invite'}
         </button>
       </div>
       {message && (
-        <p className={`text-xs ${status === 'success' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+        <p className={`text-xs ${status === 'success' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
           {message}
         </p>
       )}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
+import { Sparkles, Send, Plus, Trash2, Clock, CheckCircle2, AlertTriangle, Loader2 } from "lucide-react";
 
 export default function ClientStandupFeed({ workspaceId, sessionToken }: { workspaceId: string; sessionToken: string }) {
   const [standups, setStandups] = useState<any[]>([]);
@@ -31,7 +32,7 @@ export default function ClientStandupFeed({ workspaceId, sessionToken }: { works
         if (json.data && json.data.status === "DRAFT") {
           setDraft(json.data);
         } else {
-          setDraft(null); // It's posted or doesn't exist
+          setDraft(null);
         }
       }
     } catch (e) {
@@ -101,31 +102,45 @@ export default function ClientStandupFeed({ workspaceId, sessionToken }: { works
     }
   };
 
-  if (loading) return <div className="text-zinc-500">Loading standups...</div>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-12 text-xs text-zinc-400">
+        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+        <span>Loading daily standups...</span>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col gap-12">
+    <div className="flex flex-col gap-10 max-w-4xl mx-auto">
+      
       {/* Draft Section */}
       {draft ? (
-        <div className="border border-blue-200 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-950/20 rounded-xl p-6 flex flex-col gap-6 shadow-sm relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-4">
-            <span className="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-100 dark:bg-blue-900/50 px-2 py-1 rounded">
+        <div className="border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 rounded-2xl p-6 sm:p-8 flex flex-col gap-6 shadow-xs relative overflow-hidden">
+          <div className="flex items-center justify-between pb-4 border-b border-zinc-100 dark:border-zinc-900">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Today's Standup Draft</h2>
+              </div>
+              <p className="text-xs text-zinc-500">Edit or refine your AI-compiled summary before sharing with the team.</p>
+            </div>
+            <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-500 bg-zinc-50 dark:bg-zinc-900">
               AI Draft
             </span>
           </div>
-          <div>
-            <h2 className="text-xl font-semibold text-black dark:text-white">Your Standup Draft</h2>
-            <p className="text-sm text-zinc-500 mt-1">Review your AI-generated draft before posting to the team.</p>
-          </div>
           
           <div className="flex flex-col gap-6">
-            <EditableSection title="Yesterday" items={draft.yesterday || []} onChange={(v) => updateDraft("yesterday", v)} />
-            <EditableSection title="Today" items={draft.today || []} onChange={(v) => updateDraft("today", v)} />
+            <EditableSection title="Accomplished Yesterday" items={draft.yesterday || []} onChange={(v) => updateDraft("yesterday", v)} />
+            <EditableSection title="Priorities for Today" items={draft.today || []} onChange={(v) => updateDraft("today", v)} />
             
             {(draft.attention || []).length > 0 && (
-              <div className="flex flex-col gap-2 p-4 border border-red-200 bg-red-50 dark:border-red-900/50 dark:bg-red-950/20 rounded-lg">
-                <h3 className="text-sm font-semibold text-red-700 dark:text-red-400">Attention Required</h3>
-                <ul className="list-disc pl-5 text-sm text-red-600 dark:text-red-300">
+              <div className="flex flex-col gap-2 p-4 border border-amber-200/60 dark:border-amber-900/40 bg-amber-50/40 dark:bg-amber-950/20 rounded-xl">
+                <h3 className="text-xs font-semibold text-amber-900 dark:text-amber-200 flex items-center gap-1.5">
+                  <AlertTriangle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                  <span>Blockers & Attention Required</span>
+                </h3>
+                <ul className="list-disc pl-5 text-xs text-amber-800 dark:text-amber-300 space-y-1">
                   {draft.attention.map((item: string, i: number) => (
                     <li key={i}>{item}</li>
                   ))}
@@ -134,73 +149,94 @@ export default function ClientStandupFeed({ workspaceId, sessionToken }: { works
             )}
           </div>
 
-          <div className="flex justify-end pt-4 border-t border-blue-200/50 dark:border-blue-900/30">
+          <div className="flex justify-end pt-4 border-t border-zinc-100 dark:border-zinc-900">
             <button 
               onClick={handlePost}
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium px-6 py-2 rounded-lg shadow-sm hover:opacity-90 transition-opacity"
+              className="inline-flex items-center gap-1.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-medium px-4 py-2 rounded-lg text-xs shadow-xs hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors"
             >
-              Post to Feed
+              <Send className="w-3.5 h-3.5" />
+              <span>Publish Standup</span>
             </button>
           </div>
         </div>
       ) : (
-        <div className="flex justify-center p-8 border border-dashed border-zinc-300 dark:border-zinc-800 rounded-xl">
+        <div className="flex flex-col items-center justify-center p-8 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl bg-white/50 dark:bg-zinc-950/50 text-center">
+          <Sparkles className="w-6 h-6 text-zinc-400 mb-2" />
+          <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-1">Generate Today's Standup</h3>
+          <p className="text-xs text-zinc-500 max-w-sm mb-4">Pillar aggregates your recent ticket updates, PR reviews, and comments into an automated draft.</p>
           <button 
             onClick={handleGenerate}
             disabled={generating}
-            className="text-sm font-medium bg-black text-white dark:bg-white dark:text-black px-4 py-2 rounded-md disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 text-xs font-medium bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 px-4 py-2 rounded-lg hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors shadow-xs disabled:opacity-50"
           >
-            {generating ? "Generating..." : "Generate Today's Standup"}
+            {generating ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <span>Aggregating commits & tickets...</span>
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Compile Standup</span>
+              </>
+            )}
           </button>
         </div>
       )}
 
       {/* Team Feed */}
-      <div className="flex flex-col gap-6">
-        <h2 className="text-xl font-semibold text-black dark:text-white">Team Updates ({standups.length})</h2>
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between pb-2 border-b border-zinc-200/80 dark:border-zinc-800/80">
+          <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+            <Clock className="w-4 h-4 text-zinc-500" />
+            <span>Team Updates ({standups.length})</span>
+          </h2>
+          <span className="text-xs font-mono text-zinc-400">{format(new Date(), "EEEE, MMM d")}</span>
+        </div>
+
         {standups.length === 0 ? (
-          <p className="text-zinc-500 text-sm p-8 text-center bg-white dark:bg-zinc-950 rounded-xl border border-zinc-200 dark:border-zinc-800">
-            No updates posted yet today.
-          </p>
+          <div className="p-8 text-center text-xs text-zinc-400 bg-white dark:bg-zinc-950 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80">
+            No updates posted yet for today.
+          </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {standups.map(s => (
-              <div key={s.id} className="p-6 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm">
-                <div className="flex items-center gap-3 mb-6">
+              <div key={s.id} className="p-5 bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl shadow-2xs space-y-4">
+                <div className="flex items-center gap-2.5 pb-3 border-b border-zinc-100 dark:border-zinc-900">
                   {s.user?.avatarUrl ? (
-                    <img src={s.user.avatarUrl} className="w-8 h-8 rounded-full" alt="" />
+                    <img src={s.user.avatarUrl} className="w-7 h-7 rounded-full border border-zinc-200 dark:border-zinc-800" alt="" />
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center text-xs font-medium text-black">
-                      {s.user?.username?.[0] || 'T'}
+                    <div className="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-[10px] font-mono font-bold text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-800/60">
+                      {s.user?.username?.[0]?.toUpperCase() || 'T'}
                     </div>
                   )}
                   <div>
-                    <h3 className="font-semibold text-sm text-black dark:text-white">{s.user?.username || 'Team Member'}</h3>
-                    <p className="text-xs text-zinc-500">{new Date(s.postedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                    <h3 className="font-medium text-xs text-zinc-900 dark:text-zinc-100">{s.user?.username || 'Team Member'}</h3>
+                    <p className="text-[10px] font-mono text-zinc-400">{new Date(s.postedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
                   </div>
                 </div>
                 
-                <div className="flex flex-col gap-4 text-sm">
+                <div className="flex flex-col gap-3 text-xs leading-relaxed">
                   {s.yesterday?.length > 0 && (
                     <div>
-                      <strong className="text-zinc-700 dark:text-zinc-300 block mb-1">Yesterday</strong>
-                      <ul className="list-disc pl-5 text-zinc-600 dark:text-zinc-400 space-y-1">
+                      <span className="text-[10px] font-mono uppercase text-zinc-400 block mb-1">Yesterday</span>
+                      <ul className="list-disc pl-4 text-zinc-700 dark:text-zinc-300 space-y-0.5">
                         {s.yesterday.map((item: string, i: number) => <li key={i}>{item}</li>)}
                       </ul>
                     </div>
                   )}
                   {s.today?.length > 0 && (
                     <div>
-                      <strong className="text-zinc-700 dark:text-zinc-300 block mb-1">Today</strong>
-                      <ul className="list-disc pl-5 text-zinc-600 dark:text-zinc-400 space-y-1">
+                      <span className="text-[10px] font-mono uppercase text-zinc-400 block mb-1">Today</span>
+                      <ul className="list-disc pl-4 text-zinc-700 dark:text-zinc-300 space-y-0.5">
                         {s.today.map((item: string, i: number) => <li key={i}>{item}</li>)}
                       </ul>
                     </div>
                   )}
                   {s.attention?.length > 0 && (
-                    <div>
-                      <strong className="text-red-700 dark:text-red-400 block mb-1">Attention</strong>
-                      <ul className="list-disc pl-5 text-red-600 dark:text-red-300 space-y-1">
+                    <div className="p-2.5 rounded-lg bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/40">
+                      <span className="text-[10px] font-mono uppercase text-amber-700 dark:text-amber-400 block mb-1">Blockers</span>
+                      <ul className="list-disc pl-4 text-amber-800 dark:text-amber-300 space-y-0.5">
                         {s.attention.map((item: string, i: number) => <li key={i}>{item}</li>)}
                       </ul>
                     </div>
@@ -211,6 +247,7 @@ export default function ClientStandupFeed({ workspaceId, sessionToken }: { works
           </div>
         )}
       </div>
+
     </div>
   );
 }
@@ -229,24 +266,31 @@ function EditableSection({ title, items, onChange }: { title: string, items: str
   };
 
   return (
-    <div className="flex flex-col gap-2">
-      <h3 className="text-sm font-semibold text-black dark:text-white">{title}</h3>
-      <div className="flex flex-col gap-2 pl-4 border-l-2 border-zinc-200 dark:border-zinc-800">
+    <div className="flex flex-col gap-1.5">
+      <h3 className="text-xs font-mono font-medium uppercase text-zinc-500">{title}</h3>
+      <div className="flex flex-col gap-1.5 pl-3 border-l border-zinc-200 dark:border-zinc-800">
         {items.map((item, idx) => (
-          <div key={idx} className="flex items-start gap-2 group">
-            <span className="text-zinc-400 mt-1.5">•</span>
+          <div key={idx} className="flex items-center gap-2 group">
+            <span className="text-zinc-300 dark:text-zinc-700 text-xs">•</span>
             <input 
               value={item} 
               onChange={(e) => handleChange(idx, e.target.value)}
-              className="flex-1 bg-transparent text-sm text-zinc-800 dark:text-zinc-200 outline-none border-b border-transparent focus:border-blue-300 dark:focus:border-blue-700 py-1 transition-colors"
+              className="flex-1 bg-transparent text-xs text-zinc-800 dark:text-zinc-200 outline-none border-b border-transparent focus:border-zinc-400 dark:focus:border-zinc-600 py-0.5 transition-colors"
             />
-            <button onClick={() => handleRemove(idx)} className="opacity-0 group-hover:opacity-100 p-1 text-zinc-400 hover:text-red-500 transition-opacity">
-              ×
+            <button 
+              onClick={() => handleRemove(idx)} 
+              className="opacity-0 group-hover:opacity-100 p-0.5 text-zinc-400 hover:text-red-500 transition-opacity"
+            >
+              <Trash2 className="w-3 h-3" />
             </button>
           </div>
         ))}
-        <button onClick={handleAdd} className="text-xs text-zinc-500 hover:text-black w-fit mt-1 flex items-center gap-1">
-          <span>+ Add item</span>
+        <button 
+          onClick={handleAdd} 
+          className="text-xs text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 w-fit mt-1 flex items-center gap-1 transition-colors"
+        >
+          <Plus className="w-3 h-3" />
+          <span>Add bullet point</span>
         </button>
       </div>
     </div>
