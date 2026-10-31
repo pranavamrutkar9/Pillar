@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Sparkles, FileText, ArrowRight, Loader2, BookOpen, Info } from "lucide-react";
+import { Sparkles, FileText, ArrowRight, Loader2, BookOpen } from "lucide-react";
 
 interface PrdInputHeroProps {
   onAnalyze: (payload: { prdText: string }) => void;
@@ -11,7 +11,7 @@ interface PrdInputHeroProps {
 
 const DEMO_PRESETS = [
   {
-    title: "Stripe Billing & Webhook Engine",
+    title: "Stripe Billing & Webhooks",
     badge: "Payments",
     description: "Multi-tier subscription billing with customer portal, webhook idempotent handler, and proration calculations.",
     text: `# Stripe Billing & Webhook Engine (PRD)
@@ -39,7 +39,7 @@ Build an enterprise-ready subscription billing infrastructure supporting self-se
 `
   },
   {
-    title: "Real-Time Collaboration Canvas",
+    title: "Real-Time Canvas Engine",
     badge: "CRDT & Sync",
     description: "Multiplayer whiteboarding canvas with optimistic local updates, conflict resolution, and live cursor presence.",
     text: `# Real-Time Collaboration Canvas (PRD)
@@ -63,7 +63,7 @@ Deliver a fluid, 60fps multiplayer whiteboard canvas allowing multiple engineers
 `
   },
   {
-    title: "Zero-Downtime Migration Pipeline",
+    title: "Zero-Downtime Migration",
     badge: "Infra & DB",
     description: "Phased schema migration runner with dual-writing, verification backfill, and automatic rollback guardrails.",
     text: `# Zero-Downtime Migration Pipeline (PRD)
@@ -113,30 +113,30 @@ export default function PrdInputHero({ onAnalyze, isLoading, initialText = "" }:
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-6 max-w-4xl mx-auto font-sans">
       {/* Hero Header */}
-      <div className="text-center max-w-xl mx-auto space-y-2">
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono text-zinc-500 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80">
-          <Sparkles className="w-3 h-3 text-zinc-400" />
-          <span>Requirements Decomposition</span>
+      <div className="text-center max-w-xl mx-auto space-y-3">
+        <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#FFE600] text-black border-2 border-black text-xs font-black uppercase tracking-wider shadow-neo-sm">
+          <Sparkles className="w-3.5 h-3.5 text-black" />
+          <span>Stage 01 · Requirements Decomposition</span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-black dark:text-white">
           PRD to Project Breakdown
         </h1>
-        <p className="text-xs sm:text-sm text-zinc-500 leading-relaxed">
+        <p className="text-xs sm:text-sm font-medium text-black/70 dark:text-white/70 leading-relaxed">
           Paste any product brief, user stories, or architecture notes. Pillar breaks it down into structured modules, estimated issues, and dependencies.
         </p>
       </div>
 
       {/* Demo Presets Bar */}
-      <div className="space-y-2">
+      <div className="space-y-2.5">
         <div className="flex items-center justify-between">
-          <span className="text-[11px] font-mono uppercase text-zinc-400 flex items-center gap-1.5">
-            <BookOpen className="w-3.5 h-3.5" />
+          <span className="text-xs font-black uppercase tracking-wider text-black dark:text-white flex items-center gap-1.5">
+            <BookOpen className="w-4 h-4 text-black dark:text-white" />
             Quick Presets
           </span>
           {activePresetBadge && (
-            <span className="text-xs text-zinc-600 dark:text-zinc-400 font-mono">
+            <span className="text-xs font-mono font-bold text-black/70 dark:text-white/70">
               Loaded: {activePresetBadge}
             </span>
           )}
@@ -147,17 +147,17 @@ export default function PrdInputHero({ onAnalyze, isLoading, initialText = "" }:
               key={preset.title}
               type="button"
               onClick={() => handleSelectPreset(preset)}
-              className="text-left p-3.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-2xs transition-all group cursor-pointer"
+              className="text-left p-4 bg-white dark:bg-[#181920] border-2 border-black dark:border-white shadow-neo-sm hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all group cursor-pointer"
             >
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-medium text-zinc-800 dark:text-zinc-200 group-hover:text-zinc-950 dark:group-hover:text-white">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs font-black uppercase tracking-wider text-black dark:text-white group-hover:text-black">
                   {preset.title}
                 </span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-900 text-zinc-500">
+                <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 bg-[#4ADE80] text-black border border-black">
                   {preset.badge}
                 </span>
               </div>
-              <p className="text-xs text-zinc-400 line-clamp-2">
+              <p className="text-xs font-medium text-black/60 dark:text-white/60 line-clamp-2">
                 {preset.description}
               </p>
             </button>
@@ -165,37 +165,44 @@ export default function PrdInputHero({ onAnalyze, isLoading, initialText = "" }:
         </div>
       </div>
 
-      {/* Main Form Container */}
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-zinc-950 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs overflow-hidden">
-        {/* Form Header */}
-        <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-900 bg-zinc-50/60 dark:bg-zinc-900/40 px-5 py-3">
-          <div className="flex items-center gap-2 text-xs font-medium text-zinc-700 dark:text-zinc-300">
-            <FileText className="w-3.5 h-3.5 text-zinc-400" />
+      {/* Main Form Container Window */}
+      <form onSubmit={handleSubmit} className="bg-white dark:bg-[#181920] border-3 border-black dark:border-white shadow-neo overflow-hidden">
+        {/* Form Window Header */}
+        <div className="flex items-center justify-between border-b-3 border-black dark:border-white bg-[#FFE600] px-5 py-3 text-black">
+          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider">
+            <FileText className="w-4 h-4 text-black" />
             <span>PRD / Markdown Specification</span>
           </div>
-          <span className="text-[11px] text-zinc-400 font-mono">
-            {prdText.length} characters
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-[11px] font-mono font-bold">
+              {prdText.length} CHARS
+            </span>
+            <div className="flex gap-1.5">
+              <span className="w-3 h-3 rounded-full border border-black bg-[#FF6B6B]" />
+              <span className="w-3 h-3 rounded-full border border-black bg-white" />
+              <span className="w-3 h-3 rounded-full border border-black bg-[#4ADE80]" />
+            </div>
+          </div>
         </div>
 
         {/* Textarea Content */}
-        <div className="p-5 space-y-3.5">
+        <div className="p-5 md:p-6 space-y-4">
           <div className="space-y-1.5">
             <textarea
               id="prdText"
-              rows={10}
+              rows={12}
               value={prdText}
               onChange={(e) => {
                 setPrdText(e.target.value);
                 if (inputError) setInputError(null);
               }}
               placeholder="Paste requirements here... e.g. # Authentication System&#10;- Support GitHub OAuth and email magic links&#10;- Session tokens must expire in 7 days&#10;- Organization RBAC roles: Owner, Admin, Member"
-              className={`w-full p-3.5 rounded-xl border ${
-                inputError ? "border-red-300 dark:border-red-800 bg-red-50/20" : "border-zinc-200 dark:border-zinc-800 bg-zinc-50/40 dark:bg-zinc-900/40"
-              } focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 text-xs font-mono leading-relaxed resize-y`}
+              className={`w-full p-4 border-2 ${
+                inputError ? "border-[#FF6B6B] bg-[#FF6B6B]/10" : "border-black dark:border-white bg-[#FFFDF8] dark:bg-[#20222a]"
+              } focus:outline-none focus:ring-2 focus:ring-[#FFE600] text-xs font-mono font-medium leading-relaxed resize-y text-black dark:text-white`}
             />
             {inputError && (
-              <p className="text-xs text-red-600 dark:text-red-400 font-medium">
+              <p className="text-xs font-bold text-[#DC2626] dark:text-[#FF6B6B]">
                 {inputError}
               </p>
             )}
@@ -206,17 +213,17 @@ export default function PrdInputHero({ onAnalyze, isLoading, initialText = "" }:
             <button
               type="submit"
               disabled={isLoading}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 disabled:opacity-50 text-white font-medium text-xs shadow-xs transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[#FFE600] text-black border-2 border-black font-black text-xs uppercase tracking-wider shadow-neo-sm hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none active:translate-x-1 active:translate-y-1 disabled:opacity-50 transition-all cursor-pointer"
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin text-black" />
                   <span>Analyzing Requirements...</span>
                 </>
               ) : (
                 <>
-                  <span>Analyze PRD</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <span>Analyze PRD Now</span>
+                  <ArrowRight className="w-4 h-4 text-black" />
                 </>
               )}
             </button>

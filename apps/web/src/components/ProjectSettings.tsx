@@ -38,7 +38,7 @@ export default function ProjectSettings({ project }: { project: any }) {
   
   const [newStatusName, setNewStatusName] = useState("");
   const [newLabelName, setNewLabelName] = useState("");
-  const [newLabelColor, setNewLabelColor] = useState("#71717a");
+  const [newLabelColor, setNewLabelColor] = useState("#FFE600");
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -175,141 +175,153 @@ export default function ProjectSettings({ project }: { project: any }) {
   const installUrl = `https://github.com/apps/${GITHUB_APP_NAME}/installations/new`;
 
   return (
-    <div className="space-y-8 max-w-4xl">
+    <div className="space-y-8 max-w-4xl font-sans">
       
       {error && (
-        <div className="p-3 bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 border border-red-200/60 dark:border-red-900/40 rounded-xl text-xs flex items-center gap-2">
+        <div className="p-3.5 bg-[#FF6B6B] text-black border-2 border-black font-bold text-xs flex items-center gap-2 shadow-neo-sm">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {/* Statuses Section */}
-      <section className="bg-white dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs space-y-4">
-        <div>
-          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-            <Layers className="w-4 h-4 text-zinc-500" />
-            <span>Workflow Statuses</span>
-          </h2>
-          <p className="text-xs text-zinc-500 mt-0.5">Customize the stages of your engineering pipeline.</p>
+      <section className="bg-white dark:bg-[#181920] border-3 border-black dark:border-white shadow-neo">
+        <div className="flex items-center justify-between px-5 py-3 border-b-3 border-black dark:border-white bg-[#FFE600] text-black">
+          <div className="flex items-center gap-2">
+            <Layers className="w-4 h-4 text-black" />
+            <h2 className="text-xs font-black uppercase tracking-wider">Workflow Statuses</h2>
+          </div>
+          <span className="text-[10px] font-mono font-bold uppercase tracking-wider">
+            {statuses.length} Columns
+          </span>
         </div>
 
-        <div className="space-y-2">
-          {statuses.map((status) => (
-            <div 
-              key={status.id} 
-              className="flex items-center justify-between p-3 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-900/30"
-            >
-              <input
-                type="text"
-                value={status.name}
-                onChange={(e) => handleUpdateStatus(status.id, { name: e.target.value })}
-                className="bg-transparent text-xs font-medium text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 rounded px-2 py-1"
-                disabled={loading}
-              />
-              <button
-                onClick={() => handleDeleteStatus(status.id)}
-                disabled={loading}
-                className={`text-xs px-2.5 py-1 rounded-lg transition-colors ${
-                  confirmDelete === status.id 
-                    ? 'bg-red-600 text-white font-medium' 
-                    : 'text-zinc-400 hover:text-red-600'
-                }`}
+        <div className="p-5 space-y-4">
+          <p className="text-xs font-medium text-black/70 dark:text-white/70">
+            Customize the stages of your engineering pipeline. Edit titles directly or add new columns.
+          </p>
+
+          <div className="space-y-2">
+            {statuses.map((status) => (
+              <div 
+                key={status.id} 
+                className="flex items-center justify-between p-2.5 border-2 border-black dark:border-white bg-[#FFFDF8] dark:bg-[#20222a]"
               >
-                {confirmDelete === status.id ? 'Confirm Delete' : 'Delete'}
-              </button>
-            </div>
-          ))}
-        </div>
+                <input
+                  type="text"
+                  value={status.name}
+                  onChange={(e) => handleUpdateStatus(status.id, { name: e.target.value })}
+                  className="bg-transparent text-xs font-bold text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-black px-2 py-1 border border-transparent focus:border-black dark:focus:border-white"
+                  disabled={loading}
+                />
+                <button
+                  onClick={() => handleDeleteStatus(status.id)}
+                  disabled={loading}
+                  className={`text-xs px-2.5 py-1 font-bold border-2 border-black transition-all cursor-pointer ${
+                    confirmDelete === status.id 
+                      ? 'bg-[#FF6B6B] text-black shadow-neo-sm' 
+                      : 'bg-white dark:bg-black text-black dark:text-white hover:bg-[#FF6B6B] hover:text-black'
+                  }`}
+                >
+                  {confirmDelete === status.id ? 'Confirm Delete' : 'Delete'}
+                </button>
+              </div>
+            ))}
+          </div>
 
-        <form onSubmit={handleAddStatus} className="flex gap-2 pt-2">
-          <input
-            type="text"
-            value={newStatusName}
-            onChange={(e) => setNewStatusName(e.target.value)}
-            placeholder="Add new status (e.g. In QA)..."
-            className="flex-1 px-3 py-1.5 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors"
-            disabled={loading}
-          />
-          <button
-            type="submit"
-            disabled={loading || !newStatusName.trim()}
-            className="px-3.5 py-1.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-lg text-xs font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors disabled:opacity-50 shadow-2xs"
-          >
-            Add Status
-          </button>
-        </form>
+          <form onSubmit={handleAddStatus} className="flex gap-2 pt-2">
+            <input
+              type="text"
+              value={newStatusName}
+              onChange={(e) => setNewStatusName(e.target.value)}
+              placeholder="Add new status (e.g. In QA)..."
+              className="flex-1 px-3 py-2 text-xs font-medium bg-white dark:bg-[#20222a] border-2 border-black dark:border-white text-black dark:text-white placeholder:text-black/40 dark:placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[#FFE600]"
+              disabled={loading}
+            />
+            <button
+              type="submit"
+              disabled={loading || !newStatusName.trim()}
+              className="px-4 py-2 bg-[#FFE600] text-black border-2 border-black text-xs font-black uppercase tracking-wider shadow-neo-sm hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none active:translate-x-1 active:translate-y-1 transition-all disabled:opacity-50 cursor-pointer"
+            >
+              Add Status
+            </button>
+          </form>
+        </div>
       </section>
 
       {/* Labels Section */}
-      <section className="bg-white dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs space-y-4">
-        <div>
-          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-            <Tag className="w-4 h-4 text-zinc-500" />
-            <span>Issue Labels</span>
-          </h2>
-          <p className="text-xs text-zinc-500 mt-0.5">Tag and categorize tickets across your repository.</p>
+      <section className="bg-white dark:bg-[#181920] border-3 border-black dark:border-white shadow-neo">
+        <div className="flex items-center justify-between px-5 py-3 border-b-3 border-black dark:border-white bg-[#4ADE80] text-black">
+          <div className="flex items-center gap-2">
+            <Tag className="w-4 h-4 text-black" />
+            <h2 className="text-xs font-black uppercase tracking-wider">Issue Labels</h2>
+          </div>
+          <span className="text-[10px] font-mono font-bold uppercase tracking-wider">
+            {labels.length} Defined
+          </span>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          {labels.map((label) => (
-            <div 
-              key={label.id} 
-              className="inline-flex items-center gap-2 px-2.5 py-1 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/60 rounded-lg text-xs"
-            >
-              <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: label.color || "#71717a" }} />
-              <span className="font-medium text-zinc-800 dark:text-zinc-200">{label.name}</span>
-              <button
-                onClick={() => handleDeleteLabel(label.id)}
-                disabled={loading}
-                className={`ml-1 text-xs transition-colors ${
-                  confirmDelete === label.id ? 'text-red-600 font-bold' : 'text-zinc-400 hover:text-red-500'
-                }`}
+        <div className="p-5 space-y-4">
+          <p className="text-xs font-medium text-black/70 dark:text-white/70">
+            Tag and categorize tickets across your repository for quick filtering and sprint planning.
+          </p>
+
+          <div className="flex flex-wrap gap-2">
+            {labels.map((label) => (
+              <div 
+                key={label.id} 
+                className="inline-flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-[#20222a] border-2 border-black dark:border-white shadow-neo-sm text-xs font-black"
               >
-                {confirmDelete === label.id ? 'Sure?' : '×'}
-              </button>
-            </div>
-          ))}
-          {labels.length === 0 && <span className="text-xs text-zinc-400 italic">No labels created yet.</span>}
-        </div>
+                <span className="w-3 h-3 rounded-none border border-black shrink-0" style={{ backgroundColor: label.color || "#FFE600" }} />
+                <span className="text-black dark:text-white uppercase tracking-wider">{label.name}</span>
+                <button
+                  onClick={() => handleDeleteLabel(label.id)}
+                  disabled={loading}
+                  className={`ml-1 text-xs px-1 font-black cursor-pointer ${
+                    confirmDelete === label.id ? 'bg-[#FF6B6B] text-black border border-black' : 'text-black/50 hover:text-black dark:text-white/50 dark:hover:text-white'
+                  }`}
+                >
+                  {confirmDelete === label.id ? 'Sure?' : '×'}
+                </button>
+              </div>
+            ))}
+            {labels.length === 0 && <span className="text-xs text-black/50 dark:text-white/50 font-bold">No labels created yet.</span>}
+          </div>
 
-        <form onSubmit={handleAddLabel} className="flex items-center gap-2 pt-2">
-          <input
-            type="text"
-            value={newLabelName}
-            onChange={(e) => setNewLabelName(e.target.value)}
-            placeholder="New label name..."
-            className="flex-1 px-3 py-1.5 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors"
-            disabled={loading}
-          />
-          <input
-            type="color"
-            value={newLabelColor}
-            onChange={(e) => setNewLabelColor(e.target.value)}
-            className="w-8 h-8 rounded-lg border border-zinc-200 dark:border-zinc-800 cursor-pointer bg-transparent"
-            disabled={loading}
-          />
-          <button
-            type="submit"
-            disabled={loading || !newLabelName.trim()}
-            className="px-3.5 py-1.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-lg text-xs font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors disabled:opacity-50 shadow-2xs"
-          >
-            Add Label
-          </button>
-        </form>
+          <form onSubmit={handleAddLabel} className="flex items-center gap-2 pt-2">
+            <input
+              type="text"
+              value={newLabelName}
+              onChange={(e) => setNewLabelName(e.target.value)}
+              placeholder="New label name (e.g. Frontend)..."
+              className="flex-1 px-3 py-2 text-xs font-medium bg-white dark:bg-[#20222a] border-2 border-black dark:border-white text-black dark:text-white placeholder:text-black/40 dark:placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[#FFE600]"
+              disabled={loading}
+            />
+            <input
+              type="color"
+              value={newLabelColor}
+              onChange={(e) => setNewLabelColor(e.target.value)}
+              className="w-10 h-10 border-2 border-black dark:border-white cursor-pointer bg-white p-0.5"
+              disabled={loading}
+            />
+            <button
+              type="submit"
+              disabled={loading || !newLabelName.trim()}
+              className="px-4 py-2 bg-[#4ADE80] text-black border-2 border-black text-xs font-black uppercase tracking-wider shadow-neo-sm hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none active:translate-x-1 active:translate-y-1 transition-all disabled:opacity-50 cursor-pointer"
+            >
+              Add Label
+            </button>
+          </form>
+        </div>
       </section>
 
       {/* Public Share Links Section */}
-      <section className="bg-white dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div>
-            <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-              <Share2 className="w-4 h-4 text-zinc-500" />
-              <span>Public Read-Only Sharing</span>
-            </h2>
-            <p className="text-xs text-zinc-500 mt-0.5">Generate tokens to share your live board without granting write permissions.</p>
+      <section className="bg-white dark:bg-[#181920] border-3 border-black dark:border-white shadow-neo">
+        <div className="flex items-center justify-between px-5 py-3 border-b-3 border-black dark:border-white bg-[#38BDF8] text-black">
+          <div className="flex items-center gap-2">
+            <Share2 className="w-4 h-4 text-black" />
+            <h2 className="text-xs font-black uppercase tracking-wider">Public Read-Only Sharing</h2>
           </div>
-
           <button
             onClick={async () => {
               setLoading(true);
@@ -323,129 +335,143 @@ export default function ProjectSettings({ project }: { project: any }) {
               }
             }}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-lg text-xs font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors disabled:opacity-50 shadow-2xs shrink-0 self-start sm:self-auto"
+            className="inline-flex items-center gap-1.5 px-3 py-1 bg-white text-black border-2 border-black text-xs font-black uppercase tracking-wider shadow-neo-sm hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all disabled:opacity-50 cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>New Share Link</span>
+            <span>Generate Link</span>
           </button>
         </div>
 
-        <div className="space-y-2">
-          {shares.length === 0 ? (
-            <p className="text-xs text-zinc-400 italic">No active share links.</p>
-          ) : (
-            shares.map((share) => (
-              <div 
-                key={share.id} 
-                className="flex items-center justify-between p-3 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-900/30 gap-4"
-              >
-                <div className="flex-1 truncate text-xs font-mono text-zinc-600 dark:text-zinc-400">
-                  {`${typeof window !== 'undefined' ? window.location.origin : ''}/projects/${project.id}/issues?viewerToken=${share.token}`}
+        <div className="p-5 space-y-4">
+          <p className="text-xs font-medium text-black/70 dark:text-white/70">
+            Generate secure tokens to share your live issue board with clients or stakeholders without granting write access.
+          </p>
+
+          <div className="space-y-2.5">
+            {shares.length === 0 ? (
+              <p className="text-xs text-black/50 dark:text-white/50 font-bold">No active share links.</p>
+            ) : (
+              shares.map((share) => (
+                <div 
+                  key={share.id} 
+                  className="flex flex-col sm:flex-row sm:items-center justify-between p-3 border-2 border-black dark:border-white bg-[#FFFDF8] dark:bg-[#20222a] gap-3"
+                >
+                  <div className="flex-1 truncate text-xs font-mono font-bold text-black dark:text-white">
+                    {`${typeof window !== 'undefined' ? window.location.origin : ''}/projects/${project.id}/issues?viewerToken=${share.token}`}
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={() => handleCopyLink(share.token)}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#FFE600] text-black border-2 border-black text-xs font-black uppercase tracking-wider shadow-neo-sm hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all cursor-pointer"
+                    >
+                      {copiedLink === share.token ? (
+                        <><Check className="w-3 h-3 text-black" /> Copied</>
+                      ) : (
+                        <><Copy className="w-3 h-3 text-black" /> Copy</>
+                      )}
+                    </button>
+                    <button
+                      onClick={async () => {
+                        setLoading(true);
+                        try {
+                          await revokeProjectShareAction(project.workspaceId, project.id, share.id);
+                          setShares(shares.filter(s => s.id !== share.id));
+                        } catch (err) {
+                          console.error(err);
+                        } finally {
+                          setLoading(false);
+                        }
+                      }}
+                      disabled={loading}
+                      className="px-3 py-1.5 bg-[#FF6B6B] text-black border-2 border-black text-xs font-black uppercase tracking-wider shadow-neo-sm hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all disabled:opacity-50 cursor-pointer"
+                    >
+                      Revoke
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <button
-                    onClick={() => handleCopyLink(share.token)}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 transition-colors"
-                  >
-                    {copiedLink === share.token ? (
-                      <><Check className="w-3 h-3 text-emerald-500" /> Copied</>
-                    ) : (
-                      <><Copy className="w-3 h-3" /> Copy</>
-                    )}
-                  </button>
-                  <button
-                    onClick={async () => {
-                      setLoading(true);
-                      try {
-                        await revokeProjectShareAction(project.workspaceId, project.id, share.id);
-                        setShares(shares.filter(s => s.id !== share.id));
-                      } catch (err) {
-                        console.error(err);
-                      } finally {
-                        setLoading(false);
-                      }
-                    }}
-                    disabled={loading}
-                    className="px-2.5 py-1 text-xs text-red-500 hover:text-red-700 dark:hover:text-red-400 transition-colors disabled:opacity-50"
-                  >
-                    Revoke
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
+              ))
+            )}
+          </div>
         </div>
       </section>
 
       {/* GitHub Integration Section */}
-      <section className="bg-white dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs space-y-4">
-        <div>
-          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-            <GitBranch className="w-4 h-4 text-zinc-500" />
-            <span>GitHub Repository Connection</span>
-          </h2>
-          <p className="text-xs text-zinc-500 mt-0.5">Automate issue resolution when PRs are merged.</p>
+      <section className="bg-white dark:bg-[#181920] border-3 border-black dark:border-white shadow-neo">
+        <div className="flex items-center justify-between px-5 py-3 border-b-3 border-black dark:border-white bg-[#C084FC] text-black">
+          <div className="flex items-center gap-2">
+            <GitBranch className="w-4 h-4 text-black" />
+            <h2 className="text-xs font-black uppercase tracking-wider">GitHub Repository Connection</h2>
+          </div>
+          <span className="text-[10px] font-mono font-bold uppercase tracking-wider">
+            {project.githubRepositoryId ? 'Connected' : 'Unlinked'}
+          </span>
         </div>
 
-        {project.githubRepositoryId ? (
-          <div className="space-y-4">
-            <div className="p-4 rounded-xl border border-emerald-200/60 dark:border-emerald-900/40 bg-emerald-50/30 dark:bg-emerald-950/20 flex items-center justify-between">
-              <div>
-                <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5" /> Repository Synchronized
-                </p>
-                <p className="text-xs text-zinc-500 mt-0.5">Pull requests automatically associate with issues by sequence ID.</p>
-              </div>
-              <button 
-                onClick={handleSyncGithub} 
-                disabled={isSyncing}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors shadow-2xs disabled:opacity-50"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
-                <span>{isSyncing ? "Syncing..." : "Sync Now"}</span>
-              </button>
-            </div>
+        <div className="p-5 space-y-4">
+          <p className="text-xs font-medium text-black/70 dark:text-white/70">
+            Automate issue status updates when Pull Requests are created or merged in your linked GitHub repository.
+          </p>
 
-            <form onSubmit={handleUpdateGithubStatus} className="space-y-3">
-              <div>
-                <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                  Target Status on PR Merge
-                </label>
-                <select 
-                  value={githubMergedStatusId}
-                  onChange={e => setGithubMergedStatusId(e.target.value)}
-                  className="w-full max-w-sm px-3 py-1.5 text-xs bg-zinc-50/50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors cursor-pointer"
-                  disabled={loading}
+          {project.githubRepositoryId ? (
+            <div className="space-y-4">
+              <div className="p-4 border-2 border-black dark:border-white bg-[#4ADE80]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black text-black dark:text-white flex items-center gap-1.5 uppercase tracking-wider">
+                    <Check className="w-4 h-4 text-[#16A34A]" /> Repository Synchronized
+                  </p>
+                  <p className="text-xs font-medium text-black/70 dark:text-white/70 mt-0.5">Pull requests automatically associate with issues by sequence ID (e.g., #PIL-42).</p>
+                </div>
+                <button 
+                  onClick={handleSyncGithub} 
+                  disabled={isSyncing}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white dark:bg-[#20222a] border-2 border-black dark:border-white text-xs font-black uppercase tracking-wider text-black dark:text-white shadow-neo-sm hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all disabled:opacity-50 cursor-pointer"
                 >
-                  <option value="">-- No automatic transition --</option>
-                  {statuses.map(s => (
-                    <option key={s.id} value={s.id}>{s.name}</option>
-                  ))}
-                </select>
+                  <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+                  <span>{isSyncing ? "Syncing..." : "Sync Now"}</span>
+                </button>
               </div>
-              <button 
-                type="submit" 
-                disabled={loading}
-                className="px-4 py-1.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-lg text-xs font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors disabled:opacity-50 shadow-2xs"
+
+              <form onSubmit={handleUpdateGithubStatus} className="space-y-3 pt-2">
+                <div>
+                  <label className="block text-xs font-black uppercase tracking-wider text-black dark:text-white mb-1.5">
+                    Target Status on PR Merge
+                  </label>
+                  <select 
+                    value={githubMergedStatusId}
+                    onChange={e => setGithubMergedStatusId(e.target.value)}
+                    className="w-full max-w-sm px-3.5 py-2 text-xs font-bold bg-white dark:bg-[#20222a] border-2 border-black dark:border-white text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-[#FFE600] cursor-pointer"
+                    disabled={loading}
+                  >
+                    <option value="">-- No automatic transition --</option>
+                    {statuses.map(s => (
+                      <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <button 
+                  type="submit" 
+                  disabled={loading}
+                  className="px-4 py-2 bg-[#FFE600] text-black border-2 border-black text-xs font-black uppercase tracking-wider shadow-neo-sm hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none active:translate-x-1 active:translate-y-1 transition-all disabled:opacity-50 cursor-pointer"
+                >
+                  Save Transition Rule
+                </button>
+              </form>
+            </div>
+          ) : (
+            <div className="p-8 border-2 border-dashed border-black dark:border-white text-center space-y-3">
+              <p className="text-xs font-bold text-black/60 dark:text-white/60">No GitHub repository connected to this project yet.</p>
+              <a 
+                href={installUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FFE600] text-black border-2 border-black text-xs font-black uppercase tracking-wider shadow-neo-sm hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none active:translate-x-1 active:translate-y-1 transition-all"
               >
-                Save Transition Rule
-              </button>
-            </form>
-          </div>
-        ) : (
-          <div className="p-8 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl text-center">
-            <p className="text-xs text-zinc-400 mb-3">No GitHub repository connected yet.</p>
-            <a 
-              href={installUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 text-xs font-medium rounded-lg hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors shadow-xs"
-            >
-              <span>Install GitHub Integration</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
-          </div>
-        )}
+                <span>Install GitHub Integration</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            </div>
+          )}
+        </div>
       </section>
 
     </div>

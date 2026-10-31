@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { GitBranch, CheckCircle2 } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
 
@@ -21,7 +22,6 @@ function GithubCallbackContent() {
   useEffect(() => {
     if (!(session?.user as any)?.token) return;
 
-    // Fetch all workspaces and projects to let the user select where to link
     const fetchProjects = async () => {
       try {
         const workspacesRes = await fetch(`${API_URL}/workspaces`, {
@@ -52,57 +52,65 @@ function GithubCallbackContent() {
     fetchProjects();
   }, [session]);
 
-  const handleLink = async () => {
-    if (!selectedProjectId || !installationId) return;
-    setSaving(true);
-    setError("");
-
-    try {
-      // First we need to tell the API that this project wants to use this installation
-      // Wait, our backend github installation created event saves the installation, but we need to link the project.
-      // We don't have a specific endpoint for linking an installation to a project, but we have updateGithubSettings which takes githubRepositoryId.
-      // Actually, the github installation has repositories. We need to fetch repositories for this installation.
-      // But we didn't expose an endpoint to fetch repositories for an installation.
-      // For V1, let's just show a message to the user.
-      
-      // Since we don't have a dedicated API to list repos for an installation yet, 
-      // let's just say "App Installed Successfully. Please wait for the sync to complete."
-      // In a real app, we'd list repos and link a specific repo ID to a project.
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   if (!installationId) {
-    return <div className="p-8">Invalid callback URL</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[#FFFDF8] dark:bg-[#0D0E12] p-6 font-sans">
+        <div className="max-w-md w-full bg-white dark:bg-[#181920] border-3 border-black dark:border-white shadow-neo p-6 text-center">
+          <p className="text-sm font-black text-[#DC2626]">Invalid GitHub callback URL</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-md mx-auto mt-20 bg-white dark:bg-zinc-950 p-8 rounded-xl shadow border border-gray-100 dark:border-zinc-800">
-      <h1 className="text-2xl font-bold mb-4">GitHub App Installed!</h1>
-      <p className="text-gray-600 dark:text-gray-400 mb-6">
-        The GitHub App was successfully installed (ID: {installationId}). 
-        The background worker is currently syncing your repositories.
-      </p>
-      
-      <p className="text-sm text-gray-500 mb-6">
-        (Note: To complete the linking, you would select a specific repository here. 
-        For this prototype, the webhook has registered your installation in the background.)
-      </p>
+    <div className="flex items-center justify-center min-h-screen bg-[#FFFDF8] dark:bg-[#0D0E12] p-6 font-sans">
+      <div className="max-w-md w-full bg-white dark:bg-[#181920] border-3 border-black dark:border-white shadow-neo overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-3 border-b-3 border-black dark:border-white bg-[#FFE600] text-black">
+          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider">
+            <GitBranch className="w-4 h-4 text-black" />
+            <span>GitHub App Connection</span>
+          </div>
+          <div className="flex gap-1.5">
+            <span className="w-3 h-3 rounded-full border border-black bg-[#FF6B6B]" />
+            <span className="w-3 h-3 rounded-full border border-black bg-white" />
+            <span className="w-3 h-3 rounded-full border border-black bg-[#4ADE80]" />
+          </div>
+        </div>
 
-      <button 
-        onClick={() => router.push("/")}
-        className="w-full py-2 bg-black text-white dark:bg-white dark:text-black font-medium rounded-md hover:opacity-90"
-      >
-        Return to Dashboard
-      </button>
+        <div className="p-6 space-y-4">
+          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[#16A34A] dark:text-[#4ADE80]">
+            <CheckCircle2 className="w-4 h-4" />
+            <span>Installation Successful</span>
+          </div>
+
+          <h1 className="text-2xl font-black uppercase tracking-tight text-black dark:text-white">
+            GitHub App Installed
+          </h1>
+          
+          <p className="text-xs font-medium text-black/70 dark:text-white/70 leading-relaxed">
+            The GitHub App was successfully installed (ID: <span className="font-mono font-bold text-black dark:text-white">{installationId}</span>). 
+            The background worker is currently syncing repositories and pull request events.
+          </p>
+
+          <button 
+            onClick={() => router.push("/workspaces")}
+            className="w-full py-3 bg-[#FFE600] text-black border-2 border-black font-black text-xs uppercase tracking-wider shadow-neo-sm hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none active:translate-x-1 active:translate-y-1 transition-all cursor-pointer"
+          >
+            Return to Workspaces →
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
 
 export default function GithubCallbackPage() {
   return (
-    <Suspense fallback={<div className="p-8">Loading...</div>}>
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen bg-[#FFFDF8] dark:bg-[#0D0E12] font-mono font-bold text-xs">
+        LOADING CALLBACK...
+      </div>
+    }>
       <GithubCallbackContent />
     </Suspense>
   );

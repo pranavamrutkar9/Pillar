@@ -25,26 +25,26 @@ export default async function ProjectLayout(props: { params: Promise<{ projectId
   const isViewer = !session?.user;
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#09090B] text-zinc-900 dark:text-zinc-100 font-sans flex flex-col transition-colors">
+    <div className="min-h-screen bg-[#FFFDF8] dark:bg-[#0D0E12] text-black dark:text-zinc-100 font-sans flex flex-col transition-colors selection:bg-[#FFE600] selection:text-black">
       
-      {/* Sticky Glass Header */}
-      <header className="border-b border-zinc-200/80 dark:border-zinc-800/80 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md sticky top-0 z-30 transition-colors">
+      {/* Sticky Neobrutalist Header */}
+      <header className="border-b-2 border-black dark:border-white bg-[#FFFDF8]/90 dark:bg-[#0D0E12]/90 backdrop-blur-md sticky top-0 z-30 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           {/* Top Row: Breadcrumbs & Utilities */}
-          <div className="flex justify-between items-center h-14 border-b border-zinc-100 dark:border-zinc-900">
+          <div className="flex justify-between items-center h-14 border-b-2 border-black/10 dark:border-white/20">
             <div className="flex items-center gap-2 text-xs">
               <Link 
                 href={`/workspaces/${project.workspaceId}`} 
-                className="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors flex items-center gap-1 font-medium"
+                className="text-black dark:text-white px-2.5 py-1 rounded-md border-2 border-black dark:border-white bg-white dark:bg-zinc-800 font-bold transition-all flex items-center gap-1 shadow-[1.5px_1.5px_0px_0px_#000] dark:shadow-[1.5px_1.5px_0px_0px_#fff] hover:-translate-y-0.5 active:translate-y-0.5"
               >
-                <ArrowLeft className="w-3 h-3" />
+                <ArrowLeft className="w-3 h-3 stroke-[2.5]" />
                 <span>Workspace</span>
               </Link>
-              <ChevronRight className="w-3 h-3 text-zinc-300 dark:text-zinc-700" />
-              <div className="flex items-center gap-1.5">
-                <span className="font-semibold text-zinc-900 dark:text-zinc-100 text-sm tracking-tight">{project.name}</span>
-                <span className="text-[11px] font-mono text-zinc-400 px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/60">
+              <ChevronRight className="w-3.5 h-3.5 text-zinc-500 font-bold" />
+              <div className="flex items-center gap-2">
+                <span className="font-black text-black dark:text-white text-base tracking-tight">{project.name}</span>
+                <span className="text-[11px] font-mono font-black text-black px-2 py-0.5 rounded bg-[#FFE600] border-2 border-black shadow-[1.5px_1.5px_0px_0px_#000]">
                   {project.slug}
                 </span>
               </div>
@@ -57,7 +57,7 @@ export default async function ProjectLayout(props: { params: Promise<{ projectId
           </div>
           
           {/* Bottom Row: Tab Navigation */}
-          <div className="py-1.5">
+          <div className="py-2">
             <ProjectNav projectId={projectId} isViewer={isViewer} />
           </div>
 

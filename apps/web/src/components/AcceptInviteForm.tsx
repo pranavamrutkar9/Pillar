@@ -28,13 +28,17 @@ export default function AcceptInviteForm({ token }: { token: string }) {
 
   return (
     <div className="flex flex-col gap-3 w-full items-center">
-      {error && <p className="text-rose-500 text-xs">{error}</p>}
+      {error && (
+        <div className="w-full p-2.5 bg-[#FF6B6B] border-2 border-black text-black text-xs font-bold text-center">
+          {error}
+        </div>
+      )}
       <button 
         onClick={handleAccept} 
         disabled={loading}
-        className="w-full bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-medium py-2.5 px-4 rounded-xl text-xs disabled:opacity-50 transition-colors shadow-sm"
+        className="w-full bg-[#FFE600] hover:bg-[#FACC15] text-black border-2 border-black font-black py-3 px-4 text-xs uppercase tracking-wider shadow-neo-sm hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none active:translate-x-1 active:translate-y-1 transition-all disabled:opacity-50 cursor-pointer"
       >
-        {loading ? 'Joining workspace...' : 'Accept Invitation & Continue'}
+        {loading ? 'Joining workspace...' : 'Accept Invitation & Enter →'}
       </button>
     </div>
   );

@@ -58,23 +58,23 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
   const statusColor = getStatusDot(currentStatus?.name || '', currentStatus?.color);
 
   return (
-    <div className="bg-white dark:bg-zinc-950 p-6 sm:p-8 rounded-2xl shadow-xs border border-zinc-200/80 dark:border-zinc-800/80 space-y-8">
+    <div className="bg-white dark:bg-zinc-900 p-6 sm:p-8 rounded-2xl shadow-[6px_6px_0px_0px_#000] dark:shadow-[6px_6px_0px_0px_#fff] border-3 border-black dark:border-white space-y-8">
       
       {/* Title & Key */}
-      <div className="space-y-2">
+      <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono font-medium text-zinc-400 px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/60">
+            <span className="text-xs font-mono font-black text-black px-2.5 py-1 rounded bg-[#FFE600] border-2 border-black shadow-[2px_2px_0px_0px_#000]">
               {project.slug}-{issue.sequenceId}
             </span>
-            <span className="text-xs text-zinc-400 font-mono">
+            <span className="text-xs font-mono font-bold text-zinc-500">
               Created {format(new Date(issue.createdAt), 'MMM d, yyyy')}
             </span>
           </div>
 
           {loading && (
-            <span className="inline-flex items-center gap-1 text-[11px] text-zinc-400 font-mono">
-              <Loader2 className="w-3 h-3 animate-spin" /> Saving...
+            <span className="inline-flex items-center gap-1.5 text-xs font-mono font-black text-black dark:text-white bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded border border-black">
+              <Loader2 className="w-3.5 h-3.5 animate-spin stroke-[2.5]" /> Saving...
             </span>
           )}
         </div>
@@ -83,29 +83,29 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           onBlur={() => { if(title !== issue.title) handleUpdate("title", title); }}
-          className="text-2xl sm:text-3xl font-semibold tracking-tight w-full bg-transparent text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 rounded-lg px-1.5 py-1 -ml-1.5 transition-all"
+          className="text-2xl sm:text-3xl font-black tracking-tight w-full bg-white dark:bg-zinc-950 text-black dark:text-white border-2 border-black dark:border-white focus:outline-none focus:shadow-[3px_3px_0px_0px_#000] dark:focus:shadow-[3px_3px_0px_0px_#fff] rounded-xl px-3 py-2 transition-all"
         />
       </div>
 
       {/* Properties Ribbon */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-zinc-50/70 dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/60">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-amber-50/50 dark:bg-zinc-950 border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff]">
         
         {/* Status */}
         <div>
-          <label className="text-[10px] font-mono uppercase text-zinc-400 block mb-1">Status</label>
-          <div className="flex items-center gap-1.5 bg-white dark:bg-zinc-950 px-2.5 py-1.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs">
-            <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: statusColor }} />
+          <label className="text-[10px] font-mono font-black uppercase text-black dark:text-white block mb-1">Status</label>
+          <div className="flex items-center gap-1.5 bg-white dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border-2 border-black dark:border-white shadow-[1.5px_1.5px_0px_0px_#000] dark:shadow-[1.5px_1.5px_0px_0px_#fff]">
+            <span className="w-2.5 h-2.5 rounded-full shrink-0 border border-black" style={{ backgroundColor: statusColor }} />
             <select 
               value={statusId}
               onChange={(e) => {
                 setStatusId(e.target.value);
                 handleUpdate("statusId", e.target.value);
               }}
-              className="w-full bg-transparent text-xs font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer"
+              className="w-full bg-transparent text-xs font-bold text-black dark:text-white focus:outline-none cursor-pointer"
               disabled={loading}
             >
               {project.issueStatuses?.map((s: any) => (
-                <option key={s.id} value={s.id}>{s.name}</option>
+                <option key={s.id} value={s.id} className="text-black">{s.name}</option>
               ))}
             </select>
           </div>
@@ -113,15 +113,15 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
 
         {/* Priority */}
         <div>
-          <label className="text-[10px] font-mono uppercase text-zinc-400 block mb-1">Priority</label>
-          <div className="bg-white dark:bg-zinc-950 px-2.5 py-1.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs">
+          <label className="text-[10px] font-mono font-black uppercase text-black dark:text-white block mb-1">Priority</label>
+          <div className="bg-white dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border-2 border-black dark:border-white shadow-[1.5px_1.5px_0px_0px_#000] dark:shadow-[1.5px_1.5px_0px_0px_#fff]">
             <select 
               value={priority}
               onChange={(e) => {
                 setPriority(e.target.value);
                 handleUpdate("priority", e.target.value);
               }}
-              className="w-full bg-transparent text-xs font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer"
+              className="w-full bg-transparent text-xs font-bold text-black dark:text-white focus:outline-none cursor-pointer"
               disabled={loading}
             >
               <option value="NONE">None</option>
@@ -135,21 +135,21 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
 
         {/* Assignee */}
         <div>
-          <label className="text-[10px] font-mono uppercase text-zinc-400 block mb-1">Assignee</label>
-          <div className="bg-white dark:bg-zinc-950 px-2.5 py-1.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex items-center gap-1.5">
-            <User className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+          <label className="text-[10px] font-mono font-black uppercase text-black dark:text-white block mb-1">Assignee</label>
+          <div className="bg-white dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border-2 border-black dark:border-white shadow-[1.5px_1.5px_0px_0px_#000] dark:shadow-[1.5px_1.5px_0px_0px_#fff] flex items-center gap-1.5">
+            <User className="w-3.5 h-3.5 text-black dark:text-white shrink-0 stroke-[2.5]" />
             <select 
               value={assigneeId}
               onChange={(e) => {
                 setAssigneeId(e.target.value);
                 handleUpdate("assigneeId", e.target.value || null);
               }}
-              className="w-full bg-transparent text-xs font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer"
+              className="w-full bg-transparent text-xs font-bold text-black dark:text-white focus:outline-none cursor-pointer"
               disabled={loading}
             >
               <option value="">Unassigned</option>
               {(project.workspace?.members || project.members)?.map((m: any) => (
-                <option key={m.userId} value={m.userId}>{m.user?.username || m.user?.email}</option>
+                <option key={m.userId} value={m.userId} className="text-black">{m.user?.username || m.user?.email}</option>
               ))}
             </select>
           </div>
@@ -157,8 +157,8 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
 
         {/* Estimate */}
         <div>
-          <label className="text-[10px] font-mono uppercase text-zinc-400 block mb-1">Estimate</label>
-          <div className="bg-white dark:bg-zinc-950 px-2.5 py-1.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs">
+          <label className="text-[10px] font-mono font-black uppercase text-black dark:text-white block mb-1">Estimate</label>
+          <div className="bg-white dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border-2 border-black dark:border-white shadow-[1.5px_1.5px_0px_0px_#000] dark:shadow-[1.5px_1.5px_0px_0px_#fff]">
             <input 
               type="number"
               min="0"
@@ -169,7 +169,7 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
                 setEstimate(val);
                 handleUpdate("estimate", val === "" ? null : val);
               }}
-              className="w-full bg-transparent text-xs font-mono font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none"
+              className="w-full bg-transparent text-xs font-mono font-black text-black dark:text-white focus:outline-none"
               disabled={loading}
             />
           </div>
@@ -177,21 +177,21 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
 
         {/* Cycle */}
         <div>
-          <label className="text-[10px] font-mono uppercase text-zinc-400 block mb-1">Cycle</label>
-          <div className="bg-white dark:bg-zinc-950 px-2.5 py-1.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex items-center gap-1.5">
-            <Repeat className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+          <label className="text-[10px] font-mono font-black uppercase text-black dark:text-white block mb-1">Cycle</label>
+          <div className="bg-white dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border-2 border-black dark:border-white shadow-[1.5px_1.5px_0px_0px_#000] dark:shadow-[1.5px_1.5px_0px_0px_#fff] flex items-center gap-1.5">
+            <Repeat className="w-3.5 h-3.5 text-black dark:text-white shrink-0 stroke-[2.5]" />
             <select 
               value={cycleId}
               onChange={(e) => {
                 setCycleId(e.target.value);
                 handleUpdate("cycleId", e.target.value || null);
               }}
-              className="w-full bg-transparent text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer"
+              className="w-full bg-transparent text-xs font-bold text-black dark:text-white focus:outline-none cursor-pointer"
               disabled={loading}
             >
               <option value="">No Cycle</option>
               {cycles.map((c: any) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
+                <option key={c.id} value={c.id} className="text-black">{c.name}</option>
               ))}
             </select>
           </div>
@@ -199,21 +199,21 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
 
         {/* Module */}
         <div>
-          <label className="text-[10px] font-mono uppercase text-zinc-400 block mb-1">Module</label>
-          <div className="bg-white dark:bg-zinc-950 px-2.5 py-1.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex items-center gap-1.5">
-            <Layers className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+          <label className="text-[10px] font-mono font-black uppercase text-black dark:text-white block mb-1">Module</label>
+          <div className="bg-white dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border-2 border-black dark:border-white shadow-[1.5px_1.5px_0px_0px_#000] dark:shadow-[1.5px_1.5px_0px_0px_#fff] flex items-center gap-1.5">
+            <Layers className="w-3.5 h-3.5 text-black dark:text-white shrink-0 stroke-[2.5]" />
             <select 
               value={moduleId}
               onChange={(e) => {
                 setModuleId(e.target.value);
                 handleUpdate("moduleId", e.target.value || null);
               }}
-              className="w-full bg-transparent text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer"
+              className="w-full bg-transparent text-xs font-bold text-black dark:text-white focus:outline-none cursor-pointer"
               disabled={loading}
             >
               <option value="">No Module</option>
               {modules.map((m: any) => (
-                <option key={m.id} value={m.id}>{m.name}</option>
+                <option key={m.id} value={m.id} className="text-black">{m.name}</option>
               ))}
             </select>
           </div>
@@ -221,9 +221,9 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
 
         {/* Due Date */}
         <div>
-          <label className="text-[10px] font-mono uppercase text-zinc-400 block mb-1">Due Date</label>
-          <div className="bg-white dark:bg-zinc-950 px-2.5 py-1.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex items-center gap-1.5">
-            <Calendar className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+          <label className="text-[10px] font-mono font-black uppercase text-black dark:text-white block mb-1">Due Date</label>
+          <div className="bg-white dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border-2 border-black dark:border-white shadow-[1.5px_1.5px_0px_0px_#000] dark:shadow-[1.5px_1.5px_0px_0px_#fff] flex items-center gap-1.5">
+            <Calendar className="w-3.5 h-3.5 text-black dark:text-white shrink-0 stroke-[2.5]" />
             <input 
               type="date"
               value={dueDate}
@@ -231,7 +231,7 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
                 setDueDate(e.target.value);
                 handleUpdate("dueDate", e.target.value ? new Date(e.target.value).toISOString() : null);
               }}
-              className="w-full bg-transparent text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none"
+              className="w-full bg-transparent text-xs font-bold text-black dark:text-white focus:outline-none"
               disabled={loading}
             />
           </div>
@@ -239,9 +239,9 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
 
         {/* Labels Count Summary */}
         <div>
-          <label className="text-[10px] font-mono uppercase text-zinc-400 block mb-1">Labels</label>
-          <div className="bg-white dark:bg-zinc-950 px-2.5 py-1.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex items-center gap-1.5 text-xs text-zinc-600 dark:text-zinc-400">
-            <Tag className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+          <label className="text-[10px] font-mono font-black uppercase text-black dark:text-white block mb-1">Labels</label>
+          <div className="bg-white dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border-2 border-black dark:border-white shadow-[1.5px_1.5px_0px_0px_#000] dark:shadow-[1.5px_1.5px_0px_0px_#fff] flex items-center gap-1.5 text-xs font-bold text-black dark:text-white">
+            <Tag className="w-3.5 h-3.5 text-black dark:text-white shrink-0 stroke-[2.5]" />
             <span>{labelIds.length} applied</span>
           </div>
         </div>
@@ -250,9 +250,9 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
 
       {/* Labels Selector */}
       {project.issueLabels && project.issueLabels.length > 0 && (
-        <div className="space-y-1.5">
-          <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">Applied Labels</label>
-          <div className="flex flex-wrap gap-1.5">
+        <div className="space-y-2">
+          <label className="text-xs font-black uppercase text-black dark:text-white">Applied Labels</label>
+          <div className="flex flex-wrap gap-2">
             {project.issueLabels.map((label: any) => {
               const isSelected = labelIds.includes(label.id);
               return (
@@ -270,10 +270,10 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
                     setLabelIds(newLabelIds);
                     handleUpdate("labelIds", newLabelIds);
                   }}
-                  className={`px-2.5 py-1 text-xs rounded-lg border transition-all ${
+                  className={`px-3 py-1 text-xs font-bold rounded-lg border-2 border-black transition-all cursor-pointer ${
                     isSelected 
-                      ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 border-zinc-900 dark:border-zinc-100 font-medium' 
-                      : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300'
+                      ? 'bg-[#FFE600] text-black shadow-[2px_2px_0px_0px_#000]' 
+                      : 'bg-white dark:bg-zinc-800 text-black dark:text-white shadow-[1px_1px_0px_0px_#000]'
                   } disabled:opacity-50`}
                 >
                   {label.name}
@@ -286,9 +286,9 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
 
       {/* Pull Requests Integration */}
       {issue.PullRequestIssue && issue.PullRequestIssue.length > 0 && (
-        <div className="space-y-2 pt-4 border-t border-zinc-100 dark:border-zinc-900">
-          <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-            <GitPullRequest className="w-4 h-4 text-purple-500" />
+        <div className="space-y-3 pt-4 border-t-2 border-black dark:border-white">
+          <label className="text-xs font-black uppercase text-black dark:text-white flex items-center gap-1.5">
+            <GitPullRequest className="w-4 h-4 text-purple-600 stroke-[2.5]" />
             <span>Linked Pull Requests ({issue.PullRequestIssue.length})</span>
           </label>
           <div className="space-y-2">
@@ -300,9 +300,9 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
       )}
 
       {/* Description Area */}
-      <div className="space-y-3 pt-4 border-t border-zinc-100 dark:border-zinc-900">
+      <div className="space-y-3 pt-4 border-t-2 border-black dark:border-white">
         <div className="flex justify-between items-center">
-          <h3 className="text-xs font-mono font-medium text-zinc-400 uppercase tracking-wider">Description</h3>
+          <h3 className="text-xs font-mono font-black text-black dark:text-white uppercase tracking-wider">Description</h3>
           <button 
             onClick={() => {
               if(isEditingDesc && JSON.stringify(description) !== JSON.stringify(issue.description)) {
@@ -310,17 +310,17 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
               }
               setIsEditingDesc(!isEditingDesc);
             }}
-            className="inline-flex items-center gap-1 text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-black rounded-lg bg-[#FFE600] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] hover:-translate-y-0.5 active:translate-y-0.5 transition-all cursor-pointer"
           >
             {isEditingDesc ? (
-              <><Check className="w-3.5 h-3.5 text-emerald-500" /> <span>Save</span></>
+              <><Check className="w-3.5 h-3.5 stroke-[3]" /> <span>Save</span></>
             ) : (
-              <><Edit3 className="w-3.5 h-3.5" /> <span>Edit</span></>
+              <><Edit3 className="w-3.5 h-3.5 stroke-[2.5]" /> <span>Edit</span></>
             )}
           </button>
         </div>
         
-        <div className="rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 overflow-hidden bg-white dark:bg-zinc-950 p-2">
+        <div>
           <TiptapEditor 
             value={description} 
             onChange={setDescription} 

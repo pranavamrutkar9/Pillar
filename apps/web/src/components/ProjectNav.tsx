@@ -33,7 +33,7 @@ export default function ProjectNav({ projectId, isViewer }: ProjectNavProps) {
   }
 
   return (
-    <nav className="flex items-center space-x-1 overflow-x-auto no-scrollbar py-1">
+    <nav className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
       {navItems.map((item) => {
         const Icon = item.icon;
         const isActive = pathname.startsWith(item.href);
@@ -41,13 +41,13 @@ export default function ProjectNav({ projectId, isViewer }: ProjectNavProps) {
           <Link
             key={item.href}
             href={item.href}
-            className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-black transition-all border-2 ${
               isActive
-                ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-2xs"
-                : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-900/60"
+                ? "bg-[#FFE600] text-black border-black shadow-[2px_2px_0px_0px_#000] -translate-y-0.5"
+                : "bg-white dark:bg-zinc-900 text-black dark:text-white border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] hover:-translate-y-0.5"
             }`}
           >
-            <Icon className={`w-3.5 h-3.5 ${isActive ? "text-zinc-900 dark:text-zinc-100" : "text-zinc-400"}`} />
+            <Icon className="w-3.5 h-3.5 stroke-[2.5]" />
             <span>{item.label}</span>
           </Link>
         );
@@ -55,4 +55,3 @@ export default function ProjectNav({ projectId, isViewer }: ProjectNavProps) {
     </nav>
   );
 }
-

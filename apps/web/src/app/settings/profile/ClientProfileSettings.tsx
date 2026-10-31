@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession, SessionProvider } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { ArrowLeft, User, Calendar, FolderGit2, CheckSquare, MessageSquare, Edit3, Shield } from "lucide-react";
 
 function ProfileSettingsForm({ sessionToken }: { sessionToken?: string }) {
   const { data: session, update } = useSession();
@@ -70,135 +71,177 @@ function ProfileSettingsForm({ sessionToken }: { sessionToken?: string }) {
   };
 
   return (
-    <div className="flex flex-col flex-1 p-8 bg-zinc-50 dark:bg-black w-full min-h-screen font-sans">
-      <div className="max-w-2xl w-full mx-auto flex flex-col gap-8">
+    <div className="flex flex-col flex-1 p-6 md:p-10 bg-[#FFFDF8] dark:bg-[#0D0E12] w-full min-h-screen font-sans">
+      <div className="max-w-3xl w-full mx-auto flex flex-col gap-6">
         
-        <div className="flex flex-col gap-2 border-b border-zinc-200 dark:border-zinc-800 pb-6">
-          <h1 className="text-2xl font-bold text-black dark:text-white tracking-tight">Your Profile</h1>
-          <p className="text-zinc-500 dark:text-zinc-400">Update your personal information.</p>
-        </div>
+        {/* Back Link */}
+        <Link 
+          href="/workspaces" 
+          className="inline-flex items-center gap-2 self-start px-3 py-1.5 bg-white dark:bg-[#181920] border-2 border-black dark:border-white text-xs font-black uppercase tracking-wider shadow-neo-sm hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Back to Workspaces
+        </Link>
 
-        {!isEditing ? (
-          <div className="flex flex-col gap-6 items-start">
-            <div className="flex items-center gap-6">
-              {session?.user?.image ? (
-                <img 
-                  src={session.user.image} 
-                  alt="Profile" 
-                  className="w-24 h-24 rounded-full object-cover border border-zinc-200 dark:border-zinc-800"
-                />
-              ) : (
-                <div className="w-24 h-24 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-3xl font-semibold text-zinc-500">
-                  {session?.user?.name?.charAt(0) || "U"}
+        {/* Card Header Window */}
+        <div className="bg-white dark:bg-[#181920] border-3 border-black dark:border-white shadow-neo">
+          <div className="flex items-center justify-between px-5 py-3 border-b-3 border-black dark:border-white bg-[#FFE600] text-black">
+            <div className="flex items-center gap-2">
+              <User className="w-4 h-4 text-black" />
+              <h1 className="text-sm font-black uppercase tracking-wider">User Identity & Profile</h1>
+            </div>
+            <div className="flex gap-1.5">
+              <span className="w-3 h-3 rounded-full border border-black bg-[#FF6B6B]" />
+              <span className="w-3 h-3 rounded-full border border-black bg-white" />
+              <span className="w-3 h-3 rounded-full border border-black bg-[#4ADE80]" />
+            </div>
+          </div>
+
+          <div className="p-6 md:p-8 space-y-6">
+            {!isEditing ? (
+              <div className="flex flex-col gap-6 items-start">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+                  {session?.user?.image ? (
+                    <img 
+                      src={session.user.image} 
+                      alt="Profile" 
+                      className="w-24 h-24 border-3 border-black dark:border-white shadow-neo-sm object-cover bg-white"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 border-3 border-black dark:border-white shadow-neo-sm bg-[#FFE600] text-black flex items-center justify-center text-3xl font-black">
+                      {session?.user?.name?.charAt(0) || "U"}
+                    </div>
+                  )}
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-2xl font-black text-black dark:text-white uppercase tracking-tight">
+                        {profileData?.username || session?.user?.name || "No name provided"}
+                      </h2>
+                      <span className="px-2 py-0.5 bg-[#4ADE80] text-black border-2 border-black text-[10px] font-black uppercase tracking-wider">
+                        Active
+                      </span>
+                    </div>
+                    <p className="text-xs font-mono font-bold text-black/70 dark:text-white/70">
+                      {session?.user?.email || "No email provided"}
+                    </p>
+                    {profileData?.githubUsername && (
+                      <p className="text-xs font-mono font-bold text-black/80 dark:text-white/80 flex items-center gap-1.5 mt-1">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                          <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd"></path>
+                        </svg>
+                        github.com/{profileData.githubUsername}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              )}
-              <div className="flex flex-col gap-1">
-                <h2 className="text-2xl font-semibold text-black dark:text-white">
-                  {profileData?.username || session?.user?.name || "No name provided"}
-                </h2>
-                <p className="text-sm text-zinc-500">
-                  {session?.user?.email || "No email provided"}
-                </p>
-                {profileData?.githubUsername && (
-                  <p className="text-sm text-zinc-500 flex items-center gap-1 mt-1">
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd"></path>
-                    </svg>
-                    github.com/{profileData.githubUsername}
-                  </p>
+
+                {profileData && (
+                  <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+                    <div className="flex flex-col gap-1 p-3.5 bg-white dark:bg-[#20222a] border-2 border-black dark:border-white shadow-neo-sm">
+                      <div className="flex items-center gap-1.5 text-black/60 dark:text-white/60">
+                        <Calendar className="w-3.5 h-3.5" />
+                        <span className="text-[10px] font-black uppercase tracking-wider">Joined</span>
+                      </div>
+                      <span className="text-base font-black text-black dark:text-white">
+                        {new Date(profileData.createdAt).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
+                      </span>
+                    </div>
+
+                    <div className="flex flex-col gap-1 p-3.5 bg-[#38BDF8]/20 border-2 border-black dark:border-white shadow-neo-sm">
+                      <div className="flex items-center gap-1.5 text-black dark:text-white">
+                        <FolderGit2 className="w-3.5 h-3.5" />
+                        <span className="text-[10px] font-black uppercase tracking-wider">Workspaces</span>
+                      </div>
+                      <span className="text-base font-black text-black dark:text-white">
+                        {profileData._count?.workspaceMembers || 0}
+                      </span>
+                    </div>
+
+                    <div className="flex flex-col gap-1 p-3.5 bg-[#4ADE80]/20 border-2 border-black dark:border-white shadow-neo-sm">
+                      <div className="flex items-center gap-1.5 text-black dark:text-white">
+                        <CheckSquare className="w-3.5 h-3.5" />
+                        <span className="text-[10px] font-black uppercase tracking-wider">Assigned</span>
+                      </div>
+                      <span className="text-base font-black text-black dark:text-white">
+                        {profileData._count?.issuesAssigned || 0} Tasks
+                      </span>
+                    </div>
+
+                    <div className="flex flex-col gap-1 p-3.5 bg-[#C084FC]/20 border-2 border-black dark:border-white shadow-neo-sm">
+                      <div className="flex items-center gap-1.5 text-black dark:text-white">
+                        <MessageSquare className="w-3.5 h-3.5" />
+                        <span className="text-[10px] font-black uppercase tracking-wider">Comments</span>
+                      </div>
+                      <span className="text-base font-black text-black dark:text-white">
+                        {profileData._count?.comments || 0}
+                      </span>
+                    </div>
+                  </div>
                 )}
-              </div>
-            </div>
 
-            {profileData && (
-              <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                <div className="flex flex-col gap-1 p-4 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg">
-                  <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Joined</span>
-                  <span className="text-lg font-medium text-black dark:text-white">
-                    {new Date(profileData.createdAt).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
-                  </span>
+                {message && (
+                  <div className={`p-3 border-2 border-black font-bold text-xs w-full mt-2 ${message.includes('success') ? 'bg-[#4ADE80] text-black' : 'bg-[#FF6B6B] text-black'}`}>
+                    {message}
+                  </div>
+                )}
+
+                <button 
+                  onClick={() => setIsEditing(true)}
+                  className="inline-flex items-center gap-2 px-6 py-2.5 mt-2 text-xs font-black uppercase tracking-wider text-black bg-[#FFE600] border-2 border-black shadow-neo-sm hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none active:translate-x-1 active:translate-y-1 transition-all cursor-pointer"
+                >
+                  <Edit3 className="w-4 h-4" />
+                  Edit Profile
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-5">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-black uppercase tracking-wider text-black dark:text-white">Display Name</label>
+                  <input 
+                    type="text" 
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Your full name"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-[#20222a] border-2 border-black dark:border-white font-medium text-sm text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-[#FFE600]"
+                  />
                 </div>
-                <div className="flex flex-col gap-1 p-4 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg">
-                  <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Workspaces</span>
-                  <span className="text-lg font-medium text-black dark:text-white">
-                    {profileData._count?.workspaceMembers || 0}
-                  </span>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-black uppercase tracking-wider text-black dark:text-white">Avatar URL</label>
+                  <input 
+                    type="url" 
+                    value={avatarUrl}
+                    onChange={(e) => setAvatarUrl(e.target.value)}
+                    placeholder="https://example.com/avatar.jpg"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-[#20222a] border-2 border-black dark:border-white font-medium text-sm text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-[#FFE600]"
+                  />
                 </div>
-                <div className="flex flex-col gap-1 p-4 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg">
-                  <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Tasks</span>
-                  <span className="text-lg font-medium text-black dark:text-white">
-                    {profileData._count?.issuesAssigned || 0} Assigned
-                  </span>
-                </div>
-                <div className="flex flex-col gap-1 p-4 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg">
-                  <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Comments</span>
-                  <span className="text-lg font-medium text-black dark:text-white">
-                    {profileData._count?.comments || 0} Written
-                  </span>
+                
+                {message && (
+                  <div className={`p-3 border-2 border-black font-bold text-xs ${message.includes('success') ? 'bg-[#4ADE80] text-black' : 'bg-[#FF6B6B] text-black'}`}>
+                    {message}
+                  </div>
+                )}
+
+                <div className="flex justify-end gap-3 pt-4 border-t-2 border-black dark:border-white">
+                  <button 
+                    onClick={() => setIsEditing(false)}
+                    className="px-4 py-2 text-xs font-black uppercase tracking-wider text-black dark:text-white border-2 border-black dark:border-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={handleSave}
+                    disabled={isLoading}
+                    className="px-6 py-2 text-xs font-black uppercase tracking-wider text-black bg-[#FFE600] border-2 border-black shadow-neo-sm hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none active:translate-x-1 active:translate-y-1 transition-all disabled:opacity-50 cursor-pointer"
+                  >
+                    {isLoading ? "Saving..." : "Save Changes"}
+                  </button>
                 </div>
               </div>
             )}
-
-            {message && (
-              <div className={`p-3 rounded-md text-sm font-medium w-full mt-4 ${message.includes('success') ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400' : 'bg-red-50 text-red-600 dark:bg-red-950/30 dark:text-red-400'}`}>
-                {message}
-              </div>
-            )}
-
-            <button 
-              onClick={() => setIsEditing(true)}
-              className="px-6 py-2 mt-4 text-sm font-medium text-white bg-black dark:text-black dark:bg-white rounded-md hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors"
-            >
-              Edit Profile
-            </button>
           </div>
-        ) : (
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Name</label>
-              <input 
-                type="text" 
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Your full name"
-                className="w-full px-3 py-2 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-md focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-black dark:text-white"
-              />
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Avatar URL</label>
-              <input 
-                type="url" 
-                value={avatarUrl}
-                onChange={(e) => setAvatarUrl(e.target.value)}
-                placeholder="https://example.com/avatar.jpg"
-                className="w-full px-3 py-2 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-md focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-black dark:text-white"
-              />
-            </div>
-            
-            {message && (
-              <div className={`p-3 rounded-md text-sm font-medium ${message.includes('success') ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400' : 'bg-red-50 text-red-600 dark:bg-red-950/30 dark:text-red-400'}`}>
-                {message}
-              </div>
-            )}
-
-            <div className="flex justify-end gap-4 pt-4 border-t border-zinc-200 dark:border-zinc-800">
-              <button 
-                onClick={() => setIsEditing(false)}
-                className="px-4 py-2 text-sm font-medium text-zinc-600 hover:text-black dark:text-zinc-400 dark:hover:text-white transition-colors"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={handleSave}
-                disabled={isLoading}
-                className="px-6 py-2 text-sm font-medium text-white bg-black dark:text-black dark:bg-white rounded-md hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors disabled:opacity-50"
-              >
-                {isLoading ? "Saving..." : "Save Changes"}
-              </button>
-            </div>
-          </div>
-        )}
+        </div>
 
       </div>
     </div>

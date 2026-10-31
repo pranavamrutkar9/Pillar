@@ -93,46 +93,46 @@ export default function ClientIssuesPage({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       
       {/* Action & Filter Toolbar */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 p-2 bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl shadow-2xs">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 p-3 bg-white dark:bg-zinc-900 border-2 border-black dark:border-white rounded-xl shadow-[4px_4px_0px_0px_#000] dark:shadow-[4px_4px_0px_0px_#fff]">
         
         {/* Left: View Switcher */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center p-1 bg-zinc-100/80 dark:bg-zinc-900/80 rounded-lg border border-zinc-200/60 dark:border-zinc-800/60">
+        <div className="flex items-center gap-2.5">
+          <div className="flex items-center p-1 bg-zinc-100 dark:bg-zinc-950 rounded-lg border-2 border-black dark:border-white gap-1">
             <button 
               onClick={() => updateUrl('view', 'board')} 
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-all ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-black transition-all cursor-pointer ${
                 view === 'board' 
-                  ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-2xs' 
-                  : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+                  ? 'bg-[#FFE600] text-black border border-black shadow-[1.5px_1.5px_0px_0px_#000]' 
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white'
               }`}
             >
-              <LayoutGrid className="w-3.5 h-3.5" />
+              <LayoutGrid className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Board</span>
             </button>
             <button 
               onClick={() => updateUrl('view', 'list')} 
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-all ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-black transition-all cursor-pointer ${
                 view === 'list' 
-                  ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-2xs' 
-                  : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+                  ? 'bg-[#FFE600] text-black border border-black shadow-[1.5px_1.5px_0px_0px_#000]' 
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white'
               }`}
             >
-              <List className="w-3.5 h-3.5" />
+              <List className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>List</span>
             </button>
           </div>
 
           {/* Hackathon Timer */}
           {isHackathon && (
-            <div className="flex items-center gap-2 pl-2 border-l border-zinc-200 dark:border-zinc-800">
+            <div className="flex items-center gap-2 pl-2 border-l-2 border-black dark:border-white">
               <HackathonTimer deadline={project.deadline} />
               {isCrunchMode && (
                 <button 
                   onClick={() => setShowAllCrunch(!showAllCrunch)}
-                  className="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900"
+                  className="text-[11px] font-mono font-black px-2.5 py-1 rounded-lg bg-[#FF6B6B] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] hover:-translate-y-0.5 active:translate-y-0.5 transition-all cursor-pointer"
                 >
                   {showAllCrunch ? "Apply Crunch Filter" : "Show All"}
                 </button>
@@ -146,13 +146,13 @@ export default function ClientIssuesPage({
           
           {/* Search Box */}
           <div className="relative">
-            <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-black dark:text-white absolute left-2.5 top-1/2 -translate-y-1/2 stroke-[2.5]" />
             <input 
               type="text" 
               placeholder="Filter issues..." 
               value={searchQuery}
               onChange={(e) => updateUrl('search', e.target.value)}
-              className="text-xs pl-8 pr-2.5 py-1.5 w-44 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors"
+              className="text-xs font-bold pl-8 pr-2.5 py-1.5 w-44 rounded-lg border-2 border-black dark:border-white bg-white dark:bg-zinc-950 text-black dark:text-white placeholder:text-zinc-400 focus:outline-none focus:shadow-[2px_2px_0px_0px_#000] dark:focus:shadow-[2px_2px_0px_0px_#fff] transition-all"
             />
           </div>
           
@@ -160,7 +160,7 @@ export default function ClientIssuesPage({
           <select 
             value={statusFilter[0] || ""}
             onChange={(e) => updateUrl('status', e.target.value)}
-            className="text-xs px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors cursor-pointer"
+            className="text-xs font-bold px-2.5 py-1.5 rounded-lg border-2 border-black dark:border-white bg-white dark:bg-zinc-950 text-black dark:text-white focus:outline-none focus:shadow-[2px_2px_0px_0px_#000] dark:focus:shadow-[2px_2px_0px_0px_#fff] transition-all cursor-pointer"
           >
             <option value="">All Statuses</option>
             {project.issueStatuses?.map((s: any) => (
@@ -173,7 +173,7 @@ export default function ClientIssuesPage({
             <select 
               value={cycleFilter}
               onChange={(e) => updateUrl('cycleId', e.target.value)}
-              className="text-xs px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors cursor-pointer"
+              className="text-xs font-bold px-2.5 py-1.5 rounded-lg border-2 border-black dark:border-white bg-white dark:bg-zinc-950 text-black dark:text-white focus:outline-none focus:shadow-[2px_2px_0px_0px_#000] dark:focus:shadow-[2px_2px_0px_0px_#fff] transition-all cursor-pointer"
             >
               <option value="">All Cycles</option>
               {cycles.map((c: any) => (
@@ -187,7 +187,7 @@ export default function ClientIssuesPage({
             <select 
               value={moduleFilter}
               onChange={(e) => updateUrl('moduleId', e.target.value)}
-              className="text-xs px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors cursor-pointer"
+              className="text-xs font-bold px-2.5 py-1.5 rounded-lg border-2 border-black dark:border-white bg-white dark:bg-zinc-950 text-black dark:text-white focus:outline-none focus:shadow-[2px_2px_0px_0px_#000] dark:focus:shadow-[2px_2px_0px_0px_#fff] transition-all cursor-pointer"
             >
               <option value="">All Modules</option>
               {modules.map((m: any) => (
@@ -198,12 +198,12 @@ export default function ClientIssuesPage({
 
           {/* Active Presence */}
           {activeUsers.length > 0 && (
-            <div className="flex items-center gap-1 pl-2 border-l border-zinc-200 dark:border-zinc-800">
+            <div className="flex items-center gap-1 pl-2 border-l-2 border-black dark:border-white">
               <div className="flex -space-x-1.5">
                 {activeUsers.map(user => (
                   <div 
                     key={user.id} 
-                    className="w-5 h-5 rounded-full bg-zinc-800 text-white dark:bg-zinc-200 dark:text-zinc-900 flex items-center justify-center text-[9px] font-mono font-bold border border-white dark:border-zinc-900 shadow-2xs" 
+                    className="w-6 h-6 rounded-lg bg-[#FFE600] text-black flex items-center justify-center text-[10px] font-mono font-black border-2 border-black shadow-[1.5px_1.5px_0px_0px_#000]" 
                     title="Active now"
                   >
                     {getInitials(user.id)}
@@ -217,9 +217,9 @@ export default function ClientIssuesPage({
           {!isViewer && (
             <button
               onClick={() => setIsCreateOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all shadow-xs shrink-0"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black bg-[#FFE600] hover:bg-[#FFDE59] text-black border-2 border-black shadow-[3px_3px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_0px_#000] active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_#000] transition-all shrink-0 cursor-pointer"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-4 h-4 stroke-[3]" />
               <span>New Issue</span>
             </button>
           )}
@@ -229,11 +229,11 @@ export default function ClientIssuesPage({
 
       {/* Crunch Notice */}
       {isCrunchMode && !showAllCrunch && filteredIssues.length === 0 && (
-        <div className="p-3 bg-amber-50 dark:bg-amber-950/20 text-amber-800 dark:text-amber-200 rounded-lg text-xs border border-amber-200 dark:border-amber-900/40 flex items-center justify-between">
-          <span><strong>Crunch Mode Active:</strong> Non-critical issues are filtered out. Click Show All to reveal full board.</span>
+        <div className="p-3.5 bg-[#FF6B6B] text-black font-bold rounded-xl text-xs border-2 border-black shadow-[3px_3px_0px_0px_#000] flex items-center justify-between">
+          <span><strong>CRUNCH MODE ACTIVE:</strong> Non-critical issues are filtered out. Click Show All to reveal full board.</span>
           <button 
             onClick={() => setShowAllCrunch(true)}
-            className="underline font-medium text-amber-900 dark:text-amber-100 ml-2"
+            className="underline font-black ml-2 cursor-pointer"
           >
             Show All
           </button>
@@ -247,7 +247,7 @@ export default function ClientIssuesPage({
 
       {/* New Issue Modal Dialog */}
       {isCreateOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
           <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto">
             <IssueForm
               projectId={project.id}

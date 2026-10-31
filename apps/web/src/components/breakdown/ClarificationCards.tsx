@@ -79,40 +79,52 @@ export default function ClarificationCards({
   };
 
   return (
-    <div className="space-y-6 max-w-3xl mx-auto">
-      {/* Title & Context Banner */}
-      <div className="p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 space-y-1.5 shadow-xs">
-        <div className="flex items-center gap-1.5 text-xs font-mono text-zinc-400">
-          <HelpCircle className="w-3.5 h-3.5" />
-          <span>STAGE 02 · ARCHITECTURAL CLARIFICATIONS</span>
+    <div className="space-y-6 max-w-3xl mx-auto font-sans">
+      {/* Title & Context Window */}
+      <div className="bg-white dark:bg-[#181920] border-3 border-black dark:border-white shadow-neo overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-3 border-b-3 border-black dark:border-white bg-[#FFE600] text-black">
+          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider">
+            <HelpCircle className="w-4 h-4 text-black" />
+            <span>Stage 02 · Architectural Clarifications</span>
+          </div>
+          <div className="flex gap-1.5">
+            <span className="w-3 h-3 rounded-full border border-black bg-[#FF6B6B]" />
+            <span className="w-3 h-3 rounded-full border border-black bg-white" />
+            <span className="w-3 h-3 rounded-full border border-black bg-[#4ADE80]" />
+          </div>
         </div>
-        <h2 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-          {projectTitle}
-        </h2>
-        <p className="text-xs text-zinc-500 leading-relaxed">
-          {summary} Confirm these technical decisions to produce well-scoped issues.
-        </p>
+
+        <div className="p-6 space-y-2">
+          <h2 className="text-2xl font-black uppercase tracking-tight text-black dark:text-white">
+            {projectTitle}
+          </h2>
+          <p className="text-xs font-medium text-black/70 dark:text-white/70 leading-relaxed">
+            {summary} Confirm these technical decisions to produce well-scoped issues and clean module boundaries.
+          </p>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
         {questions.map((q, idx) => (
           <div
             key={q.id}
-            className="p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 shadow-2xs space-y-2.5"
+            className="p-6 border-3 border-black dark:border-white bg-white dark:bg-[#181920] shadow-neo space-y-3"
           >
             <div>
-              <span className="text-[10px] font-mono uppercase text-zinc-400">Question {idx + 1} of {questions.length}</span>
-              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mt-0.5">
+              <span className="inline-block px-2 py-0.5 mb-1.5 bg-[#38BDF8] text-black border border-black text-[10px] font-black uppercase tracking-wider">
+                Question {idx + 1} of {questions.length}
+              </span>
+              <h3 className="text-base font-black text-black dark:text-white uppercase tracking-tight">
                 {q.question}
               </h3>
             </div>
 
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs font-medium text-black/70 dark:text-white/70">
               {q.context}
             </p>
 
             {/* Options List */}
-            <div className="space-y-1.5 pt-1">
+            <div className="space-y-2 pt-1">
               {q.options.map((option) => {
                 const isSelected = answers[q.id] === option;
                 const isRecommended = q.recommendedOption === option;
@@ -122,27 +134,25 @@ export default function ClarificationCards({
                     key={option}
                     type="button"
                     onClick={() => handleSelectOption(q.id, option)}
-                    className={`w-full text-left p-3 rounded-xl border text-xs flex items-center justify-between transition-colors ${
+                    className={`w-full text-left p-3.5 border-2 text-xs flex items-center justify-between transition-all cursor-pointer ${
                       isSelected
-                        ? "border-zinc-900 dark:border-zinc-100 bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium"
-                        : "border-zinc-200/70 dark:border-zinc-800/70 bg-white dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700"
+                        ? "border-black dark:border-white bg-[#FFE600] text-black font-black shadow-neo-sm"
+                        : "border-black/30 dark:border-white/30 bg-[#FFFDF8] dark:bg-[#20222a] text-black dark:text-white hover:border-black dark:hover:border-white"
                     }`}
                   >
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex items-center gap-3">
                       <div
-                        className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center shrink-0 ${
-                          isSelected
-                            ? "border-zinc-900 bg-zinc-900 dark:border-zinc-100 dark:bg-zinc-100"
-                            : "border-zinc-300 dark:border-zinc-700"
+                        className={`w-4 h-4 border-2 border-black flex items-center justify-center shrink-0 ${
+                          isSelected ? "bg-black" : "bg-white"
                         }`}
                       >
-                        {isSelected && <div className="w-1 h-1 bg-white dark:bg-zinc-900 rounded-full" />}
+                        {isSelected && <div className="w-1.5 h-1.5 bg-[#FFE600]" />}
                       </div>
-                      <span>{option}</span>
+                      <span className="font-bold">{option}</span>
                     </div>
                     {isRecommended && (
-                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-900/40 flex items-center gap-1">
-                        <CheckCircle2 className="w-2.5 h-2.5" />
+                      <span className="text-[10px] font-mono font-black uppercase tracking-wider px-2 py-0.5 bg-[#4ADE80] text-black border border-black flex items-center gap-1 shrink-0">
+                        <CheckCircle2 className="w-3 h-3 text-black" />
                         Recommended
                       </span>
                     )}
@@ -151,13 +161,13 @@ export default function ClarificationCards({
               })}
 
               {/* Custom Write-in */}
-              <div className="pt-1">
+              <div className="pt-2">
                 <input
                   type="text"
-                  placeholder="Or provide a custom technical choice..."
+                  placeholder="Or enter a custom technical choice..."
                   value={customAnswers[q.id] || ""}
                   onChange={(e) => handleCustomChange(q.id, e.target.value)}
-                  className="w-full px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-xs text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors"
+                  className="w-full px-3.5 py-2.5 border-2 border-black dark:border-white bg-[#FFFDF8] dark:bg-[#20222a] text-xs font-medium text-black dark:text-white placeholder:text-black/40 dark:placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[#FFE600]"
                 />
               </div>
             </div>
@@ -165,42 +175,42 @@ export default function ClarificationCards({
         ))}
 
         {/* Action Controls */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3">
           <button
             type="button"
             onClick={onBack}
             disabled={isLoading}
-            className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-[#181920] border-2 border-black dark:border-white text-xs font-black uppercase tracking-wider text-black dark:text-white shadow-neo-sm hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all cursor-pointer"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to PRD</span>
           </button>
 
-          <div className="flex items-center gap-2.5 w-full sm:w-auto">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
             <button
               type="button"
               onClick={handleProceedWithDefaults}
               disabled={isLoading}
-              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-xs font-medium text-zinc-700 dark:text-zinc-300 transition-colors shadow-2xs"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-black bg-white dark:bg-[#20222a] text-xs font-black uppercase tracking-wider text-black dark:text-white shadow-neo-sm hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all cursor-pointer"
             >
-              <FastForward className="w-3 h-3" />
-              <span>Use Recommendations</span>
+              <FastForward className="w-3.5 h-3.5 text-black dark:text-white" />
+              <span>Use Defaults</span>
             </button>
 
             <button
               type="submit"
               disabled={isLoading}
-              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 text-white font-medium text-xs shadow-xs transition-colors"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-[#FFE600] text-black border-2 border-black font-black text-xs uppercase tracking-wider shadow-neo-sm hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none active:translate-x-1 active:translate-y-1 transition-all cursor-pointer"
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-black" />
                   <span>Generating Breakdown...</span>
                 </>
               ) : (
                 <>
                   <span>Generate Breakdown</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <ArrowRight className="w-3.5 h-3.5 text-black" />
                 </>
               )}
             </button>

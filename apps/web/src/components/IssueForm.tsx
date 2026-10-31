@@ -82,60 +82,60 @@ export default function IssueForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl bg-white dark:bg-zinc-950 p-6 rounded-xl shadow-xs border border-zinc-200/80 dark:border-zinc-800/80">
-      <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-900">
+    <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-[6px_6px_0px_0px_#000] dark:shadow-[6px_6px_0px_0px_#fff] border-3 border-black dark:border-white">
+      <div className="flex items-center justify-between pb-3 border-b-2 border-black dark:border-white">
         <div>
-          <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Create New Issue</h3>
-          <p className="text-xs text-zinc-500">Capture a new task, bug, or feature request.</p>
+          <h3 className="text-base font-black text-black dark:text-white uppercase tracking-wider">Create New Issue</h3>
+          <p className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">Capture a new task, bug, or feature request.</p>
         </div>
         {onClose && (
           <button 
             type="button" 
             onClick={onClose}
-            className="p-1 rounded-md text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
+            className="p-1.5 rounded-lg border-2 border-black dark:border-white bg-white dark:bg-zinc-800 text-black dark:text-white hover:bg-zinc-100 transition-colors cursor-pointer"
           >
-            <X className="w-4 h-4" />
+            <X className="w-4 h-4 stroke-[3]" />
           </button>
         )}
       </div>
       
       {error && (
-        <div className="text-red-600 dark:text-red-400 text-xs bg-red-50 dark:bg-red-950/30 p-2.5 rounded-lg border border-red-200/60 dark:border-red-900/40">
+        <div className="text-black bg-[#FF6B6B]/20 font-bold text-xs p-2.5 rounded-lg border-2 border-[#FF6B6B]">
           {error}
         </div>
       )}
       {success && (
-        <div className="text-emerald-600 dark:text-emerald-400 text-xs bg-emerald-50 dark:bg-emerald-950/30 p-2.5 rounded-lg border border-emerald-200/60 dark:border-emerald-900/40">
+        <div className="text-black bg-[#4ADE80]/30 font-bold text-xs p-2.5 rounded-lg border-2 border-[#4ADE80]">
           Issue created successfully!
         </div>
       )}
       
       <div>
-        <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Issue Title</label>
+        <label className="block text-xs font-black uppercase text-black dark:text-white mb-1.5">Issue Title</label>
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="e.g. Implement WebSocket heartbeat reconnection"
-          className="w-full px-3 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 dark:focus:ring-zinc-100/10 focus:border-zinc-400 dark:focus:border-zinc-600 transition-colors"
+          className="w-full px-3 py-2 text-sm font-bold rounded-lg border-2 border-black dark:border-white bg-white dark:bg-zinc-950 text-black dark:text-white placeholder:text-zinc-400 focus:outline-none focus:shadow-[2px_2px_0px_0px_#000] dark:focus:shadow-[2px_2px_0px_0px_#fff] transition-all"
           required
         />
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Description</label>
-        <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden bg-white dark:bg-zinc-900/40">
+        <label className="block text-xs font-black uppercase text-black dark:text-white mb-1.5">Description</label>
+        <div>
           <TiptapEditor value={description} onChange={setDescription} />
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
         <div>
-          <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Status</label>
+          <label className="block text-xs font-black uppercase text-black dark:text-white mb-1.5">Status</label>
           <select
             value={statusId}
             onChange={(e) => setStatusId(e.target.value)}
-            className="w-full px-3 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors"
+            className="w-full px-3 py-2 text-xs font-bold rounded-lg border-2 border-black dark:border-white bg-white dark:bg-zinc-950 text-black dark:text-white focus:outline-none focus:shadow-[2px_2px_0px_0px_#000] dark:focus:shadow-[2px_2px_0px_0px_#fff] transition-all cursor-pointer"
             required
           >
             {statuses.map(s => (
@@ -145,11 +145,11 @@ export default function IssueForm({
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Priority</label>
+          <label className="block text-xs font-black uppercase text-black dark:text-white mb-1.5">Priority</label>
           <select
             value={priority}
             onChange={(e) => setPriority(e.target.value)}
-            className="w-full px-3 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors"
+            className="w-full px-3 py-2 text-xs font-bold rounded-lg border-2 border-black dark:border-white bg-white dark:bg-zinc-950 text-black dark:text-white focus:outline-none focus:shadow-[2px_2px_0px_0px_#000] dark:focus:shadow-[2px_2px_0px_0px_#fff] transition-all cursor-pointer"
           >
             <option value="NONE">None</option>
             <option value="LOW">Low</option>
@@ -162,11 +162,11 @@ export default function IssueForm({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
         <div>
-          <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Assignee</label>
+          <label className="block text-xs font-black uppercase text-black dark:text-white mb-1.5">Assignee</label>
           <select
             value={assigneeId}
             onChange={(e) => setAssigneeId(e.target.value)}
-            className="w-full px-3 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors"
+            className="w-full px-3 py-2 text-xs font-bold rounded-lg border-2 border-black dark:border-white bg-white dark:bg-zinc-950 text-black dark:text-white focus:outline-none focus:shadow-[2px_2px_0px_0px_#000] dark:focus:shadow-[2px_2px_0px_0px_#fff] transition-all cursor-pointer"
           >
             <option value="">Unassigned</option>
             {members.map((m) => (
@@ -176,35 +176,35 @@ export default function IssueForm({
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Due Date</label>
+          <label className="block text-xs font-black uppercase text-black dark:text-white mb-1.5">Due Date</label>
           <input
             type="date"
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
-            className="w-full px-3 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors"
+            className="w-full px-3 py-2 text-xs font-bold rounded-lg border-2 border-black dark:border-white bg-white dark:bg-zinc-950 text-black dark:text-white focus:outline-none focus:shadow-[2px_2px_0px_0px_#000] dark:focus:shadow-[2px_2px_0px_0px_#fff] transition-all"
           />
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
         <div>
-          <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Estimate (Points)</label>
+          <label className="block text-xs font-black uppercase text-black dark:text-white mb-1.5">Estimate (Points)</label>
           <input
             type="number"
             min="0"
             value={estimate}
             onChange={(e) => setEstimate(e.target.value === "" ? "" : parseInt(e.target.value, 10))}
-            className="w-full px-3 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors"
+            className="w-full px-3 py-2 text-xs font-bold rounded-lg border-2 border-black dark:border-white bg-white dark:bg-zinc-950 text-black dark:text-white focus:outline-none focus:shadow-[2px_2px_0px_0px_#000] dark:focus:shadow-[2px_2px_0px_0px_#fff] transition-all"
             placeholder="e.g. 3"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Cycle</label>
+          <label className="block text-xs font-black uppercase text-black dark:text-white mb-1.5">Cycle</label>
           <select
             value={cycleId}
             onChange={(e) => setCycleId(e.target.value)}
-            className="w-full px-3 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors"
+            className="w-full px-3 py-2 text-xs font-bold rounded-lg border-2 border-black dark:border-white bg-white dark:bg-zinc-950 text-black dark:text-white focus:outline-none focus:shadow-[2px_2px_0px_0px_#000] dark:focus:shadow-[2px_2px_0px_0px_#fff] transition-all cursor-pointer"
           >
             <option value="">No Cycle</option>
             {cycles.map((c) => (
@@ -214,11 +214,11 @@ export default function IssueForm({
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Module</label>
+          <label className="block text-xs font-black uppercase text-black dark:text-white mb-1.5">Module</label>
           <select
             value={moduleId}
             onChange={(e) => setModuleId(e.target.value)}
-            className="w-full px-3 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:border-zinc-600 transition-colors"
+            className="w-full px-3 py-2 text-xs font-bold rounded-lg border-2 border-black dark:border-white bg-white dark:bg-zinc-950 text-black dark:text-white focus:outline-none focus:shadow-[2px_2px_0px_0px_#000] dark:focus:shadow-[2px_2px_0px_0px_#fff] transition-all cursor-pointer"
           >
             <option value="">No Module</option>
             {modules.map((m) => (
@@ -229,8 +229,8 @@ export default function IssueForm({
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Labels</label>
-        <div className="flex flex-wrap gap-1.5">
+        <label className="block text-xs font-black uppercase text-black dark:text-white mb-1.5">Labels</label>
+        <div className="flex flex-wrap gap-2">
           {labels.map(label => {
             const isSelected = labelIds.includes(label.id);
             return (
@@ -244,26 +244,26 @@ export default function IssueForm({
                     setLabelIds([...labelIds, label.id]);
                   }
                 }}
-                className={`px-2 py-0.5 text-xs rounded-md border transition-colors ${
+                className={`px-2.5 py-1 text-xs font-bold rounded-lg border-2 border-black transition-all cursor-pointer ${
                   isSelected 
-                    ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 border-zinc-900 dark:border-zinc-100 font-medium' 
-                    : 'bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300'
+                    ? 'bg-[#FFE600] text-black shadow-[2px_2px_0px_0px_#000]' 
+                    : 'bg-white dark:bg-zinc-800 text-black dark:text-white shadow-[1px_1px_0px_0px_#000]'
                 }`}
               >
                 {label.name}
               </button>
             );
           })}
-          {labels.length === 0 && <span className="text-xs text-zinc-400">No labels configured</span>}
+          {labels.length === 0 && <span className="text-xs text-zinc-500 font-bold">No labels configured</span>}
         </div>
       </div>
 
-      <div className="pt-2 flex items-center justify-end gap-2">
+      <div className="pt-3 flex items-center justify-end gap-3 border-t-2 border-black dark:border-white">
         {onClose && (
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-medium rounded-lg text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
+            className="px-4 py-2 text-xs font-black rounded-lg text-black dark:text-white hover:underline transition-all cursor-pointer"
           >
             Cancel
           </button>
@@ -271,16 +271,16 @@ export default function IssueForm({
         <button
           type="submit"
           disabled={loading || !title.trim()}
-          className="flex items-center gap-1.5 py-2 px-4 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 transition-colors shadow-xs disabled:opacity-50"
+          className="flex items-center gap-1.5 py-2.5 px-5 rounded-xl text-xs font-black text-black bg-[#FFE600] hover:bg-[#FFDE59] border-2 border-black shadow-[3px_3px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_0px_#000] active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_#000] transition-all disabled:opacity-50 cursor-pointer"
         >
           {loading ? (
             <>
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              <Loader2 className="w-4 h-4 animate-spin stroke-[2.5]" />
               <span>Creating...</span>
             </>
           ) : (
             <>
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-4 h-4 stroke-[3]" />
               <span>Create Issue</span>
             </>
           )}

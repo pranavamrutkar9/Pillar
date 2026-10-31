@@ -13,7 +13,10 @@ import {
   Terminal, 
   ShieldCheck,
   ChevronRight,
-  ExternalLink
+  ExternalLink,
+  Flame,
+  Zap,
+  Check
 } from "lucide-react";
 
 export default async function LandingPage() {
@@ -24,52 +27,49 @@ export default async function LandingPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#FAFAFA] dark:bg-[#09090B] text-zinc-900 dark:text-zinc-100 transition-colors">
+    <div className="flex flex-col min-h-screen bg-[#FFFDF8] dark:bg-[#0D0E12] text-black dark:text-zinc-100 transition-colors selection:bg-[#FFE600] selection:text-black">
       
-      {/* Subtle top subtle border glow */}
-      <div className="h-px w-full bg-gradient-to-r from-transparent via-zinc-300 dark:via-zinc-700 to-transparent opacity-50" />
-
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-[#FAFAFA]/80 dark:bg-[#09090B]/80 border-b border-zinc-200/60 dark:border-zinc-800/60">
+      <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-[#FFFDF8]/90 dark:bg-[#0D0E12]/90 border-b-2 border-black dark:border-white">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-7 h-7 rounded-lg bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center text-white dark:text-zinc-900 font-semibold text-sm tracking-tight transition-transform group-hover:scale-105">
+            <div className="w-8 h-8 rounded-lg bg-[#FFE600] border-2 border-black flex items-center justify-center text-black font-black text-base shadow-[2px_2px_0px_0px_#000] transition-transform group-hover:-translate-y-0.5">
               <span className="font-mono">P</span>
             </div>
-            <span className="text-base font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
+            <span className="text-lg font-black tracking-tight text-black dark:text-white">
               Pillar
             </span>
-            <span className="text-[11px] font-mono font-medium px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-500 bg-zinc-100/60 dark:bg-zinc-900/60">
+            <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded border-2 border-black dark:border-white text-black dark:text-white bg-[#4ADE80] shadow-[1.5px_1.5px_0px_0px_#000] dark:shadow-[1.5px_1.5px_0px_0px_#fff]">
               v2.0
             </span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-8 text-sm text-zinc-600 dark:text-zinc-400 font-normal">
-            <a href="#features" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+          <nav className="hidden md:flex items-center gap-8 text-sm font-bold text-black dark:text-zinc-300">
+            <a href="#features" className="hover:text-amber-600 dark:hover:text-[#FFE600] transition-colors">
               Features
             </a>
-            <a href="#architecture" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+            <a href="#architecture" className="hover:text-amber-600 dark:hover:text-[#FFE600] transition-colors">
               Philosophy
             </a>
             <Link 
               href="https://github.com/pranavamrutkar9/Pillar" 
               target="_blank" 
-              className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors flex items-center gap-1.5"
+              className="hover:text-amber-600 dark:hover:text-[#FFE600] transition-colors flex items-center gap-1.5"
             >
-              GitHub <ExternalLink className="w-3.5 h-3.5 opacity-60" />
+              GitHub <ExternalLink className="w-3.5 h-3.5" />
             </Link>
           </nav>
 
           <div className="flex items-center gap-3">
             <Link 
               href="/auth" 
-              className="text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 px-3.5 py-1.5 transition-colors"
+              className="text-xs font-bold text-black dark:text-white px-3.5 py-1.5 border-2 border-black dark:border-white rounded-lg bg-white dark:bg-zinc-900 shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] hover:-translate-y-0.5 active:translate-y-0.5 transition-all"
             >
               Sign In
             </Link>
             <Link 
               href="/auth" 
-              className="text-sm font-medium px-4 py-1.5 rounded-lg bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 transition-all shadow-xs"
+              className="text-xs font-black px-4 py-1.5 rounded-lg bg-[#FFE600] text-black border-2 border-black shadow-[3px_3px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_0px_#000] active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_#000] transition-all"
             >
               Get Started
             </Link>
@@ -81,161 +81,162 @@ export default async function LandingPage() {
       <main className="flex-1 flex flex-col items-center">
         
         {/* Hero Section */}
-        <section className="w-full max-w-5xl px-6 pt-20 pb-16 flex flex-col items-center text-center">
+        <section className="w-full max-w-5xl px-6 pt-16 pb-14 flex flex-col items-center text-center">
           
-          {/* Subtle Announcement Pill */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 mb-8 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors cursor-default">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Pillar 2.0 is live</span>
-            <span className="text-zinc-300 dark:text-zinc-700">•</span>
-            <span className="text-zinc-500 dark:text-zinc-500">The engineering workspace for focused teams</span>
+          {/* Announcement Pill */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold text-black bg-[#FFE600] border-2 border-black shadow-[3px_3px_0px_0px_#000] mb-8 hover:-translate-y-0.5 transition-transform cursor-default">
+            <span className="w-2 h-2 rounded-full bg-black animate-ping" />
+            <span>Pillar 2.0 Neo-Edition</span>
+            <span>•</span>
+            <span className="font-mono">Uncompromising Engineering Speed</span>
           </div>
 
           {/* Headline */}
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 max-w-3xl leading-[1.08] mb-6">
-            Crafted for clarity. <br />
-            <span className="text-zinc-400 dark:text-zinc-500">Engineered for speed.</span>
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-black dark:text-white max-w-3xl leading-[1.05] mb-6">
+            ENGINEERED FOR FLOW. <br />
+            <span className="inline-block bg-[#FFE600] text-black px-3 py-1 border-2 border-black shadow-[4px_4px_0px_0px_#000] -rotate-1 mt-2">
+              ZERO BUSYWORK.
+            </span>
           </h1>
 
           {/* Subheading */}
-          <p className="text-base sm:text-lg md:text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl font-normal leading-relaxed mb-10">
-            A quiet, thoughtful issue tracker and architectural platform. Manage cycles, maintain ADRs, and break down complex PRDs without administrative friction.
+          <p className="text-base sm:text-lg md:text-xl text-zinc-700 dark:text-zinc-300 max-w-2xl font-medium leading-relaxed mb-10">
+            A high-contrast, tactile issue tracker and engineering workbench. Manage sprints, commit ADRs & RFCs, and break down complex PRDs with AI.
           </p>
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row items-center gap-3.5 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
             <Link 
               href="/auth" 
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 text-sm font-medium transition-all shadow-xs group"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 rounded-xl bg-[#FFE600] text-black font-black text-sm border-2 border-black shadow-[4px_4px_0px_0px_#000] hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_#000] active:translate-y-1 active:shadow-[1px_1px_0px_0px_#000] transition-all group"
             >
               Start Free Workspace
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </Link>
             <Link 
               href="https://github.com/pranavamrutkar9/Pillar" 
               target="_blank"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-sm font-medium transition-colors"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border-2 border-black dark:border-white bg-white dark:bg-zinc-900 text-black dark:text-white font-bold text-sm shadow-[4px_4px_0px_0px_#000] dark:shadow-[4px_4px_0px_0px_#fff] hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_#000] dark:hover:shadow-[6px_6px_0px_0px_#fff] active:translate-y-1 active:shadow-[1px_1px_0px_0px_#000] transition-all"
             >
-              <GitBranch className="w-4 h-4 text-zinc-400" />
+              <GitBranch className="w-4 h-4 text-black dark:text-white" />
               View Source on GitHub
             </Link>
           </div>
 
           {/* Product Showcase Mockup */}
-          <div className="w-full mt-16 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 p-2 sm:p-3 shadow-2xl shadow-zinc-900/5 dark:shadow-black/50">
+          <div className="w-full mt-14 rounded-2xl border-3 border-black dark:border-white bg-white dark:bg-zinc-900 p-3 sm:p-4 shadow-[8px_8px_0px_0px_#000] dark:shadow-[8px_8px_0px_0px_#fff]">
             {/* Window Topbar */}
-            <div className="rounded-lg border border-zinc-200/60 dark:border-zinc-800/60 bg-zinc-50/80 dark:bg-zinc-900/40 p-4">
-              <div className="flex items-center justify-between pb-3 mb-4 border-b border-zinc-200/50 dark:border-zinc-800/50 text-left">
+            <div className="rounded-xl border-2 border-black dark:border-white bg-amber-50 dark:bg-zinc-950 p-4">
+              <div className="flex items-center justify-between pb-3 mb-4 border-b-2 border-black dark:border-white text-left">
                 <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-zinc-300 dark:bg-zinc-700" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-zinc-300 dark:bg-zinc-700" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-zinc-300 dark:bg-zinc-700" />
-                  <span className="text-xs font-mono text-zinc-400 dark:text-zinc-500 ml-2">pillar / core / sprint-14</span>
+                  <div className="w-3.5 h-3.5 rounded-full bg-[#FF5F56] border border-black" />
+                  <div className="w-3.5 h-3.5 rounded-full bg-[#FFBD2E] border border-black" />
+                  <div className="w-3.5 h-3.5 rounded-full bg-[#27C93F] border border-black" />
+                  <span className="text-xs font-mono font-bold text-black dark:text-white ml-2 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-black rounded">
+                    pillar / sprint-14
+                  </span>
                 </div>
-                <div className="flex items-center gap-2 text-xs font-medium text-zinc-500">
-                  <span className="px-2 py-0.5 rounded-md bg-zinc-200/50 dark:bg-zinc-800/50 font-mono text-[11px]">84% velocity</span>
-                  <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Active
+                <div className="flex items-center gap-2 text-xs font-bold text-black dark:text-white">
+                  <span className="px-2 py-0.5 rounded border-2 border-black bg-[#FFE600] font-mono text-[11px] shadow-[1.5px_1.5px_0px_0px_#000]">
+                    92% VELOCITY
+                  </span>
+                  <span className="px-2 py-0.5 rounded border-2 border-black bg-[#4ADE80] text-black font-mono text-[11px] shadow-[1.5px_1.5px_0px_0px_#000] flex items-center gap-1">
+                    <Zap className="w-3 h-3 fill-current" /> ACTIVE
                   </span>
                 </div>
               </div>
 
               {/* Mock Kanban Columns */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-left">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
                 
                 {/* Column 1: In Progress */}
-                <div className="bg-white/80 dark:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60 rounded-lg p-3">
-                  <div className="flex items-center justify-between mb-3 text-xs font-medium text-zinc-600 dark:text-zinc-400">
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-amber-400" />
-                      <span>In Progress</span>
+                <div className="bg-amber-100/60 dark:bg-zinc-900 border-2 border-black dark:border-white rounded-xl p-3.5 shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff]">
+                  <div className="flex items-center justify-between mb-3 text-xs font-black text-black dark:text-white">
+                    <div className="flex items-center gap-1.5 bg-[#FFE600] px-2 py-0.5 border-2 border-black rounded shadow-[1.5px_1.5px_0px_0px_#000]">
+                      <span>IN PROGRESS</span>
                     </div>
-                    <span className="text-[11px] font-mono text-zinc-400">2</span>
+                    <span className="text-xs font-mono font-bold px-1.5 py-0.5 rounded bg-white dark:bg-zinc-800 border-2 border-black">2</span>
                   </div>
                   
-                  <div className="space-y-2">
-                    <div className="p-2.5 rounded-md border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900 text-xs shadow-2xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
-                      <div className="flex items-center justify-between text-[11px] font-mono text-zinc-400 mb-1">
+                  <div className="space-y-2.5">
+                    <div className="p-3 rounded-lg border-2 border-black dark:border-white bg-white dark:bg-zinc-950 text-xs shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff] hover:-translate-y-0.5 transition-transform">
+                      <div className="flex items-center justify-between text-[11px] font-mono font-bold text-black dark:text-white mb-1.5">
                         <span>PIL-104</span>
-                        <span className="text-amber-600 dark:text-amber-400 font-sans font-medium text-[10px]">High</span>
+                        <span className="bg-[#FF6B6B] text-black font-mono text-[10px] px-1.5 py-0.2 rounded border border-black">URGENT</span>
                       </div>
-                      <p className="font-medium text-zinc-800 dark:text-zinc-200 leading-snug">Implement webhook deduplication layer</p>
-                      <div className="mt-2.5 flex items-center gap-1.5 text-[10px] text-zinc-400">
-                        <span className="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500">Backend</span>
-                        <span>•</span>
-                        <span>3 pts</span>
+                      <p className="font-bold text-black dark:text-white leading-snug">Implement webhook deduplication layer</p>
+                      <div className="mt-2.5 flex items-center gap-1.5 text-[10px] font-mono font-bold">
+                        <span className="px-1.5 py-0.5 rounded bg-zinc-200 dark:bg-zinc-800 text-black dark:text-white border border-black">BACKEND</span>
+                        <span className="px-1.5 py-0.5 rounded bg-[#FFE600] text-black border border-black">3 PTS</span>
                       </div>
                     </div>
 
-                    <div className="p-2.5 rounded-md border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900 text-xs shadow-2xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
-                      <div className="flex items-center justify-between text-[11px] font-mono text-zinc-400 mb-1">
+                    <div className="p-3 rounded-lg border-2 border-black dark:border-white bg-white dark:bg-zinc-950 text-xs shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff] hover:-translate-y-0.5 transition-transform">
+                      <div className="flex items-center justify-between text-[11px] font-mono font-bold text-black dark:text-white mb-1.5">
                         <span>PIL-106</span>
-                        <span className="text-zinc-400 font-sans font-medium text-[10px]">Normal</span>
+                        <span className="bg-[#38BDF8] text-black font-mono text-[10px] px-1.5 py-0.2 rounded border border-black">HIGH</span>
                       </div>
-                      <p className="font-medium text-zinc-800 dark:text-zinc-200 leading-snug">Optimistic UI for cycle item reordering</p>
-                      <div className="mt-2.5 flex items-center gap-1.5 text-[10px] text-zinc-400">
-                        <span className="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500">Frontend</span>
-                        <span>•</span>
-                        <span>2 pts</span>
+                      <p className="font-bold text-black dark:text-white leading-snug">Optimistic UI for cycle item reordering</p>
+                      <div className="mt-2.5 flex items-center gap-1.5 text-[10px] font-mono font-bold">
+                        <span className="px-1.5 py-0.5 rounded bg-zinc-200 dark:bg-zinc-800 text-black dark:text-white border border-black">FRONTEND</span>
+                        <span className="px-1.5 py-0.5 rounded bg-[#FFE600] text-black border border-black">2 PTS</span>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Column 2: In Review */}
-                <div className="bg-white/80 dark:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60 rounded-lg p-3">
-                  <div className="flex items-center justify-between mb-3 text-xs font-medium text-zinc-600 dark:text-zinc-400">
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-purple-400" />
-                      <span>In Review</span>
+                <div className="bg-purple-100/60 dark:bg-zinc-900 border-2 border-black dark:border-white rounded-xl p-3.5 shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff]">
+                  <div className="flex items-center justify-between mb-3 text-xs font-black text-black dark:text-white">
+                    <div className="flex items-center gap-1.5 bg-[#C084FC] px-2 py-0.5 border-2 border-black rounded shadow-[1.5px_1.5px_0px_0px_#000]">
+                      <span>IN REVIEW</span>
                     </div>
-                    <span className="text-[11px] font-mono text-zinc-400">1</span>
+                    <span className="text-xs font-mono font-bold px-1.5 py-0.5 rounded bg-white dark:bg-zinc-800 border-2 border-black">1</span>
                   </div>
 
-                  <div className="space-y-2">
-                    <div className="p-2.5 rounded-md border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900 text-xs shadow-2xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
-                      <div className="flex items-center justify-between text-[11px] font-mono text-zinc-400 mb-1">
+                  <div className="space-y-2.5">
+                    <div className="p-3 rounded-lg border-2 border-black dark:border-white bg-white dark:bg-zinc-950 text-xs shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff] hover:-translate-y-0.5 transition-transform">
+                      <div className="flex items-center justify-between text-[11px] font-mono font-bold text-black dark:text-white mb-1.5">
                         <span>ADR-04</span>
-                        <span className="text-purple-600 dark:text-purple-400 font-sans font-medium text-[10px]">Proposed</span>
+                        <span className="bg-[#DDD6FE] text-black font-mono text-[10px] px-1.5 py-0.2 rounded border border-black">PROPOSED</span>
                       </div>
-                      <p className="font-medium text-zinc-800 dark:text-zinc-200 leading-snug">Redis caching policy for multi-tenant workspace queries</p>
-                      <div className="mt-2.5 flex items-center gap-1.5 text-[10px] text-zinc-400">
-                        <span className="px-1.5 py-0.5 rounded bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200/50 dark:border-purple-800/50">Architecture</span>
+                      <p className="font-bold text-black dark:text-white leading-snug">Redis caching policy for multi-tenant workspace queries</p>
+                      <div className="mt-2.5 flex items-center gap-1.5 text-[10px] font-mono font-bold">
+                        <span className="px-1.5 py-0.5 rounded bg-[#C084FC] text-black border border-black">ARCHITECTURE</span>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Column 3: Done */}
-                <div className="bg-white/80 dark:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60 rounded-lg p-3">
-                  <div className="flex items-center justify-between mb-3 text-xs font-medium text-zinc-600 dark:text-zinc-400">
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                      <span>Completed</span>
+                <div className="bg-emerald-100/60 dark:bg-zinc-900 border-2 border-black dark:border-white rounded-xl p-3.5 shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff]">
+                  <div className="flex items-center justify-between mb-3 text-xs font-black text-black dark:text-white">
+                    <div className="flex items-center gap-1.5 bg-[#4ADE80] px-2 py-0.5 border-2 border-black rounded shadow-[1.5px_1.5px_0px_0px_#000]">
+                      <span>COMPLETED</span>
                     </div>
-                    <span className="text-[11px] font-mono text-zinc-400">2</span>
+                    <span className="text-xs font-mono font-bold px-1.5 py-0.5 rounded bg-white dark:bg-zinc-800 border-2 border-black">2</span>
                   </div>
 
-                  <div className="space-y-2">
-                    <div className="p-2.5 rounded-md border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900 text-xs shadow-2xs opacity-80 hover:opacity-100 transition-opacity">
-                      <div className="flex items-center justify-between text-[11px] font-mono text-zinc-400 mb-1">
+                  <div className="space-y-2.5">
+                    <div className="p-3 rounded-lg border-2 border-black dark:border-white bg-white dark:bg-zinc-950 text-xs shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff] hover:-translate-y-0.5 transition-transform">
+                      <div className="flex items-center justify-between text-[11px] font-mono font-bold text-black dark:text-white mb-1.5">
                         <span>PIL-99</span>
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                        <Check className="w-4 h-4 text-emerald-600 stroke-[3]" />
                       </div>
-                      <p className="font-medium text-zinc-700 dark:text-zinc-300 leading-snug line-through">Automated AI requirement breakdown studio</p>
-                      <div className="mt-2.5 flex items-center gap-1.5 text-[10px] text-zinc-400">
-                        <span className="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500">Shipped</span>
+                      <p className="font-bold text-zinc-600 dark:text-zinc-400 line-through leading-snug">Automated AI requirement breakdown studio</p>
+                      <div className="mt-2.5 flex items-center gap-1.5 text-[10px] font-mono font-bold">
+                        <span className="px-1.5 py-0.5 rounded bg-[#4ADE80] text-black border border-black">SHIPPED</span>
                       </div>
                     </div>
 
-                    <div className="p-2.5 rounded-md border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900 text-xs shadow-2xs opacity-80 hover:opacity-100 transition-opacity">
-                      <div className="flex items-center justify-between text-[11px] font-mono text-zinc-400 mb-1">
+                    <div className="p-3 rounded-lg border-2 border-black dark:border-white bg-white dark:bg-zinc-950 text-xs shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff] hover:-translate-y-0.5 transition-transform">
+                      <div className="flex items-center justify-between text-[11px] font-mono font-bold text-black dark:text-white mb-1.5">
                         <span>PIL-101</span>
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                        <Check className="w-4 h-4 text-emerald-600 stroke-[3]" />
                       </div>
-                      <p className="font-medium text-zinc-700 dark:text-zinc-300 leading-snug line-through">GitHub OAuth webhook sync listener</p>
-                      <div className="mt-2.5 flex items-center gap-1.5 text-[10px] text-zinc-400">
-                        <span className="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500">Shipped</span>
+                      <p className="font-bold text-zinc-600 dark:text-zinc-400 line-through leading-snug">GitHub OAuth webhook sync listener</p>
+                      <div className="mt-2.5 flex items-center gap-1.5 text-[10px] font-mono font-bold">
+                        <span className="px-1.5 py-0.5 rounded bg-[#4ADE80] text-black border border-black">SHIPPED</span>
                       </div>
                     </div>
                   </div>
@@ -248,54 +249,57 @@ export default async function LandingPage() {
         </section>
 
         {/* Features Grid */}
-        <section id="features" className="w-full max-w-5xl px-6 py-20 border-t border-zinc-200/70 dark:border-zinc-800/70">
+        <section id="features" className="w-full max-w-5xl px-6 py-20 border-t-2 border-black dark:border-white">
           <div className="text-center max-w-xl mx-auto mb-16">
-            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 mb-3">
-              Designed with quiet intentionality.
+            <span className="inline-block text-xs font-mono font-black uppercase px-2.5 py-1 bg-[#FFE600] border-2 border-black rounded shadow-[2px_2px_0px_0px_#000] mb-3">
+              SYSTEM CAPABILITIES
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-black dark:text-white mb-3">
+              BUILT FOR MOMENTUM.
             </h2>
-            <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400 font-normal">
-              Every detail is calibrated to reduce context switching and amplify engineering momentum.
+            <p className="text-base text-zinc-700 dark:text-zinc-300 font-medium">
+              Every interaction is engineered to eliminate drag, friction, and administrative lag.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             {/* Feature 1 */}
-            <div className="p-6 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/40 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
-              <div className="w-9 h-9 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center text-zinc-700 dark:text-zinc-300 mb-5">
-                <Clock className="w-4 h-4" />
+            <div className="p-6 rounded-2xl border-2 border-black dark:border-white bg-[#FEF08A] text-black shadow-[5px_5px_0px_0px_#000] dark:shadow-[5px_5px_0px_0px_#fff] hover:-translate-y-1 transition-transform">
+              <div className="w-12 h-12 rounded-xl border-2 border-black bg-white flex items-center justify-center text-black mb-5 shadow-[2px_2px_0px_0px_#000]">
+                <Clock className="w-6 h-6 stroke-[2.5]" />
               </div>
-              <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
+              <h3 className="text-lg font-black text-black mb-2 uppercase">
                 Cycles Over Backlogs
               </h3>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal">
-                Focus on fixed 2-week horizons with automated rollover and burndown metrics. Never look at a stagnant 400-ticket backlog again.
+              <p className="text-sm text-black font-medium leading-relaxed">
+                Focus on fixed 2-week horizons with automated rollover and real-time burndown analytics. Ban stagnant 400-ticket backlogs forever.
               </p>
             </div>
 
             {/* Feature 2 */}
-            <div className="p-6 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/40 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
-              <div className="w-9 h-9 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center text-zinc-700 dark:text-zinc-300 mb-5">
-                <FileText className="w-4 h-4" />
+            <div className="p-6 rounded-2xl border-2 border-black dark:border-white bg-[#BAE6FD] text-black shadow-[5px_5px_0px_0px_#000] dark:shadow-[5px_5px_0px_0px_#fff] hover:-translate-y-1 transition-transform">
+              <div className="w-12 h-12 rounded-xl border-2 border-black bg-white flex items-center justify-center text-black mb-5 shadow-[2px_2px_0px_0px_#000]">
+                <FileText className="w-6 h-6 stroke-[2.5]" />
               </div>
-              <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
+              <h3 className="text-lg font-black text-black mb-2 uppercase">
                 First-Class ADRs & RFCs
               </h3>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal">
-                Architecture Decision Records and RFCs live right alongside your issues. Preserve historical technical reasoning without scattered wiki docs.
+              <p className="text-sm text-black font-medium leading-relaxed">
+                Architecture Decision Records and RFCs live right alongside your issues. Preserve historical technical reasoning in plain sight.
               </p>
             </div>
 
             {/* Feature 3 */}
-            <div className="p-6 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/40 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
-              <div className="w-9 h-9 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center text-zinc-700 dark:text-zinc-300 mb-5">
-                <Sparkles className="w-4 h-4" />
+            <div className="p-6 rounded-2xl border-2 border-black dark:border-white bg-[#BBF7D0] text-black shadow-[5px_5px_0px_0px_#000] dark:shadow-[5px_5px_0px_0px_#fff] hover:-translate-y-1 transition-transform">
+              <div className="w-12 h-12 rounded-xl border-2 border-black bg-white flex items-center justify-center text-black mb-5 shadow-[2px_2px_0px_0px_#000]">
+                <Sparkles className="w-6 h-6 stroke-[2.5]" />
               </div>
-              <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
-                AI Requirements Studio
+              <h3 className="text-lg font-black text-black mb-2 uppercase">
+                AI Breakdown Studio
               </h3>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal">
-                Paste product specifications or technical briefs. Pillar extracts modules, clarifies ambiguities, and generates structured issues ready to commit.
+              <p className="text-sm text-black font-medium leading-relaxed">
+                Paste product specifications or technical briefs. Pillar extracts modules, clarifies ambiguities, and generates structured issues ready to execute.
               </p>
             </div>
 
@@ -303,22 +307,24 @@ export default async function LandingPage() {
         </section>
 
         {/* Philosophy section */}
-        <section id="architecture" className="w-full max-w-5xl px-6 py-20 border-t border-zinc-200/70 dark:border-zinc-800/70">
-          <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/30 p-8 sm:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+        <section id="architecture" className="w-full max-w-5xl px-6 py-20 border-t-2 border-black dark:border-white">
+          <div className="rounded-2xl border-3 border-black dark:border-white bg-[#FFE600] dark:bg-zinc-900 text-black dark:text-white p-8 sm:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-8 shadow-[8px_8px_0px_0px_#000] dark:shadow-[8px_8px_0px_0px_#fff]">
             <div className="max-w-xl">
-              <span className="text-xs font-mono font-medium text-zinc-500 uppercase tracking-wider">Simplicity Principle</span>
-              <h3 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 mt-2 mb-4">
-                Software tools should get out of the engineer's way.
+              <span className="text-xs font-mono font-black uppercase tracking-wider px-2 py-0.5 rounded border-2 border-black bg-white text-black shadow-[1.5px_1.5px_0px_0px_#000]">
+                TACTILE PRINCIPLE
+              </span>
+              <h3 className="text-2xl sm:text-4xl font-black tracking-tight mt-3 mb-4 leading-tight">
+                Tools should feel physical, fast, and satisfying.
               </h3>
-              <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal">
-                No bloated enterprise dashboards, slow paginated loads, or multi-step configuration wizards. Pillar is built with optimistic client updates and keyboard-accessible workflows for pure flow state.
+              <p className="text-sm sm:text-base font-semibold leading-relaxed">
+                No sluggish micro-interactions or hidden context menus. Pillar treats engineering project management as high-performance tooling with immediate visual clarity.
               </p>
             </div>
             <Link 
               href="/auth" 
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 text-sm font-medium transition-all shadow-xs shrink-0"
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-black text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 text-sm font-black transition-all shadow-[4px_4px_0px_0px_#FFE600] dark:shadow-[4px_4px_0px_0px_#000] hover:-translate-y-1 shrink-0"
             >
-              Get Started Free <ChevronRight className="w-4 h-4" />
+              Get Started Free <ChevronRight className="w-4 h-4 stroke-[3]" />
             </Link>
           </div>
         </section>
@@ -326,22 +332,22 @@ export default async function LandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="w-full border-t border-zinc-200/60 dark:border-zinc-800/60 bg-white/50 dark:bg-zinc-950/50">
-        <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
+      <footer className="w-full border-t-2 border-black dark:border-white bg-white dark:bg-zinc-950">
+        <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-bold text-black dark:text-zinc-400">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center text-[10px] text-white dark:text-zinc-900 font-mono font-bold">
+            <div className="w-6 h-6 rounded bg-[#FFE600] border-2 border-black flex items-center justify-center text-xs text-black font-mono font-black shadow-[1.5px_1.5px_0px_0px_#000]">
               P
             </div>
-            <span className="font-medium text-zinc-700 dark:text-zinc-300">Pillar</span>
+            <span className="font-black text-black dark:text-white">Pillar</span>
             <span>—</span>
-            <span>Simple, subtle engineering management</span>
+            <span>High-Speed Engineering Operations</span>
           </div>
 
           <div className="flex items-center gap-6">
-            <Link href="https://github.com/pranavamrutkar9/Pillar" target="_blank" className="hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors">
+            <Link href="https://github.com/pranavamrutkar9/Pillar" target="_blank" className="hover:text-amber-600 transition-colors">
               GitHub
             </Link>
-            <span className="text-zinc-300 dark:text-zinc-700">•</span>
+            <span>•</span>
             <span>MIT License</span>
           </div>
         </div>

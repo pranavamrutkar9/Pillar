@@ -68,21 +68,21 @@ export default function BurndownChart({
   const yAxisTicks = Array.from({ length: 5 }).map((_, i) => maxPoints * (i / 4));
 
   return (
-    <div className={`flex flex-col bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm ${className}`}>
+    <div className={`flex flex-col bg-white dark:bg-zinc-950 border-2 border-black dark:border-white rounded-xl overflow-hidden shadow-[4px_4px_0px_0px_#000] dark:shadow-[4px_4px_0px_0px_#fff] ${className}`}>
       {/* Header */}
       {title && (
-        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100 dark:border-zinc-800/50 bg-zinc-50/50 dark:bg-zinc-900/30">
-          <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-            <TrendingDown className="w-4 h-4 text-violet-500" />
+        <div className="flex items-center justify-between px-6 py-4 border-b-2 border-black dark:border-white bg-[#FFE600] text-black">
+          <h3 className="font-black text-xs uppercase tracking-wider flex items-center gap-2">
+            <TrendingDown className="w-4 h-4 stroke-[2.5]" />
             {title}
           </h3>
-          <div className="flex items-center gap-4 text-xs font-medium">
-            <span className="flex items-center gap-1.5 text-zinc-600 dark:text-zinc-400">
-              <span className="w-2.5 h-2.5 rounded-full bg-violet-500 shadow-[0_0_8px_rgba(139,92,246,0.5)]"></span>
+          <div className="flex items-center gap-4 text-xs font-black">
+            <span className="flex items-center gap-1.5">
+              <span className="w-3 h-3 rounded-full bg-violet-600 border border-black"></span>
               Remaining
             </span>
-            <span className="flex items-center gap-1.5 text-zinc-500 dark:text-zinc-500">
-              <span className="w-2.5 h-2.5 rounded-full bg-zinc-300 dark:bg-zinc-600 border border-zinc-400 dark:border-zinc-500"></span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-3 h-3 rounded-full bg-zinc-200 border border-black"></span>
               Ideal
             </span>
           </div>
@@ -242,26 +242,24 @@ export default function BurndownChart({
         {/* Floating Tooltip */}
         {hoveredIndex !== null && tooltipPos && (
           <div
-            className="absolute z-10 pointer-events-none transition-all duration-75 ease-out flex flex-col bg-zinc-900/95 dark:bg-zinc-100/95 backdrop-blur-md text-zinc-50 dark:text-zinc-900 px-3 py-2 rounded-lg shadow-xl text-sm border border-zinc-800 dark:border-zinc-200/50"
+            className="absolute z-10 pointer-events-none transition-all duration-75 ease-out flex flex-col bg-[#FFE600] text-black px-3.5 py-2 rounded-xl shadow-[4px_4px_0px_0px_#000] text-xs font-bold border-2 border-black"
             style={{
               left: `${tooltipPos.x}px`,
               top: `${tooltipPos.y}px`,
               transform: `translate(-50%, calc(-100% - 16px))`,
             }}
           >
-            <div className="font-semibold mb-1 opacity-90 border-b border-zinc-700 dark:border-zinc-300 pb-1">
+            <div className="font-black mb-1 border-b border-black pb-1 uppercase">
               Day {data[hoveredIndex].day}
             </div>
             <div className="flex justify-between gap-4">
-              <span className="opacity-70">Remaining:</span>
-              <span className="font-bold text-violet-400 dark:text-violet-600">{data[hoveredIndex].remaining} pts</span>
+              <span>Remaining:</span>
+              <span className="font-black">{data[hoveredIndex].remaining} pts</span>
             </div>
             <div className="flex justify-between gap-4">
-              <span className="opacity-70">Ideal:</span>
-              <span className="font-bold">{Math.round(data[hoveredIndex].ideal)} pts</span>
+              <span>Ideal:</span>
+              <span className="font-black">{Math.round(data[hoveredIndex].ideal)} pts</span>
             </div>
-            {/* Tooltip caret */}
-            <div className="absolute left-1/2 -bottom-1 -translate-x-1/2 w-2 h-2 rotate-45 bg-zinc-900/95 dark:bg-zinc-100/95 border-r border-b border-zinc-800 dark:border-zinc-200/50"></div>
           </div>
         )}
       </div>

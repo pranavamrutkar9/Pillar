@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { getProjectPullRequestsAction } from "../actions/githubActions";
 import { PullRequestCard } from "./PullRequestCard";
-import { GitPullRequest } from "lucide-react";
+import { GitPullRequest, Loader2 } from "lucide-react";
 
 export function ProjectPullRequests({ projectId }: { projectId: string }) {
   const [prs, setPrs] = useState<any[]>([]);
@@ -18,18 +18,21 @@ export function ProjectPullRequests({ projectId }: { projectId: string }) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-8 text-xs text-zinc-400">
-        <div className="w-4 h-4 border-2 border-zinc-400 border-t-transparent rounded-full animate-spin mr-2" />
-        Loading pull requests...
+      <div className="flex items-center justify-center p-12 text-xs font-mono font-bold text-black dark:text-white">
+        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+        LOADING PULL REQUESTS...
       </div>
     );
   }
 
   if (prs.length === 0) {
     return (
-      <div className="text-xs text-zinc-500 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl p-8 text-center flex flex-col items-center justify-center gap-2">
-        <GitPullRequest className="w-6 h-6 text-zinc-400" />
-        <span>No pull requests linked to this project yet.</span>
+      <div className="text-xs font-medium text-black/70 dark:text-white/70 bg-white dark:bg-[#181920] border-3 border-black dark:border-white shadow-neo p-10 text-center flex flex-col items-center justify-center gap-3">
+        <div className="w-12 h-12 bg-[#FFE600] border-2 border-black flex items-center justify-center shadow-neo-sm">
+          <GitPullRequest className="w-6 h-6 text-black" />
+        </div>
+        <span className="font-black text-sm uppercase tracking-wider text-black dark:text-white">No Pull Requests Linked</span>
+        <span className="text-xs text-black/60 dark:text-white/60">Connect a GitHub repository in project settings to view tracked PRs here.</span>
       </div>
     );
   }

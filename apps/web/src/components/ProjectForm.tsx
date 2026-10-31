@@ -33,57 +33,57 @@ export default function ProjectForm({ workspaceId }: { workspaceId: string }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-md p-5 bg-white dark:bg-zinc-950 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs">
+    <form onSubmit={handleSubmit} className="space-y-4 max-w-md p-6 bg-white dark:bg-zinc-900 rounded-2xl border-3 border-black dark:border-white shadow-[5px_5px_0px_0px_#000] dark:shadow-[5px_5px_0px_0px_#fff]">
       <div>
-        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Create New Project</h3>
-        <p className="text-xs text-zinc-500 mt-0.5">Initialize a tracking repository for your team.</p>
+        <h3 className="text-sm font-black uppercase text-black dark:text-white">Create New Project</h3>
+        <p className="text-xs text-zinc-600 dark:text-zinc-400 font-medium mt-0.5">Initialize a tracking repository for your team.</p>
       </div>
       
       {error && (
-        <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 text-xs">
+        <div className="p-2.5 rounded-lg bg-[#FF6B6B]/20 border-2 border-[#FF6B6B] text-black dark:text-white text-xs font-bold">
           {error}
         </div>
       )}
       
       <div>
-        <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Project Name</label>
+        <label className="block text-xs font-black uppercase text-black dark:text-white mb-1.5">Project Name</label>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="e.g. Core Engine"
-          className="w-full px-3 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 dark:focus:ring-zinc-100/10 focus:border-zinc-400 dark:focus:border-zinc-600 transition-colors"
+          className="w-full px-3 py-2 text-sm rounded-lg border-2 border-black dark:border-white bg-white dark:bg-zinc-950 text-black dark:text-white placeholder:text-zinc-400 font-medium focus:outline-none focus:shadow-[3px_3px_0px_0px_#000] dark:focus:shadow-[3px_3px_0px_0px_#fff] transition-all"
           required
         />
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Description (Optional)</label>
+        <label className="block text-xs font-black uppercase text-black dark:text-white mb-1.5">Description (Optional)</label>
         <textarea
           rows={2}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Brief summary of project scope..."
-          className="w-full px-3 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 dark:focus:ring-zinc-100/10 focus:border-zinc-400 dark:focus:border-zinc-600 transition-colors"
+          className="w-full px-3 py-2 text-sm rounded-lg border-2 border-black dark:border-white bg-white dark:bg-zinc-950 text-black dark:text-white placeholder:text-zinc-400 font-medium focus:outline-none focus:shadow-[3px_3px_0px_0px_#000] dark:focus:shadow-[3px_3px_0px_0px_#fff] transition-all"
         />
       </div>
 
-      <div className="pt-1 flex items-center space-x-2">
+      <div className="pt-1 flex items-center space-x-2.5">
         <input
           type="checkbox"
           id="hackathonMode"
           checked={isHackathonMode}
           onChange={(e) => setIsHackathonMode(e.target.checked)}
-          className="w-4 h-4 rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-900 dark:focus:ring-zinc-100"
+          className="w-4 h-4 rounded border-2 border-black text-black accent-[#FFE600] cursor-pointer"
         />
-        <label htmlFor="hackathonMode" className="text-xs font-medium text-zinc-700 dark:text-zinc-300 cursor-pointer">
+        <label htmlFor="hackathonMode" className="text-xs font-bold text-black dark:text-white cursor-pointer select-none">
           Enable Hackathon / Crunch Countdown
         </label>
       </div>
 
       {isHackathonMode && (
         <div>
-          <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Target Deadline</label>
+          <label className="block text-xs font-black uppercase text-black dark:text-white mb-1.5">Target Deadline</label>
           <DatePicker
             selected={deadline ? new Date(deadline) : null}
             onChange={(date: Date | null) => setDeadline(date ? date.toISOString() : "")}
@@ -92,7 +92,7 @@ export default function ProjectForm({ workspaceId }: { workspaceId: string }) {
             timeIntervals={15}
             timeCaption="time"
             dateFormat="MMMM d, yyyy h:mm aa"
-            className="w-full px-3 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 dark:focus:ring-zinc-100/10 focus:border-zinc-400 dark:focus:border-zinc-600 transition-colors"
+            className="w-full px-3 py-2 text-sm rounded-lg border-2 border-black dark:border-white bg-white dark:bg-zinc-950 text-black dark:text-white font-medium focus:outline-none focus:shadow-[3px_3px_0px_0px_#000] dark:focus:shadow-[3px_3px_0px_0px_#fff] transition-all"
             placeholderText="Select deadline"
             required={isHackathonMode}
           />
@@ -102,13 +102,13 @@ export default function ProjectForm({ workspaceId }: { workspaceId: string }) {
       <button
         type="submit"
         disabled={loading || !name.trim()}
-        className="w-full flex items-center justify-center gap-1.5 py-2 px-4 rounded-lg text-sm font-medium text-white bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 transition-colors shadow-xs disabled:opacity-50"
+        className="w-full flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl text-xs font-black text-black bg-[#FFE600] hover:bg-[#FFDE59] border-2 border-black shadow-[3px_3px_0px_0px_#000] hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_0px_#000] active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_#000] transition-all disabled:opacity-50 cursor-pointer"
       >
         {loading ? (
-          <Loader2 className="w-4 h-4 animate-spin" />
+          <Loader2 className="w-4 h-4 animate-spin stroke-[2.5]" />
         ) : (
           <>
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 stroke-[3]" />
             <span>Create Project</span>
           </>
         )}

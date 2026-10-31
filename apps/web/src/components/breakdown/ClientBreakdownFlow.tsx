@@ -115,50 +115,50 @@ export default function ClientBreakdownFlow({ workspaceId }: ClientBreakdownFlow
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 font-sans">
       {/* Navigation & Progress Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-200 dark:border-zinc-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b-3 border-black dark:border-white">
         <Link
           href={`/workspaces/${workspaceId}/projects`}
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+          className="inline-flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-[#181920] border-2 border-black dark:border-white text-xs font-black uppercase tracking-wider shadow-neo-sm hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all self-start sm:self-auto"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Back to Projects
         </Link>
 
         {/* 3-Step Wizard Indicator */}
-        <div className="flex items-center gap-2 text-xs">
+        <div className="flex flex-wrap items-center gap-2 text-xs">
           <div
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-full font-medium ${
+            className={`flex items-center gap-1.5 px-3 py-1 border-2 border-black text-xs font-black uppercase tracking-wider ${
               step === 1
-                ? "bg-violet-600 text-white"
-                : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
+                ? "bg-[#FFE600] text-black shadow-neo-sm"
+                : "bg-white dark:bg-[#20222a] text-black/60 dark:text-white/60"
             }`}
           >
             <span>1</span>
             <span>Input PRD</span>
           </div>
 
-          <span className="text-zinc-300 dark:text-zinc-700">→</span>
+          <span className="font-black text-black dark:text-white">→</span>
 
           <div
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-full font-medium ${
+            className={`flex items-center gap-1.5 px-3 py-1 border-2 border-black text-xs font-black uppercase tracking-wider ${
               step === 2
-                ? "bg-violet-600 text-white"
-                : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
+                ? "bg-[#FFE600] text-black shadow-neo-sm"
+                : "bg-white dark:bg-[#20222a] text-black/60 dark:text-white/60"
             }`}
           >
             <span>2</span>
             <span>Clarifications</span>
           </div>
 
-          <span className="text-zinc-300 dark:text-zinc-700">→</span>
+          <span className="font-black text-black dark:text-white">→</span>
 
           <div
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-full font-medium ${
+            className={`flex items-center gap-1.5 px-3 py-1 border-2 border-black text-xs font-black uppercase tracking-wider ${
               step === 3
-                ? "bg-violet-600 text-white"
-                : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
+                ? "bg-[#FFE600] text-black shadow-neo-sm"
+                : "bg-white dark:bg-[#20222a] text-black/60 dark:text-white/60"
             }`}
           >
             <span>3</span>
@@ -169,10 +169,10 @@ export default function ClientBreakdownFlow({ workspaceId }: ClientBreakdownFlow
 
       {/* Global Error Banner */}
       {error && (
-        <div className="p-4 rounded-xl border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-200 text-sm flex items-start gap-3 shadow-sm">
-          <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-600 dark:text-rose-400 mt-0.5" />
+        <div className="p-4 border-3 border-black bg-[#FF6B6B] text-black text-xs font-bold flex items-start gap-3 shadow-neo">
+          <AlertCircle className="w-5 h-5 flex-shrink-0 text-black mt-0.5" />
           <div className="flex-1">
-            <div className="font-semibold">Something went wrong</div>
+            <div className="font-black uppercase tracking-wider">Something went wrong</div>
             <div className="text-xs mt-0.5">{error}</div>
           </div>
         </div>

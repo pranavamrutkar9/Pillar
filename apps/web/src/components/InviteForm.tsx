@@ -29,24 +29,24 @@ export function InviteForm({ workspaceId }: { workspaceId: string }) {
   };
 
   return (
-    <form onSubmit={handleInvite} className="mt-6 pt-6 border-t border-zinc-200/80 dark:border-zinc-800/80 flex flex-col gap-3">
+    <form onSubmit={handleInvite} className="mt-6 pt-6 border-t-2 border-black dark:border-white flex flex-col gap-3">
       <div className="flex items-center gap-2">
-        <UserPlus className="w-3.5 h-3.5 text-zinc-500" />
-        <h4 className="text-xs font-medium text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Invite new member</h4>
+        <UserPlus className="w-4 h-4 text-black dark:text-white stroke-[2.5]" />
+        <h4 className="text-xs font-black text-black dark:text-white uppercase tracking-wider">Invite new member</h4>
       </div>
-      <div className="flex flex-col sm:flex-row gap-2">
+      <div className="flex flex-col sm:flex-row gap-2.5">
         <input
           type="email"
           placeholder="colleague@company.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="flex-1 bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400"
+          className="flex-1 bg-white dark:bg-zinc-950 border-2 border-black dark:border-white rounded-lg px-3 py-1.5 text-xs font-medium focus:outline-none focus:shadow-[2px_2px_0px_0px_#000] dark:focus:shadow-[2px_2px_0px_0px_#fff] text-black dark:text-white placeholder:text-zinc-400"
           required
         />
         <select
           value={role}
           onChange={(e) => setRole(e.target.value)}
-          className="bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 text-zinc-900 dark:text-zinc-100"
+          className="bg-white dark:bg-zinc-950 border-2 border-black dark:border-white rounded-lg px-3 py-1.5 text-xs font-bold text-black dark:text-white focus:outline-none focus:shadow-[2px_2px_0px_0px_#000] dark:focus:shadow-[2px_2px_0px_0px_#fff] cursor-pointer"
         >
           <option value="ADMIN">Admin</option>
           <option value="MEMBER">Member</option>
@@ -55,13 +55,13 @@ export function InviteForm({ workspaceId }: { workspaceId: string }) {
         <button
           type="submit"
           disabled={status === 'loading'}
-          className="bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 px-4 py-1.5 rounded-lg text-xs font-medium disabled:opacity-50 transition-colors shadow-sm"
+          className="bg-[#FFE600] hover:bg-[#FFDE59] text-black border-2 border-black px-4 py-1.5 rounded-lg text-xs font-black disabled:opacity-50 transition-all shadow-[2px_2px_0px_0px_#000] hover:-translate-y-0.5 active:translate-y-0.5 cursor-pointer"
         >
           {status === 'loading' ? 'Sending...' : 'Send Invite'}
         </button>
       </div>
       {message && (
-        <p className={`text-xs ${status === 'success' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+        <p className={`text-xs font-bold ${status === 'success' ? 'text-emerald-600' : 'text-rose-600'}`}>
           {message}
         </p>
       )}
