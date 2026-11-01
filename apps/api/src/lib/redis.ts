@@ -4,6 +4,7 @@ import { env } from '../config/env.js'
 export const redis = new Redis(env.REDIS_URL, {
   maxRetriesPerRequest: null,
   family: 4,
+  connectTimeout: 15000,
   tls: env.REDIS_URL.startsWith('rediss://') ? { rejectUnauthorized: false } : undefined,
   retryStrategy(times) {
     // Backoff capped at 10s to prevent aggressive spamming when Redis is disconnected
@@ -23,12 +24,16 @@ export function handleRedisError(context: string, err: any) {
     return;
   }
 
-  // Throttle ECONNREFUSED so it prints at most once every 30 seconds rather than flooding the console
-  if (err.code === 'ECONNREFUSED' || (err.message && err.message.includes('ECONNREFUSED'))) {
+  // Throttle ECONNREFUSED and ETIMEDOUT so it prints at most once every 30 seconds rather than flooding the console
+  if (
+    err.code === 'ECONNREFUSED' ||
+    err.code === 'ETIMEDOUT' ||
+    (err.message && (err.message.includes('ECONNREFUSED') || err.message.includes('ETIMEDOUT')))
+  ) {
     const now = Date.now();
     if (now - lastConnectionWarnTime > 30000) {
       lastConnectionWarnTime = now;
-      console.warn(`[Redis Connection Warning] Cannot connect to Redis at ${env.REDIS_URL}. Background workers and queue operations are paused until Redis is reachable.`);
+      console.warn(`[Redis Connection Warning] Cannot connect to Redis at ${env.REDIS_URL} (${err.message || err.code}). Retrying in background...`);
     }
     return;
   }
