@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { createWorkspaceAction } from "../actions/workspaceActions";
-import { Loader2, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { createWorkspaceAction } from "@/actions/workspaceActions";
 
-export function WorkspaceForm() {
+export default function WorkspaceForm() {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,11 +16,14 @@ export function WorkspaceForm() {
 
     setLoading(true);
     setError("");
+
     try {
-      await createWorkspaceAction(name);
-      setName("");
+      const res = await createWorkspaceAction({ name });
+      if (res.workspace) {
+        setName("");
+        router.refresh();
+      }
     } catch (err: any) {
-      console.error(err);
       setError(err.message || "Failed to create workspace");
     } finally {
       setLoading(false);
@@ -27,48 +31,30 @@ export function WorkspaceForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-3.5 w-full">
-      <div>
-        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-          Create a new workspace
-        </h3>
-        <p className="text-xs text-zinc-500 mt-0.5">
-          Organize projects, team members, and architecture records in one place.
-        </p>
-      </div>
-
+    <form onSubmit={handleSubmit} className="space-y-4 font-sans">
       {error && (
-        <div className="p-2 rounded bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 text-xs">
+        <div className="p-2 border-2 border-[#D32F2F] bg-[#D32F2F]/10 text-[#D32F2F] text-xs font-bold">
           {error}
         </div>
       )}
-
-      <div className="flex flex-col sm:flex-row gap-2">
+      <div className="space-y-1">
+        <label className="text-xs font-black uppercase">WORKSPACE DESIGNATION</label>
         <input
-          id="workspace-name"
           type="text"
-          placeholder="e.g. Acme Engineering"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="flex-1 px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-800 rounded-lg bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 dark:focus:ring-zinc-100/10 focus:border-zinc-400 dark:focus:border-zinc-600 transition-colors"
+          placeholder="e.g. Bauhaus Weimar"
+          className="w-full p-2.5 bg-white dark:bg-[#181A20] border-2 border-[#121212] dark:border-white text-xs font-bold outline-none focus:border-[#1976D2]"
           required
-          disabled={loading}
         />
-        <button
-          type="submit"
-          disabled={loading || !name.trim()}
-          className="px-4 py-2 text-sm font-medium rounded-lg bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5 shrink-0 shadow-xs"
-        >
-          {loading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <>
-              <Plus className="w-4 h-4" />
-              <span>Create</span>
-            </>
-          )}
-        </button>
       </div>
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full py-2.5 bg-[#1976D2] hover:bg-[#0D47A1] text-white font-black text-xs uppercase tracking-wider border-2 border-[#121212] shadow-[2px_2px_0px_#121212] transition-all disabled:opacity-50 cursor-pointer"
+      >
+        {loading ? "CREATING..." : "COMMIT WORKSPACE [→]"}
+      </button>
     </form>
   );
 }

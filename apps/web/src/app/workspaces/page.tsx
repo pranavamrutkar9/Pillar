@@ -1,118 +1,65 @@
 import { getServerSession } from "next-auth";
-import { cookies } from "next/headers";
 import { authOptions } from "@/lib/auth";
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { WorkspaceForm } from "../../components/WorkspaceForm";
-import { PendingInviteCard } from "../../components/PendingInviteCard";
-import { SignOutButton } from "../../components/AuthButtons";
-import { ArrowUpRight, FolderGit2, Building2 } from "lucide-react";
-
-async function getWorkspaces() {
-  const cookieStore = await cookies();
-  const sessionToken = 
-    cookieStore.get("next-auth.session-token")?.value || 
-    cookieStore.get("__Secure-next-auth.session-token")?.value;
-
-  const apiUrl = process.env.API_URL || 'http://localhost:4000';
-  
-  try {
-    const res = await fetch(`${apiUrl}/api/workspaces`, {
-      headers: {
-        ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
-      },
-      cache: "no-store",
-    });
-    
-    if (res.ok) {
-      const json = await res.json();
-      return json.data || [];
-    } else {
-      const text = await res.text().catch(() => '');
-      console.error(`Failed to fetch workspaces: ${res.status} ${res.statusText}`, text);
-    }
-  } catch (err) {
-    console.error("Failed to fetch workspaces exception:", err);
-  }
-  return [];
-}
-
-async function getPendingInvites() {
-  const cookieStore = await cookies();
-  const sessionToken = 
-    cookieStore.get("next-auth.session-token")?.value || 
-    cookieStore.get("__Secure-next-auth.session-token")?.value;
-
-  const apiUrl = process.env.API_URL || 'http://localhost:4000';
-  
-  try {
-    const res = await fetch(`${apiUrl}/api/invites/pending`, {
-      headers: {
-        ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
-      },
-      cache: "no-store",
-    });
-    
-    if (res.ok) {
-      const json = await res.json();
-      return json.data || [];
-    }
-  } catch (err) {
-    console.error("Failed to fetch pending invites:", err);
-  }
-  return [];
-}
+import Link from "next/link";
+import WorkspaceForm from "@/components/WorkspaceForm";
+import PendingInviteCard from "@/components/PendingInviteCard";
+import AuthButtons from "@/components/AuthButtons";
+import { getWorkspacesAction, getPendingInvitesAction } from "@/actions/workspaceActions";
+import { ArrowRight } from "lucide-react";
 
 export default async function WorkspacesPage() {
   const session = await getServerSession(authOptions);
-  
+
   if (!session) {
     redirect("/auth");
   }
 
-  const [workspaces, pendingInvites] = await Promise.all([
-    getWorkspaces(),
-    getPendingInvites()
-  ]);
-
-  if (workspaces.length === 1 && pendingInvites.length === 0) {
-    redirect(`/workspaces/${workspaces[0].id}`);
-  }
-
-  const userInitial = (session.user?.name || session.user?.email || "U")[0].toUpperCase();
+  const workspaces = await getWorkspacesAction();
+  const pendingInvites = await getPendingInvitesAction();
 
   return (
-    <div className="flex flex-col flex-1 items-center bg-[#FAFAFA] dark:bg-[#09090B] text-zinc-900 dark:text-zinc-100 min-h-screen py-12 px-6 transition-colors">
-      
-      <main className="flex flex-1 w-full max-w-4xl flex-col items-start">
+    <div className="min-h-screen bg-[#FAF6EE] dark:bg-[#111215] text-[#121212] dark:text-[#FAF6EE] font-sans p-6 md:p-10">
+      <div className="max-w-6xl mx-auto space-y-8">
         
-        {/* Header */}
-        <header className="w-full flex items-center justify-between pb-8 mb-10 border-b border-zinc-200/80 dark:border-zinc-800/80">
-          <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center font-mono font-semibold text-sm text-zinc-800 dark:text-zinc-200">
-              {userInitial}
-            </div>
-            <div>
-              <h1 className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-                {session.user?.name || session.user?.email?.split('@')[0]}
-              </h1>
-              <p className="text-zinc-500 text-xs">
-                {session.user?.email}
-              </p>
-            </div>
+        {/* Top Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-4 border-[#121212] dark:border-white bg-white dark:bg-[#181A20] p-6 shadow-[6px_6px_0px_#121212] overflow-hidden relative">
+          <div className="absolute top-0 left-0 right-0 h-2 grid grid-cols-3">
+            <div className="bg-[#D32F2F]" />
+            <div className="bg-[#1976D2]" />
+            <div className="bg-[#FBC02D]" />
           </div>
-          <div>
-            <SignOutButton />
+
+          <div className="pt-2">
+            <div className="flex items-center gap-2 text-xs font-black uppercase text-[#1976D2]">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#D32F2F] inline-block" />
+              <span>BAUHAUS WORKSPACE REGISTRY</span>
+            </div>
+            <h1 className="text-3xl font-black uppercase tracking-tight mt-1">
+              ORGANIZATIONS
+            </h1>
+            <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-0.5">
+              Select an active geometric workspace or instantiate a new structure.
+            </p>
           </div>
-        </header>
-        
+          <div className="flex items-center gap-3">
+            <Link
+              href="/settings/profile"
+              className="px-4 py-2 border-2 border-[#121212] dark:border-white text-xs font-black uppercase hover:bg-[#FBC02D] hover:text-[#121212] transition-all shadow-[2px_2px_0px_#121212]"
+            >
+              PROFILE
+            </Link>
+            <AuthButtons />
+          </div>
+        </div>
+
         {/* Pending Invites */}
-        {pendingInvites.length > 0 && (
-          <div className="w-full mb-10">
-            <h2 className="text-xs font-mono font-medium uppercase tracking-wider text-zinc-500 mb-3">
-              Pending Invites ({pendingInvites.length})
-            </h2>
-            <div className="flex flex-col gap-3">
+        {pendingInvites && pendingInvites.length > 0 && (
+          <div className="space-y-3">
+            <div className="text-xs font-black uppercase tracking-wider text-[#D32F2F]">
+              PENDING AUTHORIZATIONS ({pendingInvites.length})
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {pendingInvites.map((invite: any) => (
                 <PendingInviteCard key={invite.id} invite={invite} />
               ))}
@@ -120,65 +67,59 @@ export default async function WorkspacesPage() {
           </div>
         )}
 
-        {/* Workspaces Section */}
-        <div className="w-full mb-12">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xs font-mono font-medium uppercase tracking-wider text-zinc-500">
-              Workspaces
-            </h2>
-            <span className="text-xs text-zinc-400 font-mono">
-              {workspaces.length} {workspaces.length === 1 ? 'workspace' : 'workspaces'}
-            </span>
+        {/* Workspaces Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="md:col-span-2 space-y-4">
+            <div className="flex items-center justify-between border-b-2 border-[#121212] dark:border-white pb-2">
+              <span className="text-xs font-black uppercase tracking-wider">
+                ACTIVE WORKSPACES [{workspaces.length}]
+              </span>
+              <span className="text-[10px] font-mono text-[#1976D2] font-black uppercase">STATUS: NORMALIZED</span>
+            </div>
+
+            {workspaces.length === 0 ? (
+              <div className="p-8 border-2 border-dashed border-[#121212] dark:border-white bg-white dark:bg-[#181A20] text-center space-y-2">
+                <p className="text-xs font-black uppercase">NO ACTIVE WORKSPACE NODES FOUND</p>
+                <p className="text-xs text-neutral-500">Create a workspace node to begin organizing modules.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {workspaces.map((ws: any, idx: number) => {
+                  const colors = ["#D32F2F", "#1976D2", "#FBC02D"];
+                  const accentColor = colors[idx % 3];
+                  return (
+                    <Link
+                      key={ws.id}
+                      href={`/workspaces/${ws.id}`}
+                      className="p-5 border-3 border-[#121212] dark:border-white bg-white dark:bg-[#181A20] shadow-[5px_5px_0px_#121212] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all group block"
+                    >
+                      <div className="flex items-center justify-between mb-3 border-b border-[#121212]/20 pb-2">
+                        <span className="w-3.5 h-3.5 border border-[#121212]" style={{ backgroundColor: accentColor }} />
+                        <ArrowRight className="w-4 h-4 text-[#121212] dark:text-white group-hover:translate-x-1 transition-transform" />
+                      </div>
+                      <h3 className="text-lg font-black uppercase tracking-tight">{ws.name}</h3>
+                      <div className="mt-4 pt-2 border-t border-[#121212]/10 flex items-center justify-between text-xs font-bold text-neutral-500">
+                        <span>PROJECTS: {ws._count?.projects || 0}</span>
+                        <span>MEMBERS: {ws._count?.members || 1}</span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
-          {workspaces.length === 0 ? (
-            <div className="p-8 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl text-center bg-white dark:bg-zinc-950 flex flex-col items-center justify-center">
-              <Building2 className="w-8 h-8 text-zinc-300 dark:text-zinc-700 mb-3" />
-              <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">No workspaces yet</p>
-              <p className="text-xs text-zinc-500 mt-1">Create your first workspace below to begin organizing projects.</p>
+          <div>
+            <div className="border-3 border-[#121212] dark:border-white bg-white dark:bg-[#181A20] p-6 shadow-[5px_5px_0px_#D32F2F]">
+              <div className="border-b-2 border-[#121212] dark:border-white pb-2 mb-4">
+                <h2 className="text-xs font-black uppercase tracking-wider">INSTANTIATE WORKSPACE</h2>
+              </div>
+              <WorkspaceForm />
             </div>
-          ) : (
-            <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {workspaces.map((ws: any) => (
-                <li key={ws.id} className="group relative p-5 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl flex flex-col justify-between bg-white dark:bg-zinc-950 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-xs transition-all">
-                  <Link href={`/workspaces/${ws.id}`} className="absolute inset-0 z-10" />
-                  
-                  <div className="flex items-start justify-between w-full mb-4">
-                    <div className="flex flex-col gap-0.5">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-base text-zinc-900 dark:text-zinc-100 group-hover:text-zinc-950 dark:group-hover:text-white transition-colors">
-                          {ws.name}
-                        </span>
-                      </div>
-                      <span className="text-xs font-mono text-zinc-400">
-                        /{ws.slug}
-                      </span>
-                    </div>
-                    {ws.members?.[0]?.role && (
-                      <span className="text-[10px] font-mono text-zinc-500 bg-zinc-100 dark:bg-zinc-900 px-2 py-0.5 rounded border border-zinc-200/60 dark:border-zinc-800/60 uppercase">
-                        {ws.members[0].role}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="flex items-center justify-between text-xs text-zinc-400 pt-3 border-t border-zinc-100 dark:border-zinc-900">
-                    <span>{ws._count?.projects ?? ws.projects?.length ?? 0} projects</span>
-                    <span className="inline-flex items-center gap-1 text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 font-medium transition-colors">
-                      Open <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                    </span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
+          </div>
         </div>
 
-        {/* Create workspace form */}
-        <div className="w-full max-w-md p-6 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 shadow-xs">
-          <WorkspaceForm />
-        </div>
-
-      </main>
+      </div>
     </div>
   );
 }
