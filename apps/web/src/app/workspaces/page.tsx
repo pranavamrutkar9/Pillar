@@ -1,12 +1,64 @@
 import { getServerSession } from "next-auth";
+import { cookies } from "next/headers";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import WorkspaceForm from "@/components/WorkspaceForm";
-import PendingInviteCard from "@/components/PendingInviteCard";
+import { WorkspaceForm } from "@/components/WorkspaceForm";
+import { PendingInviteCard } from "@/components/PendingInviteCard";
 import AuthButtons from "@/components/AuthButtons";
-import { getWorkspacesAction, getPendingInvitesAction } from "@/actions/workspaceActions";
-import { ArrowRight, Layers, User, Plus } from "lucide-react";
+import { ArrowRight, User, Plus } from "lucide-react";
+
+async function getWorkspaces() {
+  const cookieStore = await cookies();
+  const sessionToken = 
+    cookieStore.get("next-auth.session-token")?.value || 
+    cookieStore.get("__Secure-next-auth.session-token")?.value;
+
+  const apiUrl = process.env.API_URL || 'http://localhost:4000';
+  
+  try {
+    const res = await fetch(`${apiUrl}/api/workspaces`, {
+      headers: {
+        ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
+      },
+      cache: "no-store",
+    });
+    
+    if (res.ok) {
+      const json = await res.json();
+      return json.data || [];
+    }
+  } catch (err) {
+    console.error("Failed to fetch workspaces exception:", err);
+  }
+  return [];
+}
+
+async function getPendingInvites() {
+  const cookieStore = await cookies();
+  const sessionToken = 
+    cookieStore.get("next-auth.session-token")?.value || 
+    cookieStore.get("__Secure-next-auth.session-token")?.value;
+
+  const apiUrl = process.env.API_URL || 'http://localhost:4000';
+  
+  try {
+    const res = await fetch(`${apiUrl}/api/invites/pending`, {
+      headers: {
+        ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
+      },
+      cache: "no-store",
+    });
+    
+    if (res.ok) {
+      const json = await res.json();
+      return json.data || [];
+    }
+  } catch (err) {
+    console.error("Failed to fetch pending invites:", err);
+  }
+  return [];
+}
 
 export default async function WorkspacesPage() {
   const session = await getServerSession(authOptions);
@@ -15,8 +67,10 @@ export default async function WorkspacesPage() {
     redirect("/auth");
   }
 
-  const workspaces = await getWorkspacesAction();
-  const pendingInvites = await getPendingInvitesAction();
+  const [workspaces, pendingInvites] = await Promise.all([
+    getWorkspaces(),
+    getPendingInvites()
+  ]);
 
   return (
     <div className="min-h-screen bg-[#08090A] text-[#F4F4F5] font-sans p-6 md:p-10 relative">

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { acceptInviteAction } from "@/actions/workspaceActions";
 
-export default function PendingInviteCard({ invite }: { invite: any }) {
+export function PendingInviteCard({ invite }: { invite: any }) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -38,3 +38,5 @@ export default function PendingInviteCard({ invite }: { invite: any }) {
     </div>
   );
 }
+
+export default PendingInviteCard;

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createWorkspaceAction } from "@/actions/workspaceActions";
 
-export default function WorkspaceForm() {
+export function WorkspaceForm() {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -18,11 +18,9 @@ export default function WorkspaceForm() {
     setError("");
 
     try {
-      const res = await createWorkspaceAction({ name });
-      if (res.workspace) {
-        setName("");
-        router.refresh();
-      }
+      await createWorkspaceAction(name);
+      setName("");
+      router.refresh();
     } catch (err: any) {
       setError(err.message || "Failed to create workspace");
     } finally {
@@ -58,3 +56,5 @@ export default function WorkspaceForm() {
     </form>
   );
 }
+
+export default WorkspaceForm;
