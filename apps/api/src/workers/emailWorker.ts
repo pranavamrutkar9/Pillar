@@ -1,5 +1,5 @@
 import { Worker } from 'bullmq';
-import { redis } from '../lib/redis.js';
+import { redis, handleRedisError } from '../lib/redis.js';
 import { prisma } from '../db/client.js';
 import { Resend } from 'resend';
 import { env } from '../config/env.js';
@@ -31,6 +31,5 @@ export const emailWorker = new Worker('pillar-email', async (job) => {
 }, { connection: redis as any });
 
 emailWorker.on('error', (err: any) => {
-  if (err.code === 'ECONNRESET' || err.code === 'ECONNABORTED' || (err.message && (err.message.includes('ECONNRESET') || err.message.includes('ECONNABORTED')))) return;
-  console.error('[EmailWorker Error]', err);
+  handleRedisError('EmailWorker', err);
 });

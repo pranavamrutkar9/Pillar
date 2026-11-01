@@ -1,5 +1,5 @@
 import { Queue } from 'bullmq'
-import { redis } from '../lib/redis.js'
+import { redis, handleRedisError } from '../lib/redis.js'
 
 const redisEnabled = !!process.env.REDIS_URL;
 
@@ -10,16 +10,13 @@ export const notificationQueue = redisEnabled ? new Queue('pillar-notification',
 export const githubQueue = redisEnabled ? new Queue('pillar-github', { connection: redis as any }) : null;
 export const cycleQueue = redisEnabled ? new Queue('pillar-cycle', { connection: redis as any }) : null;
 
-const suppressEconnreset = (err: any) => {
-  if (err.code === 'ECONNRESET' || err.code === 'ECONNABORTED' || (err.message && (err.message.includes('ECONNRESET') || err.message.includes('ECONNABORTED')))) return;
-  console.error('[Queue Error]', err.message);
-};
+const onQueueError = (err: any) => handleRedisError('Queue', err);
 
-if (activityQueue) activityQueue.on('error', suppressEconnreset);
-if (realtimeQueue) realtimeQueue.on('error', suppressEconnreset);
-if (notificationQueue) notificationQueue.on('error', suppressEconnreset);
-if (githubQueue) githubQueue.on('error', suppressEconnreset);
-if (cycleQueue) cycleQueue.on('error', suppressEconnreset);
+if (activityQueue) activityQueue.on('error', onQueueError);
+if (realtimeQueue) realtimeQueue.on('error', onQueueError);
+if (notificationQueue) notificationQueue.on('error', onQueueError);
+if (githubQueue) githubQueue.on('error', onQueueError);
+if (cycleQueue) cycleQueue.on('error', onQueueError);
 
 export async function emit(eventType: string, payload: any) {
   if (!redisEnabled) {

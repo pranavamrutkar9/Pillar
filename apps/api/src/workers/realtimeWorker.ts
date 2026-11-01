@@ -1,5 +1,5 @@
 import { Worker } from 'bullmq'
-import { redis } from '../lib/redis.js'
+import { redis, handleRedisError } from '../lib/redis.js'
 import { Emitter } from '@socket.io/redis-emitter'
 
 const io = new Emitter(redis as any);
@@ -17,6 +17,5 @@ export const realtimeWorker = new Worker('pillar-realtime', async (job) => {
 }, { connection: redis as any })
 
 realtimeWorker.on('error', (err: any) => {
-  if (err.code === 'ECONNRESET' || err.code === 'ECONNABORTED' || (err.message && (err.message.includes('ECONNRESET') || err.message.includes('ECONNABORTED')))) return;
-  console.error('[RealtimeWorker Error]', err);
+  handleRedisError('RealtimeWorker', err);
 });
