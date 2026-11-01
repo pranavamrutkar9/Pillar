@@ -2,19 +2,10 @@ import { Worker, Queue } from "bullmq";
 import { prisma } from "../db/client.js";
 import { standupService } from "../services/standup.service.js";
 import { toZonedTime, format } from "date-fns-tz";
-import IORedis from "ioredis";
+import { redis, handleRedisError } from "../lib/redis.js";
 
-// Reuse the existing redis connection from BullMQ setup if possible, or create a new one.
-const connection = new IORedis(process.env.REDIS_URL || "redis://localhost:6379", {
-  maxRetriesPerRequest: null,
-});
-
-connection.on("error", (err: any) => {
-  if (err.code === "ECONNRESET" || err.code === "ECONNABORTED" || (err.message && (err.message.includes("ECONNRESET") || err.message.includes("ECONNABORTED")))) return;
-  console.warn("[StandupWorker Redis Error]", err.message);
-});
-
-export const standupQueue = new Queue("standup-generation", { connection });
+export const standupQueue = new Queue("standup-generation", { connection: redis as any });
+standupQueue.on("error", (err: any) => handleRedisError("StandupQueue", err));
 
 // Schedule the cron job to run every hour
 standupQueue.add("hourly-standup-trigger", {}, {
@@ -78,15 +69,14 @@ const worker = new Worker("standup-generation", async (job) => {
     const { workspaceId, userId, dateStr, timezone } = job.data;
     await standupService.generateDraft(workspaceId, userId, dateStr, timezone);
   }
-}, { connection });
+}, { connection: redis as any });
 
 worker.on("failed", (job, err) => {
   console.error(`Standup Worker Job ${job?.id} failed:`, err);
 });
 
 worker.on("error", (err: any) => {
-  if (err.code === "ECONNRESET" || err.code === "ECONNABORTED" || (err.message && (err.message.includes("ECONNRESET") || err.message.includes("ECONNABORTED")))) return;
-  console.warn("[StandupWorker Error]", err.message);
+  handleRedisError("StandupWorker", err);
 });
 
 console.log("Standup Worker initialized.");

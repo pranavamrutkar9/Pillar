@@ -1,5 +1,5 @@
 import { Worker } from "bullmq";
-import { redis } from "../lib/redis.js";
+import { redis, handleRedisError } from "../lib/redis.js";
 import { prisma } from "../db/client.js";
 import { eventService } from "../services/event.service.js";
 
@@ -85,6 +85,5 @@ export const cycleWorker = new Worker("pillar-cycle", async (job) => {
 }, { connection: redis as any });
 
 cycleWorker.on("error", (err: any) => {
-  if (err.code === "ECONNRESET" || err.code === "ECONNABORTED" || (err.message && (err.message.includes("ECONNRESET") || err.message.includes("ECONNABORTED")))) return;
-  console.error("[CycleWorker Error]", err);
+  handleRedisError("CycleWorker", err);
 });
