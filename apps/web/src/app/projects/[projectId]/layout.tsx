@@ -25,32 +25,32 @@ export default async function ProjectLayout(props: { params: Promise<{ projectId
   const isViewer = !session?.user;
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#09090B] text-zinc-900 dark:text-zinc-100 font-sans flex flex-col transition-colors">
+    <div className="min-h-screen bg-[#08090A] text-[#F4F4F5] font-sans flex flex-col selection:bg-[#5E6AD2]/30 selection:text-white">
       
-      {/* Sticky Glass Header */}
-      <header className="border-b border-zinc-200/80 dark:border-zinc-800/80 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md sticky top-0 z-30 transition-colors">
+      {/* Linear Hairline Sticky Header */}
+      <header className="border-b border-white/[0.08] backdrop-blur-xl bg-[#08090A]/80 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           {/* Top Row: Breadcrumbs & Utilities */}
-          <div className="flex justify-between items-center h-14 border-b border-zinc-100 dark:border-zinc-900">
+          <div className="flex justify-between items-center h-13 border-b border-white/[0.04]">
             <div className="flex items-center gap-2 text-xs">
               <Link 
                 href={`/workspaces/${project.workspaceId}`} 
-                className="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors flex items-center gap-1 font-medium"
+                className="text-zinc-400 hover:text-white px-2 py-1 rounded-md hover:bg-white/[0.04] transition-colors flex items-center gap-1.5"
               >
-                <ArrowLeft className="w-3 h-3" />
+                <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Workspace</span>
               </Link>
-              <ChevronRight className="w-3 h-3 text-zinc-300 dark:text-zinc-700" />
-              <div className="flex items-center gap-1.5">
-                <span className="font-semibold text-zinc-900 dark:text-zinc-100 text-sm tracking-tight">{project.name}</span>
-                <span className="text-[11px] font-mono text-zinc-400 px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/60">
+              <ChevronRight className="w-3.5 h-3.5 text-zinc-600" />
+              <div className="flex items-center gap-2">
+                <span className="font-medium text-white tracking-tight">{project.name}</span>
+                <span className="text-[10px] font-mono font-medium text-zinc-400 px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08]">
                   {project.slug}
                 </span>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               <GlobalSearch workspaceId={project.workspaceId} sessionToken={sessionToken} />
               <NotificationCenter sessionToken={sessionToken} />
             </div>

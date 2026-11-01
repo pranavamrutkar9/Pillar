@@ -1,25 +1,27 @@
 "use client";
 
-import { signIn, signOut } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 
-export function SignInButton() {
+export default function AuthButtons() {
+  const { data: session } = useSession();
+
+  if (session) {
+    return (
+      <button
+        onClick={() => signOut()}
+        className="px-3 py-1.5 rounded-md bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-xs font-medium text-zinc-300 hover:text-white transition-all cursor-pointer"
+      >
+        Sign out
+      </button>
+    );
+  }
+
   return (
     <button
       onClick={() => signIn("github")}
-      className="px-4 py-2 text-sm font-medium text-white bg-black dark:text-black dark:bg-white rounded-md hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors"
+      className="px-3.5 py-1.5 rounded-md bg-gradient-to-b from-[#5E6AD2] to-[#4B55C1] hover:brightness-110 text-xs font-medium text-white shadow-sm transition-all cursor-pointer"
     >
       Sign in with GitHub
-    </button>
-  );
-}
-
-export function SignOutButton() {
-  return (
-    <button
-      onClick={() => signOut()}
-      className="px-3 py-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white border border-transparent hover:border-zinc-200 dark:hover:border-zinc-800 rounded-md transition-colors"
-    >
-      Sign out
     </button>
   );
 }

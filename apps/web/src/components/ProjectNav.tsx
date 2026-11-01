@@ -9,7 +9,6 @@ import {
   BookOpen, 
   FileText, 
   Settings,
-  GitPullRequest
 } from "lucide-react";
 
 interface ProjectNavProps {
@@ -33,7 +32,7 @@ export default function ProjectNav({ projectId, isViewer }: ProjectNavProps) {
   }
 
   return (
-    <nav className="flex items-center space-x-1 overflow-x-auto no-scrollbar py-1">
+    <nav className="flex items-center space-x-1 overflow-x-auto no-scrollbar py-1 font-sans">
       {navItems.map((item) => {
         const Icon = item.icon;
         const isActive = pathname.startsWith(item.href);
@@ -41,13 +40,13 @@ export default function ProjectNav({ projectId, isViewer }: ProjectNavProps) {
           <Link
             key={item.href}
             href={item.href}
-            className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
               isActive
-                ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-2xs"
-                : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-900/60"
+                ? "bg-white/[0.08] text-white shadow-xs"
+                : "text-zinc-400 hover:text-white hover:bg-white/[0.04]"
             }`}
           >
-            <Icon className={`w-3.5 h-3.5 ${isActive ? "text-zinc-900 dark:text-zinc-100" : "text-zinc-400"}`} />
+            <Icon className={`w-3.5 h-3.5 ${isActive ? "text-[#818CF8]" : "text-zinc-400"}`} />
             <span>{item.label}</span>
           </Link>
         );
@@ -55,4 +54,3 @@ export default function ProjectNav({ projectId, isViewer }: ProjectNavProps) {
     </nav>
   );
 }
-

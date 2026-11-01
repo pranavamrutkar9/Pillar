@@ -1,55 +1,35 @@
+import AuthForms from "@/components/AuthForms";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { AuthForms } from "../../components/AuthForms";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 
 export default async function AuthPage() {
   const session = await getServerSession(authOptions);
-  
+
   if (session) {
     redirect("/workspaces");
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#FAFAFA] dark:bg-[#09090B] text-zinc-900 dark:text-zinc-100 transition-colors">
-      
-      {/* Top minimal bar */}
-      <header className="w-full max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link 
-          href="/" 
-          className="inline-flex items-center gap-2 text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back to home</span>
-        </Link>
-      </header>
+    <div className="flex flex-col flex-1 items-center justify-center bg-[#08090A] min-h-screen p-6 font-sans relative">
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-gradient-to-b from-[#5E6AD2]/15 via-transparent to-transparent blur-3xl pointer-events-none" />
 
-      {/* Main card */}
-      <main className="flex-1 flex flex-col items-center justify-center px-6 py-12">
-        <div className="w-full max-w-sm flex flex-col items-center">
-          
-          <div className="flex flex-col items-center gap-2 text-center mb-8">
-            <div className="w-10 h-10 rounded-xl bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center text-white dark:text-zinc-900 font-mono font-bold text-lg mb-2 shadow-xs">
-              P
-            </div>
-            <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-              Pillar Workspace
-            </h1>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">
-              Sign in or create an account to access your projects.
-            </p>
+      <div className="max-w-sm w-full bg-[#0E0F12] border border-white/[0.08] p-8 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.06)] space-y-6 relative z-10">
+        <div className="text-center space-y-2">
+          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#5E6AD2] to-[#3B429F] flex items-center justify-center text-white font-bold text-base mx-auto shadow-[0_0_15px_rgba(94,106,210,0.5)]">
+            P
           </div>
-
-          <AuthForms />
-
-          <p className="mt-8 text-center text-xs text-zinc-400">
-            By continuing, you agree to our Terms of Service & Privacy Policy.
+          <h1 className="text-xl font-semibold tracking-tight text-white">
+            Welcome to Pillar
+          </h1>
+          <p className="text-xs text-zinc-400">
+            Sign in to continue to your workspace.
           </p>
         </div>
-      </main>
 
+        <AuthForms />
+      </div>
     </div>
   );
 }
