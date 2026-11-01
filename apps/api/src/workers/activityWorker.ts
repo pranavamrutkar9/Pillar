@@ -1,5 +1,5 @@
 import { Worker } from 'bullmq'
-import { redis } from '../lib/redis.js'
+import { redis, handleRedisError } from '../lib/redis.js'
 import { prisma } from '../db/client.js'
 
 export const activityWorker = new Worker('pillar-activity', async (job) => {
@@ -13,6 +13,5 @@ export const activityWorker = new Worker('pillar-activity', async (job) => {
 }, { connection: redis as any })
 
 activityWorker.on('error', (err: any) => {
-  if (err.code === 'ECONNRESET' || err.code === 'ECONNABORTED' || (err.message && (err.message.includes('ECONNRESET') || err.message.includes('ECONNABORTED')))) return;
-  console.error('[ActivityWorker Error]', err);
+  handleRedisError('ActivityWorker', err);
 });

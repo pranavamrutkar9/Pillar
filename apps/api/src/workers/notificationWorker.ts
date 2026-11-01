@@ -1,10 +1,11 @@
 import { Worker, Queue } from 'bullmq';
-import { redis } from '../lib/redis.js';
+import { redis, handleRedisError } from '../lib/redis.js';
 import { notificationService } from '../services/notification.service.js';
 import { prisma } from '../db/client.js';
 import { Emitter } from '@socket.io/redis-emitter';
 
 export const emailQueue = new Queue('pillar-email', { connection: redis as any });
+emailQueue.on('error', (err: any) => handleRedisError('EmailQueue', err));
 const io = new Emitter(redis as any);
 
 export const notificationWorker = new Worker('pillar-notification', async (job) => {
@@ -90,6 +91,5 @@ export const notificationWorker = new Worker('pillar-notification', async (job) 
 }, { connection: redis as any });
 
 notificationWorker.on('error', (err: any) => {
-  if (err.code === 'ECONNRESET' || err.code === 'ECONNABORTED' || (err.message && (err.message.includes('ECONNRESET') || err.message.includes('ECONNABORTED')))) return;
-  console.error('[NotificationWorker Error]', err);
+  handleRedisError('NotificationWorker', err);
 });

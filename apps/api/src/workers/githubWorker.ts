@@ -1,5 +1,5 @@
 import { Worker } from "bullmq";
-import { redis } from "../lib/redis.js";
+import { redis, handleRedisError } from "../lib/redis.js";
 import { handleLinkEvent } from "./github/githubLinkWorker.js";
 import { handleIssueEvent } from "./github/githubIssueWorker.js";
 import { handleSyncEvent } from "./github/githubSyncWorker.js";
@@ -19,6 +19,5 @@ export const githubWorker = new Worker("pillar-github", async (job) => {
 }, { connection: redis as any });
 
 githubWorker.on("error", (err: any) => {
-  if (err.code === "ECONNRESET" || err.code === "ECONNABORTED" || (err.message && (err.message.includes("ECONNRESET") || err.message.includes("ECONNABORTED")))) return;
-  console.error("[GithubWorker Error]", err);
+  handleRedisError("GithubWorker", err);
 });
