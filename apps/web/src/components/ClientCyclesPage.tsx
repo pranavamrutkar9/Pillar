@@ -61,92 +61,94 @@ export default function ClientCyclesPage({ project, initialCycles, isViewer }: {
   const completedCycles = cycles.filter(c => c.status === "COMPLETED");
 
   return (
-    <div className="space-y-6 max-w-5xl">
+    <div className="space-y-6 max-w-5xl font-sans">
       
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-zinc-200/80 dark:border-zinc-800/80">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b-2 border-[#121212]">
         <div>
           <div className="flex items-center gap-2">
-            <Repeat className="w-5 h-5 text-zinc-500" />
-            <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Cycles</h1>
+            <Repeat className="w-5 h-5 text-[#1976D2]" />
+            <h1 className="text-xl font-black uppercase tracking-tight text-[#121212] dark:text-white">
+              ITERATION CYCLES
+            </h1>
           </div>
-          <p className="text-xs text-zinc-500 mt-1">
-            Time-box your team's engineering velocity with fixed iterations and clean burndown metrics.
+          <p className="text-xs font-mono uppercase text-neutral-500 mt-1">
+            Time-boxed engineering sprints with automated burndown metrics and delivery cadence.
           </p>
         </div>
 
         {!isViewer && (
           <button 
             onClick={() => setIsCreating(!isCreating)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all shadow-xs"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-black uppercase tracking-wider bg-[#1976D2] hover:bg-[#0D47A1] text-white border-2 border-[#121212] shadow-[2px_2px_0px_#121212] transition-all"
           >
-            {isCreating ? "Cancel" : <><Plus className="w-3.5 h-3.5" /> <span>New Cycle</span></>}
+            {isCreating ? "CANCEL" : <><Plus className="w-3.5 h-3.5" /> <span>SCHEDULE CYCLE</span></>}
           </button>
         )}
       </div>
 
       {/* Creation Drawer */}
       {isCreating && (
-        <form onSubmit={handleCreate} className="p-5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 shadow-xs space-y-4">
-          <div>
-            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Schedule New Cycle</h3>
-            <p className="text-xs text-zinc-500">Define the duration and cadence for the upcoming cycle.</p>
+        <form onSubmit={handleCreate} className="p-6 border-3 border-[#121212] dark:border-white bg-white dark:bg-[#181A20] shadow-[6px_6px_0px_#121212] space-y-4">
+          <div className="border-b-2 border-[#121212] pb-2">
+            <h3 className="text-sm font-black uppercase text-[#121212] dark:text-white">SCHEDULE NEW ITERATION</h3>
+            <p className="text-xs font-mono uppercase text-neutral-500">Define velocity cadence and delivery dates.</p>
           </div>
 
           {error && (
-            <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 text-xs">
+            <div className="p-3 bg-[#D32F2F] text-white border-2 border-[#121212] text-xs font-black uppercase">
               {error}
             </div>
           )}
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
             <div>
-              <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Cycle Name</label>
+              <label className="block text-xs font-black uppercase text-[#121212] dark:text-white mb-1">CYCLE NAME</label>
               <input 
                 type="text" 
                 required 
                 value={formData.name} 
                 onChange={e => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors" 
-                placeholder="e.g. Cycle 15 — Core Infrastructure"
+                className="w-full px-3 py-2 text-xs font-bold uppercase border-2 border-[#121212] bg-[#FAF6EE] text-[#121212] focus:outline-none focus:border-[#1976D2]" 
+                placeholder="e.g. Sprint 14: Engine Refactor"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Start Date</label>
+              <label className="block text-xs font-black uppercase text-[#121212] dark:text-white mb-1">START DATE</label>
               <input 
                 type="date" 
                 required 
                 value={formData.startsAt} 
                 onChange={e => setFormData({ ...formData, startsAt: e.target.value })}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors" 
+                className="w-full px-3 py-2 text-xs font-bold uppercase border-2 border-[#121212] bg-[#FAF6EE] text-[#121212] focus:outline-none focus:border-[#1976D2]" 
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">End Date</label>
+              <label className="block text-xs font-black uppercase text-[#121212] dark:text-white mb-1">END DATE</label>
               <input 
                 type="date" 
                 required 
                 value={formData.endsAt} 
                 onChange={e => setFormData({ ...formData, endsAt: e.target.value })}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors" 
+                className="w-full px-3 py-2 text-xs font-bold uppercase border-2 border-[#121212] bg-[#FAF6EE] text-[#121212] focus:outline-none focus:border-[#1976D2]" 
               />
             </div>
           </div>
 
-          <div className="flex justify-end gap-2 pt-1">
+          <div className="flex justify-end gap-2 pt-2 border-t-2 border-[#121212]">
             <button 
               type="button" 
               onClick={() => setIsCreating(false)} 
-              className="px-3 py-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+              className="px-4 py-1.5 text-xs font-black uppercase border-2 border-[#121212] hover:bg-[#FAF6EE]"
             >
-              Cancel
+              CANCEL
             </button>
             <button 
               type="submit" 
               disabled={loading}
-              className="px-4 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors shadow-xs disabled:opacity-50"
+              className="px-5 py-1.5 text-xs font-black uppercase bg-[#1976D2] hover:bg-[#0D47A1] text-white border-2 border-[#121212] shadow-[2px_2px_0px_#121212]"
             >
-              {loading ? "Scheduling..." : "Create Cycle"}
+              {loading ? "SCHEDULING..." : "COMMIT CYCLE"}
             </button>
           </div>
         </form>
@@ -154,15 +156,15 @@ export default function ClientCyclesPage({ project, initialCycles, isViewer }: {
 
       {/* Active Cycle Hero Card */}
       {activeCycle && (
-        <div className="p-5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 shadow-xs">
-          <div className="flex items-center justify-between pb-3 mb-3 border-b border-zinc-100 dark:border-zinc-900">
+        <div className="p-6 border-3 border-[#121212] dark:border-white bg-[#FBC02D] text-[#121212] shadow-[6px_6px_0px_#121212]">
+          <div className="flex items-center justify-between pb-3 mb-3 border-b-2 border-[#121212]">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-xs font-mono font-medium text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                Current Active Cycle
+              <span className="w-3 h-3 bg-[#D32F2F] inline-block border border-[#121212]" />
+              <span className="text-xs font-black uppercase tracking-wider">
+                CURRENT ACTIVE ITERATION
               </span>
             </div>
-            <span className="text-xs font-mono text-zinc-400 flex items-center gap-1">
+            <span className="text-xs font-mono font-bold uppercase flex items-center gap-1">
               <Calendar className="w-3.5 h-3.5" />
               {format(new Date(activeCycle.startsAt), 'MMM d')} – {format(new Date(activeCycle.endsAt), 'MMM d, yyyy')}
             </span>
@@ -172,12 +174,12 @@ export default function ClientCyclesPage({ project, initialCycles, isViewer }: {
             <div>
               <Link 
                 href={`/projects/${project.id}/cycles/${activeCycle.id}`}
-                className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 hover:underline tracking-tight"
+                className="text-xl font-black uppercase hover:underline tracking-tight"
               >
                 {activeCycle.name}
               </Link>
-              <p className="text-xs text-zinc-500 mt-0.5">
-                {activeCycle._count?.issues ?? activeCycle.issues?.length ?? 0} active tickets in this cycle
+              <p className="text-xs font-mono font-bold uppercase mt-1">
+                {activeCycle._count?.issues ?? activeCycle.issues?.length ?? 0} ACTIVE TICKETS ALLOCATED
               </p>
             </div>
 
@@ -185,17 +187,17 @@ export default function ClientCyclesPage({ project, initialCycles, isViewer }: {
               {!isViewer && (
                 <button 
                   onClick={() => handleComplete(activeCycle.id)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-700 dark:text-zinc-300 transition-colors shadow-2xs"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase bg-white border-2 border-[#121212] shadow-[2px_2px_0px_#121212] hover:bg-[#FAF6EE] transition-all"
                 >
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                  <span>Complete Cycle</span>
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>COMPLETE ITERATION</span>
                 </button>
               )}
               <Link 
                 href={`/projects/${project.id}/cycles/${activeCycle.id}`}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium rounded-lg bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors shadow-xs"
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-black uppercase bg-[#121212] text-white border-2 border-[#121212] shadow-[2px_2px_0px_#121212] hover:bg-neutral-800 transition-all"
               >
-                <span>View Board</span>
+                <span>OPEN SPRINT BOARD</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -203,93 +205,70 @@ export default function ClientCyclesPage({ project, initialCycles, isViewer }: {
         </div>
       )}
 
-      {/* Cycle List */}
-      <div className="space-y-4">
-        {cycles.length === 0 ? (
-          <div className="p-12 text-center border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl bg-white dark:bg-zinc-950">
-            <Repeat className="w-8 h-8 text-zinc-300 dark:text-zinc-700 mx-auto mb-2" />
-            <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">No cycles planned</p>
-            <p className="text-xs text-zinc-500 mt-0.5">Create your first cycle to structure tasks into time-boxed sprints.</p>
-          </div>
-        ) : (
-          <div className="border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl bg-white dark:bg-zinc-950 overflow-hidden shadow-2xs">
-            <div className="px-4 py-2.5 bg-zinc-50/60 dark:bg-zinc-900/40 border-b border-zinc-200/80 dark:border-zinc-800/80 text-[11px] font-mono text-zinc-400">
-              ALL CYCLES ({cycles.length})
-            </div>
-            <ul className="divide-y divide-zinc-100 dark:divide-zinc-900">
-              {cycles.map(cycle => {
-                const isActive = cycle.status === "ACTIVE";
-                const isCompleted = cycle.status === "COMPLETED";
-                const isPlanned = cycle.status === "PLANNED";
-                
-                return (
-                  <li 
-                    key={cycle.id} 
-                    className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-zinc-50/60 dark:hover:bg-zinc-900/40 transition-colors"
+      {/* Planned Cycles */}
+      {upcomingCycles.length > 0 && (
+        <div className="space-y-3">
+          <h2 className="text-sm font-black uppercase tracking-wider text-[#121212] dark:text-white flex items-center gap-2 border-b-2 border-[#121212] pb-1.5">
+            <span className="w-2.5 h-2.5 bg-[#1976D2] inline-block" />
+            <span>UPCOMING ITERATIONS ({upcomingCycles.length})</span>
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {upcomingCycles.map((cycle) => (
+              <div 
+                key={cycle.id}
+                className="p-4 border-2 border-[#121212] dark:border-white bg-white dark:bg-[#181A20] shadow-[3px_3px_0px_#121212] flex flex-col justify-between gap-3"
+              >
+                <div>
+                  <h3 className="font-black text-sm uppercase text-[#121212] dark:text-white">{cycle.name}</h3>
+                  <p className="text-[10px] font-mono font-bold text-neutral-500 uppercase mt-0.5">
+                    {format(new Date(cycle.startsAt), 'MMM d')} – {format(new Date(cycle.endsAt), 'MMM d, yyyy')}
+                  </p>
+                </div>
+                {!isViewer && (
+                  <button
+                    onClick={() => handleStart(cycle.id)}
+                    className="inline-flex items-center justify-center gap-1.5 px-3 py-1 bg-[#1976D2] hover:bg-[#0D47A1] text-white border-2 border-[#121212] text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_#121212]"
                   >
-                    <div className="flex items-start gap-3">
-                      <span className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${
-                        isActive ? 'bg-emerald-500' :
-                        isCompleted ? 'bg-zinc-400' :
-                        'bg-sky-500'
-                      }`} />
-                      
-                      <div className="flex flex-col">
-                        <div className="flex items-center gap-2">
-                          <Link 
-                            href={`/projects/${project.id}/cycles/${cycle.id}`}
-                            className="text-sm font-medium text-zinc-900 dark:text-zinc-100 hover:underline"
-                          >
-                            {cycle.name}
-                          </Link>
-                          <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${
-                            isActive ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-900/40' :
-                            isCompleted ? 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800/60 dark:text-zinc-400 border-zinc-200/60 dark:border-zinc-700/60' :
-                            'bg-sky-50 text-sky-700 dark:bg-sky-950/30 dark:text-sky-300 border-sky-200/60 dark:border-sky-900/40'
-                          }`}>
-                            {cycle.status}
-                          </span>
-                        </div>
-                        <span className="text-xs text-zinc-400 mt-0.5 font-mono">
-                          {format(new Date(cycle.startsAt), 'MMM d')} – {format(new Date(cycle.endsAt), 'MMM d, yyyy')}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 self-end sm:self-auto">
-                      {!isViewer && isPlanned && !activeCycle && (
-                        <button 
-                          onClick={() => handleStart(cycle.id)}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/30 border border-sky-200/60 dark:border-sky-900/40 rounded-lg hover:bg-sky-100 transition-colors"
-                        >
-                          <Play className="w-3 h-3" />
-                          <span>Start</span>
-                        </button>
-                      )}
-                      {!isViewer && isActive && (
-                        <button 
-                          onClick={() => handleComplete(cycle.id)}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-900/40 rounded-lg hover:bg-emerald-100 transition-colors"
-                        >
-                          <CheckCircle2 className="w-3 h-3" />
-                          <span>Complete</span>
-                        </button>
-                      )}
-                      <Link 
-                        href={`/projects/${project.id}/cycles/${cycle.id}`}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
-                      >
-                        <span>Board</span>
-                        <ArrowRight className="w-3 h-3" />
-                      </Link>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
+                    <Play className="w-3 h-3" />
+                    <span>ACTIVATE SPRINT</span>
+                  </button>
+                )}
+              </div>
+            ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Completed Cycles */}
+      {completedCycles.length > 0 && (
+        <div className="space-y-3">
+          <h2 className="text-sm font-black uppercase tracking-wider text-[#121212] dark:text-white flex items-center gap-2 border-b-2 border-[#121212] pb-1.5">
+            <span className="w-2.5 h-2.5 bg-[#D32F2F] inline-block" />
+            <span>CONCLUDED ITERATIONS ({completedCycles.length})</span>
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {completedCycles.map((cycle) => (
+              <div 
+                key={cycle.id}
+                className="p-4 border-2 border-[#121212] dark:border-white bg-[#FAF6EE] dark:bg-[#181A20] flex flex-col justify-between gap-3"
+              >
+                <div>
+                  <h3 className="font-black text-sm uppercase text-[#121212] dark:text-white">{cycle.name}</h3>
+                  <p className="text-[10px] font-mono font-bold text-neutral-500 uppercase mt-0.5">
+                    CONCLUDED // {format(new Date(cycle.endsAt), 'yyyy-MM-dd')}
+                  </p>
+                </div>
+                <Link
+                  href={`/projects/${project.id}/cycles/${cycle.id}`}
+                  className="text-xs font-black uppercase text-[#1976D2] hover:underline"
+                >
+                  VIEW BURNDOWN METRICS →
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
     </div>
   );

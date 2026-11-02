@@ -8,47 +8,51 @@ import { CSS } from '@dnd-kit/utilities';
 import { useDroppable } from '@dnd-kit/core';
 import Link from 'next/link';
 
-function getStatusDotColor(statusName: string, customColor?: string) {
-  if (customColor) return customColor;
+function getStatusGeometricIcon(statusName: string) {
   const name = statusName.toLowerCase();
-  if (name.includes('done') || name.includes('complete') || name.includes('shipped')) return '#10b981'; // emerald
-  if (name.includes('progress') || name.includes('doing') || name.includes('active')) return '#f59e0b'; // amber
-  if (name.includes('review') || name.includes('testing')) return '#a855f7'; // purple
-  if (name.includes('todo') || name.includes('ready') || name.includes('unstarted')) return '#0ea5e9'; // sky
-  return '#71717a'; // zinc-500
+  if (name.includes('done') || name.includes('complete') || name.includes('shipped')) {
+    return { symbol: '●', color: '#D32F2F', label: 'COMPLETE' };
+  }
+  if (name.includes('progress') || name.includes('doing') || name.includes('active')) {
+    return { symbol: '▲', color: '#FBC02D', label: 'ACTIVE' };
+  }
+  if (name.includes('review') || name.includes('testing')) {
+    return { symbol: '◆', color: '#1976D2', label: 'REVIEW' };
+  }
+  return { symbol: '■', color: '#1976D2', label: 'PLANNED' };
 }
 
 function PriorityIndicator({ priority }: { priority?: string }) {
   const p = (priority || '').toUpperCase();
   if (p === 'URGENT') {
     return (
-      <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 px-1.5 py-0.5 rounded border border-red-200/60 dark:border-red-900/40">
-        <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
-        Urgent
+      <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase text-white bg-[#D32F2F] px-1.5 py-0.5 border border-[#121212]">
+        <span>●</span>
+        <span>URGENT</span>
       </span>
     );
   }
   if (p === 'HIGH') {
     return (
-      <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.5 rounded border border-amber-200/60 dark:border-amber-900/40">
-        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
-        High
+      <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase text-[#121212] bg-[#FBC02D] px-1.5 py-0.5 border border-[#121212]">
+        <span>▲</span>
+        <span>HIGH</span>
       </span>
     );
   }
   if (p === 'MEDIUM') {
     return (
-      <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/70 px-1.5 py-0.5 rounded border border-zinc-200/60 dark:border-zinc-700/60">
-        <span className="w-1.5 h-1.5 rounded-full bg-yellow-500 shrink-0" />
-        Med
+      <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase text-white bg-[#1976D2] px-1.5 py-0.5 border border-[#121212]">
+        <span>■</span>
+        <span>MED</span>
       </span>
     );
   }
   if (p === 'LOW') {
     return (
-      <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/70 px-1.5 py-0.5 rounded border border-zinc-200/60 dark:border-zinc-700/60">
-        <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0" />
-        Low
+      <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase text-[#121212] bg-[#FAF6EE] px-1.5 py-0.5 border border-[#121212]">
+        <span>-</span>
+        <span>LOW</span>
       </span>
     );
   }
@@ -69,18 +73,23 @@ function SortableIssueCard({ issue, projectSlug, projectId }: { issue: any, proj
     opacity: isDragging ? 0.35 : 1
   };
 
+  const p = (issue.priority || '').toUpperCase();
+  const borderStripe = p === 'URGENT' ? 'border-l-4 border-l-[#D32F2F]' :
+                       p === 'HIGH' ? 'border-l-4 border-l-[#FBC02D]' :
+                       p === 'MEDIUM' ? 'border-l-4 border-l-[#1976D2]' : 'border-l-4 border-l-[#121212]';
+
   return (
     <div 
       ref={setNodeRef} 
       style={style} 
       {...attributes} 
       {...listeners} 
-      className={`p-3 mb-2 bg-white dark:bg-zinc-900 rounded-lg shadow-2xs border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all select-none group ${isViewer ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}`}
+      className={`p-3.5 mb-2.5 bg-white dark:bg-[#181A20] border-2 border-[#121212] dark:border-white shadow-[3px_3px_0px_#121212] dark:shadow-[3px_3px_0px_#FFF] hover:shadow-[1px_1px_0px_#121212] hover:translate-x-[1px] hover:translate-y-[1px] transition-all select-none group ${borderStripe} ${isViewer ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}`}
     >
       <div className="flex justify-between items-center mb-1.5">
         <Link 
           href={`/projects/${projectId}/issues/${issue.sequenceId}`} 
-          className="text-[11px] font-mono text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors"
+          className="text-[10px] font-mono font-black text-[#121212] dark:text-white bg-[#FAF6EE] dark:bg-[#222] px-1.5 py-0.5 border border-[#121212] dark:border-white hover:bg-[#FBC02D] transition-colors"
           onClick={(e) => isDragging && e.preventDefault()}
         >
           {projectSlug}-{issue.sequenceId}
@@ -90,158 +99,141 @@ function SortableIssueCard({ issue, projectSlug, projectId }: { issue: any, proj
 
       <Link 
         href={`/projects/${projectId}/issues/${issue.sequenceId}`}
-        className="text-xs font-medium text-zinc-800 dark:text-zinc-200 leading-snug hover:text-zinc-950 dark:hover:text-white transition-colors block mb-2"
+        className="text-xs font-black uppercase tracking-tight text-[#121212] dark:text-white leading-snug hover:text-[#D32F2F] transition-colors block mb-2"
         onClick={(e) => isDragging && e.preventDefault()}
       >
         {issue.title}
       </Link>
 
-      <div className="flex items-center justify-between pt-1 text-[11px] text-zinc-400">
+      <div className="flex items-center justify-between pt-2 border-t border-[#121212]/20 dark:border-white/20 text-[10px]">
         <div className="flex items-center gap-1.5 flex-wrap">
           {issue.cycle && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-700/50 truncate max-w-[110px]" title={issue.cycle.name}>
+            <span className="font-mono font-bold uppercase text-[9px] px-1 bg-[#1976D2] text-white border border-[#121212]">
               {issue.cycle.name}
             </span>
           )}
           {issue.module && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-700/50 truncate max-w-[110px]" title={issue.module.name}>
+            <span className="font-mono font-bold uppercase text-[9px] px-1 bg-[#FBC02D] text-[#121212] border border-[#121212]">
               {issue.module.name}
             </span>
           )}
         </div>
 
-        {issue.estimate !== null && issue.estimate !== undefined && (
-          <span className="text-[10px] font-mono font-medium text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">
-            {issue.estimate}p
-          </span>
+        <div className="flex items-center gap-1.5 shrink-0">
+          {issue.estimate !== null && issue.estimate !== undefined && (
+            <span className="font-mono font-black text-[9px] px-1 bg-[#FAF6EE] dark:bg-[#222] text-[#121212] dark:text-white border border-[#121212]">
+              {issue.estimate}PT
+            </span>
+          )}
+          {issue.assignee && (
+            <div 
+              className="w-4 h-4 bg-[#D32F2F] text-white border border-[#121212] flex items-center justify-center text-[9px] font-black uppercase" 
+              title={issue.assignee.username || issue.assignee.email}
+            >
+              {(issue.assignee.username || issue.assignee.email)[0].toUpperCase()}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DroppableColumn({ status, issues, projectSlug, projectId }: { status: any, issues: any[], projectSlug: string, projectId: string }) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: status.id,
+    data: { type: 'Column', status }
+  });
+
+  const geo = getStatusGeometricIcon(status.name);
+
+  return (
+    <div 
+      ref={setNodeRef}
+      className={`flex flex-col flex-shrink-0 w-80 max-h-full border-2 border-[#121212] dark:border-white bg-[#FAF6EE] dark:bg-[#111215] shadow-[4px_4px_0px_#121212] dark:shadow-[4px_4px_0px_#FFF] transition-colors ${
+        isOver ? 'ring-2 ring-[#D32F2F]' : ''
+      }`}
+    >
+      {/* Bauhaus Column Header */}
+      <div className="p-3 border-b-2 border-[#121212] dark:border-white bg-white dark:bg-[#181A20] flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-black" style={{ color: geo.color }}>{geo.symbol}</span>
+          <h2 className="font-black text-xs uppercase tracking-wider text-[#121212] dark:text-white">
+            {status.name}
+          </h2>
+        </div>
+        <span className="text-[10px] font-mono font-black text-white bg-[#121212] dark:bg-white dark:text-[#121212] px-2 py-0.5">
+          {issues.length}
+        </span>
+      </div>
+
+      {/* Cards Scrollable Body */}
+      <div className="p-2.5 flex-1 overflow-y-auto min-h-[140px]">
+        <SortableContext items={issues.map(i => i.id)} strategy={verticalListSortingStrategy}>
+          {issues.map(issue => (
+            <SortableIssueCard 
+              key={issue.id} 
+              issue={issue} 
+              projectSlug={projectSlug} 
+              projectId={projectId} 
+            />
+          ))}
+        </SortableContext>
+        {issues.length === 0 && (
+          <div className="h-20 border-2 border-dashed border-[#121212]/30 dark:border-white/30 flex items-center justify-center text-[10px] font-black uppercase text-neutral-400">
+            EMPTY STAGE
+          </div>
         )}
       </div>
     </div>
   );
 }
 
-function StatusColumn({ status, issues, projectSlug, projectId }: { status: any, issues: any[], projectSlug: string, projectId: string }) {
-  const { setNodeRef } = useDroppable({
-    id: status.id,
-    data: { type: 'Column', status }
-  });
-
-  const dotColor = getStatusDotColor(status.name, status.color);
-
-  return (
-    <div className="shrink-0 w-72 bg-zinc-100/50 dark:bg-zinc-900/30 border border-zinc-200/60 dark:border-zinc-800/60 rounded-xl p-2.5 flex flex-col h-full max-h-full">
-      <div className="flex items-center justify-between mb-3 px-1">
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: dotColor }} />
-          <h3 className="font-medium text-xs text-zinc-700 dark:text-zinc-300">
-            {status.name}
-          </h3>
-        </div>
-        <span className="text-[11px] font-mono text-zinc-400 bg-white dark:bg-zinc-900 px-1.5 py-0.5 rounded border border-zinc-200/60 dark:border-zinc-800/60">
-          {issues.length}
-        </span>
-      </div>
-      
-      <div ref={setNodeRef} className="flex-1 overflow-y-auto min-h-[160px] p-0.5">
-        <SortableContext id={status.id} items={issues.map(i => i.id)} strategy={verticalListSortingStrategy}>
-          {issues.map(issue => (
-            <SortableIssueCard key={issue.id} issue={issue} projectSlug={projectSlug} projectId={projectId} />
-          ))}
-        </SortableContext>
-      </div>
-    </div>
-  );
-}
-
 export default function BoardView({ issues }: { issues: any[] }) {
-  const { project, updateIssueStatusAndPosition } = useProjectStore();
-  const statuses = project.issueStatuses || [];
+  const { project, updateIssueStatusAndPosition, isViewer } = useProjectStore();
   const [activeIssue, setActiveIssue] = React.useState<any | null>(null);
-  const [isMounted, setIsMounted] = React.useState(false);
-
-  React.useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 4,
+      },
+    }),
     useSensor(KeyboardSensor)
   );
 
   const handleDragStart = (event: any) => {
+    if (isViewer) return;
     const { active } = event;
-    if (active.data.current?.type === 'Issue') {
-      setActiveIssue(active.data.current.issue);
-    }
+    const issue = issues.find(i => i.id === active.id);
+    if (issue) setActiveIssue(issue);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
-    setActiveIssue(null);
+    if (isViewer) return;
     const { active, over } = event;
+    setActiveIssue(null);
+
     if (!over) return;
 
     const issueId = active.id as string;
-    const overId = over.id as string;
-    const draggedIssue = issues.find(i => i.id === issueId);
-    if (!draggedIssue) return;
+    let targetStatusId: string | null = null;
 
-    let newStatusId = statuses.find((s:any) => s.id === overId)?.id;
-    let overIssue = issues.find(i => i.id === overId);
-
-    if (!newStatusId && overIssue) {
-      newStatusId = overIssue.statusId;
+    if (over.data.current?.type === 'Column') {
+      targetStatusId = over.id as string;
+    } else if (over.data.current?.type === 'Issue') {
+      targetStatusId = over.data.current.issue.statusId;
     }
 
-    if (!newStatusId) return;
-
-    let columnIssues = issues.filter(i => i.statusId === newStatusId).sort((a,b) => (a.position||0) - (b.position||0));
-    
-    if (draggedIssue.statusId === newStatusId) {
-      columnIssues = columnIssues.filter(i => i.id !== issueId);
-    }
-
-    let newPosition = 0;
-
-    if (newStatusId === overId) {
-      newPosition = columnIssues.length > 0 ? (columnIssues[columnIssues.length - 1].position || 0) + 65536 : 65536;
-    } else if (overIssue) {
-      const isBelow = active.rect.current.translated && active.rect.current.translated.top > over.rect.top + over.rect.height / 2;
-      
-      const overIndex = columnIssues.findIndex(i => i.id === overId);
-      const insertIndex = isBelow ? overIndex + 1 : overIndex;
-
-      const prevIssue = columnIssues[insertIndex - 1];
-      const nextIssue = columnIssues[insertIndex];
-
-      if (prevIssue && nextIssue) {
-        newPosition = (prevIssue.position + nextIssue.position) / 2;
-      } else if (prevIssue) {
-        newPosition = prevIssue.position + 65536;
-      } else if (nextIssue) {
-        newPosition = nextIssue.position / 2;
-      } else {
-        newPosition = 65536;
+    if (targetStatusId) {
+      const issue = issues.find(i => i.id === issueId);
+      if (issue && issue.statusId !== targetStatusId) {
+        updateIssueStatusAndPosition(issueId, targetStatusId, 0);
       }
-    }
-
-    if (draggedIssue.statusId !== newStatusId || draggedIssue.position !== newPosition) {
-      updateIssueStatusAndPosition(issueId, newStatusId, newPosition);
     }
   };
 
-  if (!isMounted) {
-    return (
-      <div className="flex space-x-3 overflow-x-auto pb-4 items-start" style={{ height: 'calc(100vh - 220px)' }}>
-        {statuses.map((status: any) => (
-          <div key={status.id} className="shrink-0 w-72 bg-zinc-100/50 dark:bg-zinc-900/30 border border-zinc-200/60 dark:border-zinc-800/60 rounded-xl p-2.5 flex flex-col h-full max-h-full">
-            <h3 className="font-medium text-xs text-zinc-700 dark:text-zinc-300 px-1">
-              {status.name}
-            </h3>
-          </div>
-        ))}
-      </div>
-    );
-  }
+  const statuses = project.issueStatuses || [];
 
   return (
     <DndContext 
@@ -250,23 +242,38 @@ export default function BoardView({ issues }: { issues: any[] }) {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex space-x-3 overflow-x-auto pb-4 items-start" style={{ height: 'calc(100vh - 220px)' }}>
-        {statuses.map((status: any) => (
-          <StatusColumn 
-            key={status.id} 
-            status={status} 
-            issues={issues.filter(i => i.statusId === status.id)} 
-            projectSlug={project.slug} 
-            projectId={project.id}
-          />
-        ))}
+      <div className="flex gap-4 overflow-x-auto pb-6 items-start">
+        {statuses.map((status: any) => {
+          const colIssues = issues.filter(i => i.statusId === status.id);
+          return (
+            <DroppableColumn 
+              key={status.id} 
+              status={status} 
+              issues={colIssues} 
+              projectSlug={project.slug} 
+              projectId={project.id} 
+            />
+          );
+        })}
       </div>
-      
-      <DragOverlay dropAnimation={{ sideEffects: defaultDropAnimationSideEffects({ styles: { active: { opacity: '0.4' } } }) }}>
+
+      <DragOverlay dropAnimation={{
+        sideEffects: defaultDropAnimationSideEffects({
+          styles: {
+            active: {
+              opacity: '0.4',
+            },
+          },
+        }),
+      }}>
         {activeIssue ? (
-          <div className="p-3 bg-white dark:bg-zinc-900 rounded-lg shadow-xl border border-zinc-300 dark:border-zinc-700 opacity-95">
-            <span className="text-[11px] font-mono text-zinc-400">{project.slug}-{activeIssue.sequenceId}</span>
-            <h4 className="text-xs font-medium text-zinc-900 dark:text-zinc-100 mt-1">{activeIssue.title}</h4>
+          <div className="p-3.5 bg-white dark:bg-[#181A20] border-3 border-[#D32F2F] shadow-[6px_6px_0px_#121212] w-72">
+            <div className="text-[10px] font-mono font-black text-[#D32F2F] mb-1">
+              {project.slug}-{activeIssue.sequenceId}
+            </div>
+            <div className="text-xs font-black uppercase text-[#121212] dark:text-white">
+              {activeIssue.title}
+            </div>
           </div>
         ) : null}
       </DragOverlay>

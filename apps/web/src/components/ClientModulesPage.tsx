@@ -4,7 +4,7 @@ import { useState } from "react";
 import { createModuleAction } from "../actions/moduleActions";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Layers, Plus, ArrowRight, FolderKanban } from "lucide-react";
+import { Layers, Plus, ArrowRight } from "lucide-react";
 
 export default function ClientModulesPage({ project, initialModules, isViewer }: { project: any, initialModules: any[], isViewer: boolean }) {
   const [modules, setModules] = useState(initialModules);
@@ -35,16 +35,18 @@ export default function ClientModulesPage({ project, initialModules, isViewer }:
   };
 
   return (
-    <div className="space-y-6 max-w-5xl">
+    <div className="space-y-6 max-w-5xl font-sans">
       
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-zinc-200/80 dark:border-zinc-800/80">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b-2 border-[#121212]">
         <div>
           <div className="flex items-center gap-2">
-            <Layers className="w-5 h-5 text-zinc-500" />
-            <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Modules</h1>
+            <Layers className="w-5 h-5 text-[#FBC02D]" />
+            <h1 className="text-xl font-black uppercase tracking-tight text-[#121212] dark:text-white">
+              ARCHITECTURAL MODULES
+            </h1>
           </div>
-          <p className="text-xs text-zinc-500 mt-1">
+          <p className="text-xs font-mono uppercase text-neutral-500 mt-1">
             Group issues into core architectural modules and feature epics for clear scope boundaries.
           </p>
         </div>
@@ -52,120 +54,111 @@ export default function ClientModulesPage({ project, initialModules, isViewer }:
         {!isViewer && (
           <button 
             onClick={() => setIsCreating(!isCreating)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all shadow-xs"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-black uppercase tracking-wider bg-[#FBC02D] hover:bg-[#F9A825] text-[#121212] border-2 border-[#121212] shadow-[2px_2px_0px_#121212] transition-all"
           >
-            {isCreating ? "Cancel" : <><Plus className="w-3.5 h-3.5" /> <span>New Module</span></>}
+            {isCreating ? "CANCEL" : <><Plus className="w-3.5 h-3.5" /> <span>CREATE MODULE</span></>}
           </button>
         )}
       </div>
 
       {/* Creation Drawer */}
       {isCreating && (
-        <form onSubmit={handleCreate} className="p-5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 shadow-xs space-y-4">
-          <div>
-            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Create Feature Module</h3>
-            <p className="text-xs text-zinc-500">Define a cohesive functional component of your application.</p>
+        <form onSubmit={handleCreate} className="p-6 border-3 border-[#121212] dark:border-white bg-white dark:bg-[#181A20] shadow-[6px_6px_0px_#121212] space-y-4">
+          <div className="border-b-2 border-[#121212] pb-2">
+            <h3 className="text-sm font-black uppercase text-[#121212] dark:text-white">INSTANTIATE NEW MODULE</h3>
+            <p className="text-xs font-mono uppercase text-neutral-500">Define a cohesive functional component of your application.</p>
           </div>
 
           {error && (
-            <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 text-xs">
+            <div className="p-3 bg-[#D32F2F] text-white border-2 border-[#121212] text-xs font-black uppercase">
               {error}
             </div>
           )}
 
           <div className="space-y-3.5">
             <div>
-              <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Module Name</label>
+              <label className="block text-xs font-black uppercase text-[#121212] dark:text-white mb-1">MODULE IDENTIFIER</label>
               <input 
                 type="text" 
                 required 
                 value={formData.name} 
                 onChange={e => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors" 
-                placeholder="e.g. Authentication & RBAC"
+                className="w-full px-3 py-2 text-xs font-bold uppercase border-2 border-[#121212] bg-[#FAF6EE] text-[#121212] focus:outline-none focus:border-[#1976D2]" 
+                placeholder="e.g. AUTHENTICATION & SESSION ENGINE"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Description (Optional)</label>
+              <label className="block text-xs font-black uppercase text-[#121212] dark:text-white mb-1">ARCHITECTURAL SCOPE DESCRIPTION</label>
               <textarea 
+                rows={3}
                 value={formData.description} 
                 onChange={e => setFormData({ ...formData, description: e.target.value })}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors" 
-                placeholder="Scope, dependencies, or architectural considerations..."
-                rows={2}
+                className="w-full px-3 py-2 text-xs font-bold border-2 border-[#121212] bg-[#FAF6EE] text-[#121212] focus:outline-none focus:border-[#1976D2]" 
+                placeholder="Responsibilities, interfaces, and boundary limits of this module..."
               />
             </div>
           </div>
 
-          <div className="flex justify-end gap-2 pt-1">
+          <div className="flex justify-end gap-2 pt-2 border-t-2 border-[#121212]">
             <button 
               type="button" 
               onClick={() => setIsCreating(false)} 
-              className="px-3 py-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+              className="px-4 py-1.5 text-xs font-black uppercase border-2 border-[#121212] hover:bg-[#FAF6EE]"
             >
-              Cancel
+              CANCEL
             </button>
             <button 
               type="submit" 
-              disabled={loading || !formData.name.trim()}
-              className="px-4 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors shadow-xs disabled:opacity-50"
+              disabled={loading}
+              className="px-5 py-1.5 text-xs font-black uppercase bg-[#FBC02D] hover:bg-[#F9A825] text-[#121212] border-2 border-[#121212] shadow-[2px_2px_0px_#121212]"
             >
-              {loading ? "Creating..." : "Create Module"}
+              {loading ? "CREATING..." : "COMMIT MODULE"}
             </button>
           </div>
         </form>
       )}
 
       {/* Modules Grid */}
-      {modules.length === 0 ? (
-        <div className="p-12 text-center border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl bg-white dark:bg-zinc-950">
-          <FolderKanban className="w-8 h-8 text-zinc-300 dark:text-zinc-700 mx-auto mb-2" />
-          <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">No modules created</p>
-          <p className="text-xs text-zinc-500 mt-0.5">Organize issues into domain boundaries and feature areas.</p>
-        </div>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2">
-          {modules.map(mod => {
-            return (
-              <div 
-                key={mod.id} 
-                className="p-5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 flex flex-col justify-between hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-xs transition-all group"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <Link 
-                      href={`/projects/${project.id}/modules/${mod.id}`} 
-                      className="text-base font-semibold text-zinc-900 dark:text-zinc-100 hover:underline tracking-tight"
-                    >
-                      {mod.name}
-                    </Link>
-                  </div>
-                  {mod.description ? (
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2 leading-relaxed mb-4">
-                      {mod.description}
-                    </p>
-                  ) : (
-                    <p className="text-xs text-zinc-400 italic mb-4">No description provided.</p>
-                  )}
-                </div>
-                
-                <div className="pt-3 mt-auto border-t border-zinc-100 dark:border-zinc-900 flex justify-between items-center text-xs">
-                  <span className="text-zinc-400 font-mono text-[11px]">
-                    Created {new Date(mod.createdAt).toLocaleDateString()}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        {modules.length === 0 ? (
+          <div className="col-span-full p-12 text-center border-2 border-dashed border-[#121212] dark:border-white bg-white dark:bg-[#181A20]">
+            <Layers className="w-8 h-8 text-[#FBC02D] mx-auto mb-2" />
+            <p className="text-sm font-black uppercase">NO MODULES ARCHITECTED YET</p>
+            <p className="text-xs font-mono uppercase text-neutral-500 mt-1">Break your repository into functional epics.</p>
+          </div>
+        ) : (
+          modules.map((module, idx) => (
+            <Link 
+              key={module.id} 
+              href={`/projects/${project.id}/modules/${module.id}`}
+              className="group p-5 border-2 border-[#121212] dark:border-white bg-white dark:bg-[#181A20] shadow-[4px_4px_0px_#121212] dark:shadow-[4px_4px_0px_#FFF] flex flex-col justify-between hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_#121212] transition-all"
+            >
+              <div>
+                <div className="flex justify-between items-start mb-2">
+                  <span className="text-xs font-mono font-black text-[#1976D2]">MOD // 0{idx + 1}</span>
+                  <span className="text-[10px] font-mono font-black px-1.5 py-0.5 bg-[#FAF6EE] text-[#121212] border border-[#121212]">
+                    {module._count?.issues ?? module.issues?.length ?? 0} TICKETS
                   </span>
-                  <Link 
-                    href={`/projects/${project.id}/modules/${mod.id}`}
-                    className="inline-flex items-center gap-1 font-medium text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-950 dark:group-hover:text-white transition-colors"
-                  >
-                    <span>View Issues</span>
-                    <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-                  </Link>
                 </div>
+                <h3 className="font-black text-sm uppercase text-[#121212] dark:text-white group-hover:text-[#D32F2F] transition-colors">
+                  {module.name}
+                </h3>
+                {module.description && (
+                  <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1 line-clamp-2">
+                    {module.description}
+                  </p>
+                )}
               </div>
-            );
-          })}
-        </div>
-      )}
+
+              <div className="mt-4 pt-2 border-t-2 border-[#121212] flex items-center justify-between text-xs font-black uppercase text-[#121212] dark:text-white">
+                <span>VIEW MODULE BOARD</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+          ))
+        )}
+      </div>
+
     </div>
   );
 }

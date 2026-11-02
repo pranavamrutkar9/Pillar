@@ -12,20 +12,17 @@ import {
   Layers, 
   Tag, 
   GitPullRequest, 
-  Clock, 
   Loader2,
   Check,
   Edit3
 } from "lucide-react";
 
-function getStatusDot(statusName: string, customColor?: string) {
-  if (customColor) return customColor;
+function getStatusSymbol(statusName: string) {
   const name = statusName.toLowerCase();
-  if (name.includes('done') || name.includes('complete') || name.includes('shipped')) return '#10b981';
-  if (name.includes('progress') || name.includes('doing') || name.includes('active')) return '#f59e0b';
-  if (name.includes('review') || name.includes('testing')) return '#a855f7';
-  if (name.includes('todo') || name.includes('ready') || name.includes('unstarted')) return '#0ea5e9';
-  return '#71717a';
+  if (name.includes('done') || name.includes('complete') || name.includes('shipped')) return '●';
+  if (name.includes('progress') || name.includes('doing') || name.includes('active')) return '▲';
+  if (name.includes('review') || name.includes('testing')) return '◆';
+  return '■';
 }
 
 export default function IssueDetail({ issue, project, cycles = [], modules = [] }: { issue: any, project: any, cycles?: any[], modules?: any[] }) {
@@ -55,26 +52,32 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
   };
 
   const currentStatus = project.issueStatuses?.find((s: any) => s.id === statusId);
-  const statusColor = getStatusDot(currentStatus?.name || '', currentStatus?.color);
 
   return (
-    <div className="bg-white dark:bg-zinc-950 p-6 sm:p-8 rounded-2xl shadow-xs border border-zinc-200/80 dark:border-zinc-800/80 space-y-8">
+    <div className="bg-white dark:bg-[#181A20] p-6 sm:p-8 border-4 border-[#121212] dark:border-white shadow-[6px_6px_0px_#121212] dark:shadow-[6px_6px_0px_#FFF] space-y-7 relative font-sans">
       
+      {/* Bauhaus Top Triad Accent Strip */}
+      <div className="absolute top-0 left-0 right-0 h-1.5 grid grid-cols-3">
+        <div className="bg-[#D32F2F]" />
+        <div className="bg-[#1976D2]" />
+        <div className="bg-[#FBC02D]" />
+      </div>
+
       {/* Title & Key */}
-      <div className="space-y-2">
+      <div className="space-y-3 pt-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono font-medium text-zinc-400 px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/60">
+            <span className="text-xs font-mono font-black text-white bg-[#121212] dark:bg-white dark:text-[#121212] px-2.5 py-1 border border-[#121212]">
               {project.slug}-{issue.sequenceId}
             </span>
-            <span className="text-xs text-zinc-400 font-mono">
-              Created {format(new Date(issue.createdAt), 'MMM d, yyyy')}
+            <span className="text-xs font-mono text-neutral-500 font-bold uppercase">
+              REGISTERED // {format(new Date(issue.createdAt), 'yyyy-MM-dd')}
             </span>
           </div>
 
           {loading && (
-            <span className="inline-flex items-center gap-1 text-[11px] text-zinc-400 font-mono">
-              <Loader2 className="w-3 h-3 animate-spin" /> Saving...
+            <span className="inline-flex items-center gap-1.5 text-xs font-black uppercase text-[#D32F2F]">
+              <Loader2 className="w-3.5 h-3.5 animate-spin" /> SYNCHRONIZING...
             </span>
           )}
         </div>
@@ -83,29 +86,29 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           onBlur={() => { if(title !== issue.title) handleUpdate("title", title); }}
-          className="text-2xl sm:text-3xl font-semibold tracking-tight w-full bg-transparent text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 rounded-lg px-1.5 py-1 -ml-1.5 transition-all"
+          className="text-2xl sm:text-3xl font-black uppercase tracking-tight w-full bg-[#FAF6EE] dark:bg-[#111215] text-[#121212] dark:text-white border-2 border-[#121212] dark:border-white px-3 py-2 focus:outline-none focus:border-[#D32F2F] shadow-[2px_2px_0px_#121212]"
         />
       </div>
 
-      {/* Properties Ribbon */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-zinc-50/70 dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/60">
+      {/* Properties Matrix */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-[#FAF6EE] dark:bg-[#111215] border-2 border-[#121212] dark:border-white shadow-[3px_3px_0px_#121212]">
         
         {/* Status */}
         <div>
-          <label className="text-[10px] font-mono uppercase text-zinc-400 block mb-1">Status</label>
-          <div className="flex items-center gap-1.5 bg-white dark:bg-zinc-950 px-2.5 py-1.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs">
-            <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: statusColor }} />
+          <label className="text-[10px] font-black uppercase tracking-wider text-neutral-500 block mb-1">STAGE</label>
+          <div className="flex items-center gap-1.5 bg-white dark:bg-[#181A20] px-2 py-1.5 border-2 border-[#121212]">
+            <span className="text-xs font-black text-[#D32F2F]">{getStatusSymbol(currentStatus?.name || '')}</span>
             <select 
               value={statusId}
               onChange={(e) => {
                 setStatusId(e.target.value);
                 handleUpdate("statusId", e.target.value);
               }}
-              className="w-full bg-transparent text-xs font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer"
+              className="w-full bg-transparent text-xs font-black uppercase text-[#121212] dark:text-white focus:outline-none cursor-pointer"
               disabled={loading}
             >
               {project.issueStatuses?.map((s: any) => (
-                <option key={s.id} value={s.id}>{s.name}</option>
+                <option key={s.id} value={s.id}>{s.name.toUpperCase()}</option>
               ))}
             </select>
           </div>
@@ -113,43 +116,43 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
 
         {/* Priority */}
         <div>
-          <label className="text-[10px] font-mono uppercase text-zinc-400 block mb-1">Priority</label>
-          <div className="bg-white dark:bg-zinc-950 px-2.5 py-1.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs">
+          <label className="text-[10px] font-black uppercase tracking-wider text-neutral-500 block mb-1">PRIORITY</label>
+          <div className="bg-white dark:bg-[#181A20] px-2 py-1.5 border-2 border-[#121212]">
             <select 
               value={priority}
               onChange={(e) => {
                 setPriority(e.target.value);
                 handleUpdate("priority", e.target.value);
               }}
-              className="w-full bg-transparent text-xs font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer"
+              className="w-full bg-transparent text-xs font-black uppercase text-[#121212] dark:text-white focus:outline-none cursor-pointer"
               disabled={loading}
             >
-              <option value="NONE">None</option>
-              <option value="LOW">Low</option>
-              <option value="MEDIUM">Medium</option>
-              <option value="HIGH">High</option>
-              <option value="URGENT">Urgent</option>
+              <option value="NONE">NONE</option>
+              <option value="LOW">LOW</option>
+              <option value="MEDIUM">MEDIUM</option>
+              <option value="HIGH">HIGH</option>
+              <option value="URGENT">URGENT</option>
             </select>
           </div>
         </div>
 
         {/* Assignee */}
         <div>
-          <label className="text-[10px] font-mono uppercase text-zinc-400 block mb-1">Assignee</label>
-          <div className="bg-white dark:bg-zinc-950 px-2.5 py-1.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex items-center gap-1.5">
-            <User className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+          <label className="text-[10px] font-black uppercase tracking-wider text-neutral-500 block mb-1">OPERATOR</label>
+          <div className="bg-white dark:bg-[#181A20] px-2 py-1.5 border-2 border-[#121212] flex items-center gap-1.5">
+            <User className="w-3.5 h-3.5 text-neutral-500 shrink-0" />
             <select 
               value={assigneeId}
               onChange={(e) => {
                 setAssigneeId(e.target.value);
                 handleUpdate("assigneeId", e.target.value || null);
               }}
-              className="w-full bg-transparent text-xs font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer"
+              className="w-full bg-transparent text-xs font-black uppercase text-[#121212] dark:text-white focus:outline-none cursor-pointer"
               disabled={loading}
             >
-              <option value="">Unassigned</option>
+              <option value="">UNASSIGNED</option>
               {(project.workspace?.members || project.members)?.map((m: any) => (
-                <option key={m.userId} value={m.userId}>{m.user?.username || m.user?.email}</option>
+                <option key={m.userId} value={m.userId}>{(m.user?.username || m.user?.email).toUpperCase()}</option>
               ))}
             </select>
           </div>
@@ -157,19 +160,19 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
 
         {/* Estimate */}
         <div>
-          <label className="text-[10px] font-mono uppercase text-zinc-400 block mb-1">Estimate</label>
-          <div className="bg-white dark:bg-zinc-950 px-2.5 py-1.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs">
+          <label className="text-[10px] font-black uppercase tracking-wider text-neutral-500 block mb-1">ESTIMATE</label>
+          <div className="bg-white dark:bg-[#181A20] px-2 py-1.5 border-2 border-[#121212]">
             <input 
               type="number"
               min="0"
-              placeholder="0 points"
+              placeholder="0 PT"
               value={estimate}
               onChange={(e) => {
                 const val = e.target.value === "" ? "" : parseInt(e.target.value, 10);
                 setEstimate(val);
                 handleUpdate("estimate", val === "" ? null : val);
               }}
-              className="w-full bg-transparent text-xs font-mono font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none"
+              className="w-full bg-transparent text-xs font-mono font-black text-[#121212] dark:text-white focus:outline-none placeholder:text-neutral-400"
               disabled={loading}
             />
           </div>
@@ -177,21 +180,21 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
 
         {/* Cycle */}
         <div>
-          <label className="text-[10px] font-mono uppercase text-zinc-400 block mb-1">Cycle</label>
-          <div className="bg-white dark:bg-zinc-950 px-2.5 py-1.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex items-center gap-1.5">
-            <Repeat className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+          <label className="text-[10px] font-black uppercase tracking-wider text-neutral-500 block mb-1">CYCLE</label>
+          <div className="bg-white dark:bg-[#181A20] px-2 py-1.5 border-2 border-[#121212] flex items-center gap-1.5">
+            <Repeat className="w-3.5 h-3.5 text-neutral-500 shrink-0" />
             <select 
               value={cycleId}
               onChange={(e) => {
                 setCycleId(e.target.value);
                 handleUpdate("cycleId", e.target.value || null);
               }}
-              className="w-full bg-transparent text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer"
+              className="w-full bg-transparent text-xs font-black uppercase text-[#121212] dark:text-white focus:outline-none cursor-pointer"
               disabled={loading}
             >
-              <option value="">No Cycle</option>
+              <option value="">NO CYCLE</option>
               {cycles.map((c: any) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
+                <option key={c.id} value={c.id}>{c.name.toUpperCase()}</option>
               ))}
             </select>
           </div>
@@ -199,21 +202,21 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
 
         {/* Module */}
         <div>
-          <label className="text-[10px] font-mono uppercase text-zinc-400 block mb-1">Module</label>
-          <div className="bg-white dark:bg-zinc-950 px-2.5 py-1.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex items-center gap-1.5">
-            <Layers className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+          <label className="text-[10px] font-black uppercase tracking-wider text-neutral-500 block mb-1">MODULE</label>
+          <div className="bg-white dark:bg-[#181A20] px-2 py-1.5 border-2 border-[#121212] flex items-center gap-1.5">
+            <Layers className="w-3.5 h-3.5 text-neutral-500 shrink-0" />
             <select 
               value={moduleId}
               onChange={(e) => {
                 setModuleId(e.target.value);
                 handleUpdate("moduleId", e.target.value || null);
               }}
-              className="w-full bg-transparent text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer"
+              className="w-full bg-transparent text-xs font-black uppercase text-[#121212] dark:text-white focus:outline-none cursor-pointer"
               disabled={loading}
             >
-              <option value="">No Module</option>
+              <option value="">NO MODULE</option>
               {modules.map((m: any) => (
-                <option key={m.id} value={m.id}>{m.name}</option>
+                <option key={m.id} value={m.id}>{m.name.toUpperCase()}</option>
               ))}
             </select>
           </div>
@@ -221,9 +224,9 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
 
         {/* Due Date */}
         <div>
-          <label className="text-[10px] font-mono uppercase text-zinc-400 block mb-1">Due Date</label>
-          <div className="bg-white dark:bg-zinc-950 px-2.5 py-1.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex items-center gap-1.5">
-            <Calendar className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+          <label className="text-[10px] font-black uppercase tracking-wider text-neutral-500 block mb-1">DUE DATE</label>
+          <div className="bg-white dark:bg-[#181A20] px-2 py-1.5 border-2 border-[#121212] flex items-center gap-1.5">
+            <Calendar className="w-3.5 h-3.5 text-neutral-500 shrink-0" />
             <input 
               type="date"
               value={dueDate}
@@ -231,7 +234,7 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
                 setDueDate(e.target.value);
                 handleUpdate("dueDate", e.target.value ? new Date(e.target.value).toISOString() : null);
               }}
-              className="w-full bg-transparent text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none"
+              className="w-full bg-transparent text-xs font-bold uppercase text-[#121212] dark:text-white focus:outline-none"
               disabled={loading}
             />
           </div>
@@ -239,20 +242,20 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
 
         {/* Labels Count Summary */}
         <div>
-          <label className="text-[10px] font-mono uppercase text-zinc-400 block mb-1">Labels</label>
-          <div className="bg-white dark:bg-zinc-950 px-2.5 py-1.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex items-center gap-1.5 text-xs text-zinc-600 dark:text-zinc-400">
-            <Tag className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-            <span>{labelIds.length} applied</span>
+          <label className="text-[10px] font-black uppercase tracking-wider text-neutral-500 block mb-1">LABELS</label>
+          <div className="bg-white dark:bg-[#181A20] px-2 py-1.5 border-2 border-[#121212] flex items-center gap-1.5 text-xs font-black uppercase text-neutral-700 dark:text-neutral-300">
+            <Tag className="w-3.5 h-3.5 text-neutral-500 shrink-0" />
+            <span>{labelIds.length} APPLIED</span>
           </div>
         </div>
 
       </div>
 
-      {/* Labels Selector */}
+      {/* Applied Labels Selector */}
       {project.issueLabels && project.issueLabels.length > 0 && (
-        <div className="space-y-1.5">
-          <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">Applied Labels</label>
-          <div className="flex flex-wrap gap-1.5">
+        <div className="space-y-2">
+          <label className="text-xs font-black uppercase tracking-wider text-[#121212] dark:text-white">Applied Classifications</label>
+          <div className="flex flex-wrap gap-2">
             {project.issueLabels.map((label: any) => {
               const isSelected = labelIds.includes(label.id);
               return (
@@ -270,10 +273,10 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
                     setLabelIds(newLabelIds);
                     handleUpdate("labelIds", newLabelIds);
                   }}
-                  className={`px-2.5 py-1 text-xs rounded-lg border transition-all ${
+                  className={`px-3 py-1 text-xs font-black uppercase tracking-wider border-2 border-[#121212] transition-all ${
                     isSelected 
-                      ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 border-zinc-900 dark:border-zinc-100 font-medium' 
-                      : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300'
+                      ? 'bg-[#1976D2] text-white shadow-[2px_2px_0px_#121212]' 
+                      : 'bg-white text-[#121212] hover:bg-[#FAF6EE]'
                   } disabled:opacity-50`}
                 >
                   {label.name}
@@ -284,11 +287,11 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
         </div>
       )}
 
-      {/* Pull Requests Integration */}
+      {/* Linked PRs */}
       {issue.PullRequestIssue && issue.PullRequestIssue.length > 0 && (
-        <div className="space-y-2 pt-4 border-t border-zinc-100 dark:border-zinc-900">
-          <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-            <GitPullRequest className="w-4 h-4 text-purple-500" />
+        <div className="space-y-2.5 pt-4 border-t-2 border-[#121212]">
+          <label className="text-xs font-black uppercase text-[#121212] dark:text-white flex items-center gap-2">
+            <GitPullRequest className="w-4 h-4 text-[#1976D2]" />
             <span>Linked Pull Requests ({issue.PullRequestIssue.length})</span>
           </label>
           <div className="space-y-2">
@@ -300,9 +303,9 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
       )}
 
       {/* Description Area */}
-      <div className="space-y-3 pt-4 border-t border-zinc-100 dark:border-zinc-900">
+      <div className="space-y-3 pt-4 border-t-2 border-[#121212]">
         <div className="flex justify-between items-center">
-          <h3 className="text-xs font-mono font-medium text-zinc-400 uppercase tracking-wider">Description</h3>
+          <h3 className="text-xs font-mono font-black text-neutral-500 uppercase tracking-widest">SPECIFICATION BODY</h3>
           <button 
             onClick={() => {
               if(isEditingDesc && JSON.stringify(description) !== JSON.stringify(issue.description)) {
@@ -310,17 +313,17 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
               }
               setIsEditingDesc(!isEditingDesc);
             }}
-            className="inline-flex items-center gap-1 text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-black uppercase px-3 py-1 bg-[#FBC02D] text-[#121212] border-2 border-[#121212] shadow-[2px_2px_0px_#121212] hover:bg-[#F9A825] transition-all"
           >
             {isEditingDesc ? (
-              <><Check className="w-3.5 h-3.5 text-emerald-500" /> <span>Save</span></>
+              <><Check className="w-3.5 h-3.5 text-emerald-800" /> <span>SAVE</span></>
             ) : (
-              <><Edit3 className="w-3.5 h-3.5" /> <span>Edit</span></>
+              <><Edit3 className="w-3.5 h-3.5" /> <span>EDIT</span></>
             )}
           </button>
         </div>
         
-        <div className="rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 overflow-hidden bg-white dark:bg-zinc-950 p-2">
+        <div className="border-2 border-[#121212] dark:border-white p-4 bg-[#FAF6EE] dark:bg-[#111215]">
           <TiptapEditor 
             value={description} 
             onChange={setDescription} 
