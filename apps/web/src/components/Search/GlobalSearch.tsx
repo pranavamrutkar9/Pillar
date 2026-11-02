@@ -83,11 +83,11 @@ export default function GlobalSearch({ workspaceId, sessionToken }: { workspaceI
   return (
     <div className="relative w-48 sm:w-64" ref={wrapperRef}>
       <div className="relative flex items-center">
-        <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 pointer-events-none" />
+        <Search className="w-3.5 h-3.5 text-[#626773] absolute left-2.5 pointer-events-none" />
         <input
           type="text"
           placeholder="Search..."
-          className="w-full pl-8 pr-3 py-1.5 text-xs bg-zinc-100/70 dark:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60 rounded-lg focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400"
+          className="w-full pl-8 pr-3 py-1.5 text-xs bg-[#141519] border border-white/10 rounded-md focus:outline-none focus:border-[#5E6AD2] focus:ring-1 focus:ring-[#5E6AD2]/50 transition-all text-[#EDEDED] placeholder:text-[#626773]"
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
@@ -98,33 +98,33 @@ export default function GlobalSearch({ workspaceId, sessionToken }: { workspaceI
       </div>
       
       {isOpen && query.trim().length > 0 && (
-        <div className="absolute top-full right-0 mt-2 w-80 bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl shadow-xl overflow-hidden z-50 max-h-96 flex flex-col animate-in fade-in zoom-in-95 duration-100">
+        <div className="absolute top-full right-0 mt-2 w-80 bg-[#141519] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50 max-h-96 flex flex-col backdrop-blur-xl animate-in fade-in zoom-in-95 duration-100">
           {isLoading ? (
-            <div className="p-4 text-center text-xs text-zinc-400 flex items-center justify-center gap-1.5">
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            <div className="p-4 text-center text-xs text-[#8A8F98] flex items-center justify-center gap-1.5">
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-[#5E6AD2]" />
               <span>Searching...</span>
             </div>
           ) : !hasResults ? (
-            <div className="p-4 text-center text-xs text-zinc-400">
+            <div className="p-4 text-center text-xs text-[#8A8F98]">
               No results found for "{query}"
             </div>
           ) : (
-            <div className="overflow-y-auto py-2 divide-y divide-zinc-100 dark:divide-zinc-900">
+            <div className="overflow-y-auto py-2 divide-y divide-white/[0.04]">
               
               {results.projects.length > 0 && (
                 <div className="py-1">
-                  <div className="px-3 py-1 text-[10px] font-mono font-medium text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <Layers className="w-3 h-3" /> Projects
+                  <div className="px-3 py-1 text-[10px] font-mono font-medium text-[#626773] uppercase tracking-wider flex items-center gap-1.5">
+                    <Layers className="w-3 h-3 text-[#5E6AD2]" /> Projects
                   </div>
                   <ul className="flex flex-col">
                     {results.projects.map((p) => (
                       <li key={p.id}>
                         <button 
                           onClick={() => handleResultClick(`/projects/${p.id}/issues`)}
-                          className="w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-800 dark:text-zinc-200 transition-colors flex items-center justify-between"
+                          className="w-full text-left px-3 py-1.5 text-xs hover:bg-white/[0.06] text-[#EDEDED] transition-colors flex items-center justify-between"
                         >
                           <span className="font-medium truncate">{p.name}</span>
-                          <span className="text-[10px] font-mono text-zinc-400">{p.slug}</span>
+                          <span className="text-[10px] font-mono text-[#8A8F98]">{p.slug}</span>
                         </button>
                       </li>
                     ))}
@@ -134,19 +134,19 @@ export default function GlobalSearch({ workspaceId, sessionToken }: { workspaceI
               
               {results.issues.length > 0 && (
                 <div className="py-1">
-                  <div className="px-3 py-1 text-[10px] font-mono font-medium text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <CheckSquare className="w-3 h-3" /> Issues
+                  <div className="px-3 py-1 text-[10px] font-mono font-medium text-[#626773] uppercase tracking-wider flex items-center gap-1.5">
+                    <CheckSquare className="w-3 h-3 text-[#5E6AD2]" /> Issues
                   </div>
                   <ul className="flex flex-col">
                     {results.issues.map((i) => (
                       <li key={i.id}>
                         <button 
                           onClick={() => handleResultClick(`/projects/${i.project.id}/issues/${i.sequenceId}`)}
-                          className="w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-800 dark:text-zinc-200 transition-colors"
+                          className="w-full text-left px-3 py-1.5 text-xs hover:bg-white/[0.06] text-[#EDEDED] transition-colors"
                         >
                           <div className="flex flex-col">
-                            <span className="font-medium text-zinc-900 dark:text-zinc-100 truncate">{i.title}</span>
-                            <span className="text-[10px] font-mono text-zinc-400">{i.project?.slug}-{i.sequenceId}</span>
+                            <span className="font-medium text-[#EDEDED] truncate">{i.title}</span>
+                            <span className="text-[10px] font-mono text-[#8A8F98]">{i.project?.slug}-{i.sequenceId}</span>
                           </div>
                         </button>
                       </li>
@@ -157,8 +157,8 @@ export default function GlobalSearch({ workspaceId, sessionToken }: { workspaceI
 
               {results.comments.length > 0 && (
                 <div className="py-1">
-                  <div className="px-3 py-1 text-[10px] font-mono font-medium text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <MessageSquare className="w-3 h-3" /> Comments
+                  <div className="px-3 py-1 text-[10px] font-mono font-medium text-[#626773] uppercase tracking-wider flex items-center gap-1.5">
+                    <MessageSquare className="w-3 h-3 text-[#5E6AD2]" /> Comments
                   </div>
                   <ul className="flex flex-col">
                     {results.comments.map((c) => {
@@ -167,13 +167,13 @@ export default function GlobalSearch({ workspaceId, sessionToken }: { workspaceI
                         <li key={c.id}>
                           <button 
                             onClick={() => handleResultClick(`/projects/${c.project.id}/issues/${c.project.sequenceId}`)}
-                            className="w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-800 dark:text-zinc-200 transition-colors"
+                            className="w-full text-left px-3 py-1.5 text-xs hover:bg-white/[0.06] text-[#EDEDED] transition-colors"
                           >
                             <div className="flex flex-col">
-                              <span className="text-zinc-700 dark:text-zinc-300 truncate">
+                              <span className="text-[#8A8F98] truncate">
                                 {bodyText ? bodyText.substring(0, 60) : 'Comment on issue'}...
                               </span>
-                              <span className="text-[10px] font-mono text-zinc-400">In {c.project?.slug}-{c.project?.sequenceId}</span>
+                              <span className="text-[10px] font-mono text-[#626773]">In {c.project?.slug}-{c.project?.sequenceId}</span>
                             </div>
                           </button>
                         </li>

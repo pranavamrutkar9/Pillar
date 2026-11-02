@@ -79,17 +79,17 @@ export default function ClarificationCards({
   };
 
   return (
-    <div className="space-y-6 max-w-3xl mx-auto">
+    <div className="space-y-6 max-w-3xl mx-auto text-[#EDEDED]">
       {/* Title & Context Banner */}
-      <div className="p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 space-y-1.5 shadow-xs">
-        <div className="flex items-center gap-1.5 text-xs font-mono text-zinc-400">
+      <div className="p-6 rounded-xl border border-white/[0.08] bg-[#141519] space-y-2 shadow-xl">
+        <div className="flex items-center gap-1.5 text-xs font-mono text-[#5E6AD2]">
           <HelpCircle className="w-3.5 h-3.5" />
           <span>STAGE 02 · ARCHITECTURAL CLARIFICATIONS</span>
         </div>
-        <h2 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h2 className="text-xl font-bold tracking-tight text-[#EDEDED]">
           {projectTitle}
         </h2>
-        <p className="text-xs text-zinc-500 leading-relaxed">
+        <p className="text-xs text-[#8A8F98] leading-relaxed">
           {summary} Confirm these technical decisions to produce well-scoped issues.
         </p>
       </div>
@@ -98,21 +98,21 @@ export default function ClarificationCards({
         {questions.map((q, idx) => (
           <div
             key={q.id}
-            className="p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 shadow-2xs space-y-2.5"
+            className="p-5 rounded-xl border border-white/[0.08] bg-[#141519] shadow-md space-y-3"
           >
             <div>
-              <span className="text-[10px] font-mono uppercase text-zinc-400">Question {idx + 1} of {questions.length}</span>
-              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mt-0.5">
+              <span className="text-[10px] font-mono uppercase text-[#626773]">Question {idx + 1} of {questions.length}</span>
+              <h3 className="text-sm font-semibold text-[#EDEDED] mt-0.5">
                 {q.question}
               </h3>
             </div>
 
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-[#8A8F98]">
               {q.context}
             </p>
 
             {/* Options List */}
-            <div className="space-y-1.5 pt-1">
+            <div className="space-y-2 pt-1">
               {q.options.map((option) => {
                 const isSelected = answers[q.id] === option;
                 const isRecommended = q.recommendedOption === option;
@@ -122,26 +122,26 @@ export default function ClarificationCards({
                     key={option}
                     type="button"
                     onClick={() => handleSelectOption(q.id, option)}
-                    className={`w-full text-left p-3 rounded-xl border text-xs flex items-center justify-between transition-colors ${
+                    className={`w-full text-left p-3 rounded-lg border text-xs flex items-center justify-between transition-all ${
                       isSelected
-                        ? "border-zinc-900 dark:border-zinc-100 bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium"
-                        : "border-zinc-200/70 dark:border-zinc-800/70 bg-white dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700"
+                        ? "border-[#5E6AD2] bg-[#5E6AD2]/10 text-[#EDEDED] font-medium"
+                        : "border-white/[0.06] bg-[#0B0C0E] text-[#8A8F98] hover:border-white/20 hover:text-[#EDEDED]"
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
                       <div
                         className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center shrink-0 ${
                           isSelected
-                            ? "border-zinc-900 bg-zinc-900 dark:border-zinc-100 dark:bg-zinc-100"
-                            : "border-zinc-300 dark:border-zinc-700"
+                            ? "border-[#5E6AD2] bg-[#5E6AD2]"
+                            : "border-white/20"
                         }`}
                       >
-                        {isSelected && <div className="w-1 h-1 bg-white dark:bg-zinc-900 rounded-full" />}
+                        {isSelected && <div className="w-1 h-1 bg-white rounded-full" />}
                       </div>
                       <span>{option}</span>
                     </div>
                     {isRecommended && (
-                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-900/40 flex items-center gap-1">
+                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#5E6AD2]/10 text-[#8B96FF] border border-[#5E6AD2]/30 flex items-center gap-1">
                         <CheckCircle2 className="w-2.5 h-2.5" />
                         Recommended
                       </span>
@@ -157,7 +157,7 @@ export default function ClarificationCards({
                   placeholder="Or provide a custom technical choice..."
                   value={customAnswers[q.id] || ""}
                   onChange={(e) => handleCustomChange(q.id, e.target.value)}
-                  className="w-full px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-xs text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors"
+                  className="w-full px-3 py-2 rounded-md border border-white/10 bg-[#0B0C0E] text-xs text-[#EDEDED] placeholder:text-[#626773] focus:outline-none focus:border-[#5E6AD2] focus:ring-1 focus:ring-[#5E6AD2]/50 transition-colors"
                 />
               </div>
             </div>
@@ -170,7 +170,7 @@ export default function ClarificationCards({
             type="button"
             onClick={onBack}
             disabled={isLoading}
-            className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs text-[#8A8F98] hover:text-[#EDEDED] transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to PRD</span>
@@ -181,16 +181,16 @@ export default function ClarificationCards({
               type="button"
               onClick={handleProceedWithDefaults}
               disabled={isLoading}
-              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-xs font-medium text-zinc-700 dark:text-zinc-300 transition-colors shadow-2xs"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-md border border-white/10 bg-[#141519] hover:bg-white/[0.04] text-xs font-medium text-[#EDEDED] transition-colors shadow-sm"
             >
-              <FastForward className="w-3 h-3" />
+              <FastForward className="w-3 h-3 text-[#5E6AD2]" />
               <span>Use Recommendations</span>
             </button>
 
             <button
               type="submit"
               disabled={isLoading}
-              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 text-white font-medium text-xs shadow-xs transition-colors"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-md bg-[#5E6AD2] hover:bg-[#525ec2] text-white font-medium text-xs shadow-[0_0_16px_rgba(94,106,210,0.4)] transition-all disabled:opacity-50"
             >
               {isLoading ? (
                 <>
@@ -199,7 +199,7 @@ export default function ClarificationCards({
                 </>
               ) : (
                 <>
-                  <span>Generate Breakdown</span>
+                  <span>Review Project Plan</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </>
               )}

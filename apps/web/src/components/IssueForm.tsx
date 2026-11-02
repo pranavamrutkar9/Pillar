@@ -82,17 +82,17 @@ export default function IssueForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl bg-white dark:bg-zinc-950 p-6 rounded-xl shadow-xs border border-zinc-200/80 dark:border-zinc-800/80">
-      <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-900">
+    <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl bg-[#141519] p-6 rounded-xl shadow-2xl border border-white/[0.1] font-sans text-white">
+      <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
         <div>
-          <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Create New Issue</h3>
-          <p className="text-xs text-zinc-500">Capture a new task, bug, or feature request.</p>
+          <h3 className="text-base font-semibold text-white tracking-tight">Create New Issue</h3>
+          <p className="text-[11px] text-zinc-400 mt-0.5">Capture a new task, feature request, or engineering bug.</p>
         </div>
         {onClose && (
           <button 
             type="button" 
             onClick={onClose}
-            className="p-1 rounded-md text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
+            className="p-1 rounded-md text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -100,136 +100,138 @@ export default function IssueForm({
       </div>
       
       {error && (
-        <div className="text-red-600 dark:text-red-400 text-xs bg-red-50 dark:bg-red-950/30 p-2.5 rounded-lg border border-red-200/60 dark:border-red-900/40">
+        <div className="text-rose-400 text-xs bg-rose-500/10 p-2.5 rounded-lg border border-rose-500/20">
           {error}
         </div>
       )}
       {success && (
-        <div className="text-emerald-600 dark:text-emerald-400 text-xs bg-emerald-50 dark:bg-emerald-950/30 p-2.5 rounded-lg border border-emerald-200/60 dark:border-emerald-900/40">
+        <div className="text-emerald-400 text-xs bg-emerald-500/10 p-2.5 rounded-lg border border-emerald-500/20">
           Issue created successfully!
         </div>
       )}
       
-      <div>
-        <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Issue Title</label>
+      <div className="space-y-1.5">
+        <label className="block text-[11px] font-medium text-zinc-300">Issue Title</label>
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="e.g. Implement WebSocket heartbeat reconnection"
-          className="w-full px-3 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 dark:focus:ring-zinc-100/10 focus:border-zinc-400 dark:focus:border-zinc-600 transition-colors"
+          className="linear-input w-full text-sm font-medium"
           required
         />
       </div>
 
-      <div>
-        <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Description</label>
-        <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden bg-white dark:bg-zinc-900/40">
+      <div className="space-y-1.5">
+        <label className="block text-[11px] font-medium text-zinc-300">Description</label>
+        <div className="rounded-lg border border-white/[0.08] overflow-hidden bg-[#0D0E11]">
           <TiptapEditor value={description} onChange={setDescription} />
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-        <div>
-          <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Status</label>
+        <div className="space-y-1.5">
+          <label className="block text-[11px] font-medium text-zinc-300">Status</label>
           <select
             value={statusId}
             onChange={(e) => setStatusId(e.target.value)}
-            className="w-full px-3 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors"
+            className="linear-input w-full text-xs"
             required
           >
             {statuses.map(s => (
-              <option key={s.id} value={s.id}>{s.name}</option>
+              <option key={s.id} value={s.id} className="bg-[#141519] text-white">{s.name}</option>
             ))}
           </select>
         </div>
 
-        <div>
-          <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Priority</label>
+        <div className="space-y-1.5">
+          <label className="block text-[11px] font-medium text-zinc-300">Priority</label>
           <select
             value={priority}
             onChange={(e) => setPriority(e.target.value)}
-            className="w-full px-3 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors"
+            className="linear-input w-full text-xs"
           >
-            <option value="NONE">None</option>
-            <option value="LOW">Low</option>
-            <option value="MEDIUM">Medium</option>
-            <option value="HIGH">High</option>
-            <option value="URGENT">Urgent</option>
+            <option value="NONE" className="bg-[#141519] text-white">No Priority</option>
+            <option value="LOW" className="bg-[#141519] text-white">Low</option>
+            <option value="MEDIUM" className="bg-[#141519] text-white">Medium</option>
+            <option value="HIGH" className="bg-[#141519] text-white">High</option>
+            <option value="URGENT" className="bg-[#141519] text-white">Urgent</option>
           </select>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-        <div>
-          <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Assignee</label>
+        <div className="space-y-1.5">
+          <label className="block text-[11px] font-medium text-zinc-300">Assignee</label>
           <select
             value={assigneeId}
             onChange={(e) => setAssigneeId(e.target.value)}
-            className="w-full px-3 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors"
+            className="linear-input w-full text-xs"
           >
-            <option value="">Unassigned</option>
+            <option value="" className="bg-[#141519] text-white">Unassigned</option>
             {members.map((m) => (
-              <option key={m.userId} value={m.userId}>{m.user?.username || m.user?.email}</option>
+              <option key={m.userId} value={m.userId} className="bg-[#141519] text-white">
+                {m.user?.username || m.user?.email}
+              </option>
             ))}
           </select>
         </div>
 
-        <div>
-          <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Due Date</label>
+        <div className="space-y-1.5">
+          <label className="block text-[11px] font-medium text-zinc-300">Due Date</label>
           <input
             type="date"
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
-            className="w-full px-3 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors"
+            className="linear-input w-full text-xs"
           />
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-        <div>
-          <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Estimate (Points)</label>
+        <div className="space-y-1.5">
+          <label className="block text-[11px] font-medium text-zinc-300">Estimate (Points)</label>
           <input
             type="number"
             min="0"
             value={estimate}
             onChange={(e) => setEstimate(e.target.value === "" ? "" : parseInt(e.target.value, 10))}
-            className="w-full px-3 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors"
+            className="linear-input w-full text-xs"
             placeholder="e.g. 3"
           />
         </div>
 
-        <div>
-          <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Cycle</label>
+        <div className="space-y-1.5">
+          <label className="block text-[11px] font-medium text-zinc-300">Cycle</label>
           <select
             value={cycleId}
             onChange={(e) => setCycleId(e.target.value)}
-            className="w-full px-3 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors"
+            className="linear-input w-full text-xs"
           >
-            <option value="">No Cycle</option>
+            <option value="" className="bg-[#141519] text-white">No Cycle</option>
             {cycles.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
+              <option key={c.id} value={c.id} className="bg-[#141519] text-white">{c.name}</option>
             ))}
           </select>
         </div>
 
-        <div>
-          <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Module</label>
+        <div className="space-y-1.5">
+          <label className="block text-[11px] font-medium text-zinc-300">Module</label>
           <select
             value={moduleId}
             onChange={(e) => setModuleId(e.target.value)}
-            className="w-full px-3 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:border-zinc-600 transition-colors"
+            className="linear-input w-full text-xs"
           >
-            <option value="">No Module</option>
+            <option value="" className="bg-[#141519] text-white">No Module</option>
             {modules.map((m) => (
-              <option key={m.id} value={m.id}>{m.name}</option>
+              <option key={m.id} value={m.id} className="bg-[#141519] text-white">{m.name}</option>
             ))}
           </select>
         </div>
       </div>
 
-      <div>
-        <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Labels</label>
+      <div className="space-y-1.5">
+        <label className="block text-[11px] font-medium text-zinc-300">Labels</label>
         <div className="flex flex-wrap gap-1.5">
           {labels.map(label => {
             const isSelected = labelIds.includes(label.id);
@@ -244,26 +246,26 @@ export default function IssueForm({
                     setLabelIds([...labelIds, label.id]);
                   }
                 }}
-                className={`px-2 py-0.5 text-xs rounded-md border transition-colors ${
+                className={`px-2.5 py-1 text-xs rounded-md border transition-all cursor-pointer ${
                   isSelected 
-                    ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 border-zinc-900 dark:border-zinc-100 font-medium' 
-                    : 'bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300'
+                    ? 'bg-[#5E6AD2]/20 text-[#8B96FF] border-[#5E6AD2]/40 font-medium' 
+                    : 'bg-white/[0.03] border-white/[0.08] text-zinc-400 hover:text-white hover:border-white/[0.16]'
                 }`}
               >
                 {label.name}
               </button>
             );
           })}
-          {labels.length === 0 && <span className="text-xs text-zinc-400">No labels configured</span>}
+          {labels.length === 0 && <span className="text-xs text-zinc-500">No labels configured</span>}
         </div>
       </div>
 
-      <div className="pt-2 flex items-center justify-end gap-2">
+      <div className="pt-3 border-t border-white/[0.08] flex items-center justify-end gap-2.5">
         {onClose && (
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-medium rounded-lg text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
+            className="linear-btn-secondary text-xs"
           >
             Cancel
           </button>
@@ -271,18 +273,18 @@ export default function IssueForm({
         <button
           type="submit"
           disabled={loading || !title.trim()}
-          className="flex items-center gap-1.5 py-2 px-4 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 transition-colors shadow-xs disabled:opacity-50"
+          className="linear-btn-primary shadow-linear-glow text-xs disabled:opacity-50"
         >
           {loading ? (
-            <>
+            <span className="flex items-center gap-1.5">
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
               <span>Creating...</span>
-            </>
+            </span>
           ) : (
-            <>
+            <span className="flex items-center gap-1.5">
               <Plus className="w-3.5 h-3.5" />
               <span>Create Issue</span>
-            </>
+            </span>
           )}
         </button>
       </div>

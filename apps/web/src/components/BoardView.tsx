@@ -11,44 +11,44 @@ import Link from 'next/link';
 function getStatusDotColor(statusName: string, customColor?: string) {
   if (customColor) return customColor;
   const name = statusName.toLowerCase();
-  if (name.includes('done') || name.includes('complete') || name.includes('shipped')) return '#10b981'; // emerald
-  if (name.includes('progress') || name.includes('doing') || name.includes('active')) return '#f59e0b'; // amber
-  if (name.includes('review') || name.includes('testing')) return '#a855f7'; // purple
-  if (name.includes('todo') || name.includes('ready') || name.includes('unstarted')) return '#0ea5e9'; // sky
-  return '#71717a'; // zinc-500
+  if (name.includes('done') || name.includes('complete') || name.includes('shipped')) return '#5E6AD2'; // Linear violet
+  if (name.includes('progress') || name.includes('doing') || name.includes('active')) return '#F5A623'; // Amber
+  if (name.includes('review') || name.includes('testing')) return '#0091FF'; // Linear blue
+  if (name.includes('todo') || name.includes('ready') || name.includes('unstarted')) return '#9B9EA8'; // Slate
+  return '#71737F'; // Muted
 }
 
 function PriorityIndicator({ priority }: { priority?: string }) {
   const p = (priority || '').toUpperCase();
   if (p === 'URGENT') {
     return (
-      <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 px-1.5 py-0.5 rounded border border-red-200/60 dark:border-red-900/40">
-        <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
-        Urgent
+      <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-rose-400 bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/20">
+        <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse shrink-0" />
+        <span>Urgent</span>
       </span>
     );
   }
   if (p === 'HIGH') {
     return (
-      <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.5 rounded border border-amber-200/60 dark:border-amber-900/40">
+      <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
         <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
-        High
+        <span>High</span>
       </span>
     );
   }
   if (p === 'MEDIUM') {
     return (
-      <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/70 px-1.5 py-0.5 rounded border border-zinc-200/60 dark:border-zinc-700/60">
+      <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-yellow-400 bg-yellow-500/10 px-1.5 py-0.5 rounded border border-yellow-500/20">
         <span className="w-1.5 h-1.5 rounded-full bg-yellow-500 shrink-0" />
-        Med
+        <span>Med</span>
       </span>
     );
   }
   if (p === 'LOW') {
     return (
-      <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/70 px-1.5 py-0.5 rounded border border-zinc-200/60 dark:border-zinc-700/60">
+      <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-blue-400 bg-blue-500/10 px-1.5 py-0.5 rounded border border-blue-500/20">
         <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0" />
-        Low
+        <span>Low</span>
       </span>
     );
   }
@@ -75,12 +75,12 @@ function SortableIssueCard({ issue, projectSlug, projectId }: { issue: any, proj
       style={style} 
       {...attributes} 
       {...listeners} 
-      className={`p-3 mb-2 bg-white dark:bg-zinc-900 rounded-lg shadow-2xs border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all select-none group ${isViewer ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}`}
+      className={`p-3.5 mb-2.5 bg-[#131418] hover:bg-[#18191E] rounded-lg border border-white/[0.08] hover:border-white/[0.16] shadow-xs transition-all select-none group ${isViewer ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}`}
     >
       <div className="flex justify-between items-center mb-1.5">
         <Link 
           href={`/projects/${projectId}/issues/${issue.sequenceId}`} 
-          className="text-[11px] font-mono text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors"
+          className="text-[11px] font-mono text-zinc-400 group-hover:text-zinc-200 transition-colors"
           onClick={(e) => isDragging && e.preventDefault()}
         >
           {projectSlug}-{issue.sequenceId}
@@ -90,7 +90,7 @@ function SortableIssueCard({ issue, projectSlug, projectId }: { issue: any, proj
 
       <Link 
         href={`/projects/${projectId}/issues/${issue.sequenceId}`}
-        className="text-xs font-medium text-zinc-800 dark:text-zinc-200 leading-snug hover:text-zinc-950 dark:hover:text-white transition-colors block mb-2"
+        className="text-xs font-medium text-zinc-200 group-hover:text-white leading-snug transition-colors block mb-2.5"
         onClick={(e) => isDragging && e.preventDefault()}
       >
         {issue.title}
@@ -99,19 +99,19 @@ function SortableIssueCard({ issue, projectSlug, projectId }: { issue: any, proj
       <div className="flex items-center justify-between pt-1 text-[11px] text-zinc-400">
         <div className="flex items-center gap-1.5 flex-wrap">
           {issue.cycle && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-700/50 truncate max-w-[110px]" title={issue.cycle.name}>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/[0.04] text-zinc-400 border border-white/[0.06] truncate max-w-[110px]" title={issue.cycle.name}>
               {issue.cycle.name}
             </span>
           )}
           {issue.module && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-700/50 truncate max-w-[110px]" title={issue.module.name}>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#5E6AD2]/10 text-[#8B96FF] border border-[#5E6AD2]/20 truncate max-w-[110px]" title={issue.module.name}>
               {issue.module.name}
             </span>
           )}
         </div>
 
         {issue.estimate !== null && issue.estimate !== undefined && (
-          <span className="text-[10px] font-mono font-medium text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">
+          <span className="text-[10px] font-mono font-medium text-zinc-400 bg-white/[0.04] px-1.5 py-0.5 rounded border border-white/[0.06]">
             {issue.estimate}p
           </span>
         )}
@@ -129,15 +129,15 @@ function StatusColumn({ status, issues, projectSlug, projectId }: { status: any,
   const dotColor = getStatusDotColor(status.name, status.color);
 
   return (
-    <div className="shrink-0 w-72 bg-zinc-100/50 dark:bg-zinc-900/30 border border-zinc-200/60 dark:border-zinc-800/60 rounded-xl p-2.5 flex flex-col h-full max-h-full">
-      <div className="flex items-center justify-between mb-3 px-1">
+    <div className="shrink-0 w-72 bg-[#0D0E11] border border-white/[0.06] rounded-xl p-2.5 flex flex-col h-full max-h-full shadow-linear-card">
+      <div className="flex items-center justify-between mb-3 px-1.5 pt-0.5">
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: dotColor }} />
-          <h3 className="font-medium text-xs text-zinc-700 dark:text-zinc-300">
+          <span className="w-2 h-2 rounded-full shrink-0 shadow-xs" style={{ backgroundColor: dotColor }} />
+          <h3 className="font-medium text-xs text-zinc-200">
             {status.name}
           </h3>
         </div>
-        <span className="text-[11px] font-mono text-zinc-400 bg-white dark:bg-zinc-900 px-1.5 py-0.5 rounded border border-zinc-200/60 dark:border-zinc-800/60">
+        <span className="text-[11px] font-mono text-zinc-400 bg-white/[0.04] px-1.5 py-0.5 rounded border border-white/[0.06]">
           {issues.length}
         </span>
       </div>
@@ -233,8 +233,8 @@ export default function BoardView({ issues }: { issues: any[] }) {
     return (
       <div className="flex space-x-3 overflow-x-auto pb-4 items-start" style={{ height: 'calc(100vh - 220px)' }}>
         {statuses.map((status: any) => (
-          <div key={status.id} className="shrink-0 w-72 bg-zinc-100/50 dark:bg-zinc-900/30 border border-zinc-200/60 dark:border-zinc-800/60 rounded-xl p-2.5 flex flex-col h-full max-h-full">
-            <h3 className="font-medium text-xs text-zinc-700 dark:text-zinc-300 px-1">
+          <div key={status.id} className="shrink-0 w-72 bg-[#0D0E11] border border-white/[0.06] rounded-xl p-2.5 flex flex-col h-full max-h-full">
+            <h3 className="font-medium text-xs text-zinc-300 px-1">
               {status.name}
             </h3>
           </div>
@@ -250,7 +250,7 @@ export default function BoardView({ issues }: { issues: any[] }) {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex space-x-3 overflow-x-auto pb-4 items-start" style={{ height: 'calc(100vh - 220px)' }}>
+      <div className="flex space-x-3 overflow-x-auto pb-4 items-start font-sans" style={{ height: 'calc(100vh - 220px)' }}>
         {statuses.map((status: any) => (
           <StatusColumn 
             key={status.id} 
@@ -264,9 +264,9 @@ export default function BoardView({ issues }: { issues: any[] }) {
       
       <DragOverlay dropAnimation={{ sideEffects: defaultDropAnimationSideEffects({ styles: { active: { opacity: '0.4' } } }) }}>
         {activeIssue ? (
-          <div className="p-3 bg-white dark:bg-zinc-900 rounded-lg shadow-xl border border-zinc-300 dark:border-zinc-700 opacity-95">
+          <div className="p-3.5 bg-[#18191E] rounded-lg shadow-2xl border border-white/[0.2] opacity-95 text-white">
             <span className="text-[11px] font-mono text-zinc-400">{project.slug}-{activeIssue.sequenceId}</span>
-            <h4 className="text-xs font-medium text-zinc-900 dark:text-zinc-100 mt-1">{activeIssue.title}</h4>
+            <h4 className="text-xs font-medium text-white mt-1">{activeIssue.title}</h4>
           </div>
         ) : null}
       </DragOverlay>

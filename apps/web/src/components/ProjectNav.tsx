@@ -42,7 +42,7 @@ export default function ProjectNav({ projectId, isViewer }: ProjectNavProps) {
             href={item.href}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
               isActive
-                ? "bg-white/[0.08] text-white shadow-xs"
+                ? "bg-white/[0.08] text-white shadow-xs border border-white/[0.08]"
                 : "text-zinc-400 hover:text-white hover:bg-white/[0.04]"
             }`}
           >

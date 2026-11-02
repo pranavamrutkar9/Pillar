@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { TrendingDown } from "lucide-react";
 
 export interface BurndownDataPoint {
   day: string | number;
   ideal: number;
   remaining: number;
-  completed?: number; // Optional completed points/tasks
+  completed?: number;
 }
 
 interface BurndownChartProps {
@@ -23,15 +23,12 @@ export default function BurndownChart({
   width = 800,
   height = 300,
   className = "",
-  title = "Burndown Chart",
+  title = "Burndown Velocity",
 }: BurndownChartProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
 
   const handleMouseMove = (e: React.MouseEvent<SVGGElement>, index: number) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    // we want position relative to the nearest positioned ancestor (the div wrapping the SVG)
-    // we can get the bounding box of the parent div
     const parentRect = e.currentTarget.ownerSVGElement?.parentElement?.getBoundingClientRect();
     if (parentRect) {
       setTooltipPos({
@@ -41,14 +38,13 @@ export default function BurndownChart({
     }
     setHoveredIndex(index);
   };
+
   if (!data || data.length === 0) return null;
 
-  // Chart layout configuration
-  const padding = { top: 20, right: 20, bottom: 30, left: 40 };
+  const padding = { top: 25, right: 25, bottom: 35, left: 45 };
   const chartWidth = width - padding.left - padding.right;
   const chartHeight = height - padding.top - padding.bottom;
 
-  // Calculate scales
   const maxPoints = Math.max(...data.map((d) => Math.max(d.remaining, d.ideal)), 10);
   
   const scaleX = (index: number) => 
@@ -57,33 +53,30 @@ export default function BurndownChart({
   const scaleY = (val: number) => 
     padding.top + chartHeight - (val / maxPoints) * chartHeight;
 
-  // Generate paths
   const idealPath = data.map((d, i) => `${i === 0 ? "M" : "L"} ${scaleX(i)} ${scaleY(d.ideal)}`).join(" ");
   const remainingPath = data.map((d, i) => `${i === 0 ? "M" : "L"} ${scaleX(i)} ${scaleY(d.remaining)}`).join(" ");
   
-  // Area under the remaining path
   const areaPath = `${remainingPath} L ${scaleX(data.length - 1)} ${scaleY(0)} L ${scaleX(0)} ${scaleY(0)} Z`;
 
-  // Generate Y-axis grid lines (4 intervals)
   const yAxisTicks = Array.from({ length: 5 }).map((_, i) => maxPoints * (i / 4));
 
   return (
-    <div className={`flex flex-col bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm ${className}`}>
+    <div className={`flex flex-col bg-[#0D0E11] border border-white/[0.08] rounded-xl overflow-hidden shadow-linear-card font-sans ${className}`}>
       {/* Header */}
       {title && (
-        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100 dark:border-zinc-800/50 bg-zinc-50/50 dark:bg-zinc-900/30">
-          <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-            <TrendingDown className="w-4 h-4 text-violet-500" />
-            {title}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06] bg-[#0B0C0E]">
+          <h3 className="font-semibold text-sm text-white flex items-center gap-2">
+            <TrendingDown className="w-4 h-4 text-[#818CF8]" />
+            <span>{title}</span>
           </h3>
           <div className="flex items-center gap-4 text-xs font-medium">
-            <span className="flex items-center gap-1.5 text-zinc-600 dark:text-zinc-400">
-              <span className="w-2.5 h-2.5 rounded-full bg-violet-500 shadow-[0_0_8px_rgba(139,92,246,0.5)]"></span>
-              Remaining
+            <span className="flex items-center gap-1.5 text-zinc-300">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#5E6AD2] shadow-[0_0_8px_#5E6AD2]"></span>
+              <span>Remaining</span>
             </span>
-            <span className="flex items-center gap-1.5 text-zinc-500 dark:text-zinc-500">
-              <span className="w-2.5 h-2.5 rounded-full bg-zinc-300 dark:bg-zinc-600 border border-zinc-400 dark:border-zinc-500"></span>
-              Ideal
+            <span className="flex items-center gap-1.5 text-zinc-500">
+              <span className="w-2.5 h-2.5 rounded-full bg-white/[0.2] border border-white/[0.3]"></span>
+              <span>Guideline</span>
             </span>
           </div>
         </div>
@@ -99,14 +92,10 @@ export default function BurndownChart({
           onMouseLeave={() => setHoveredIndex(null)}
         >
           <defs>
-            <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="rgb(139, 92, 246)" stopOpacity="0.2" />
-              <stop offset="100%" stopColor="rgb(139, 92, 246)" stopOpacity="0.0" />
+            <linearGradient id="linearAreaGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#5E6AD2" stopOpacity="0.25" />
+              <stop offset="100%" stopColor="#5E6AD2" stopOpacity="0.0" />
             </linearGradient>
-            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="3" result="blur" />
-              <feComposite in="SourceGraphic" in2="blur" operator="over" />
-            </filter>
           </defs>
 
           {/* Grid lines & Y-axis labels */}
@@ -119,17 +108,16 @@ export default function BurndownChart({
                   y1={y}
                   x2={width - padding.right}
                   y2={y}
-                  stroke="currentColor"
-                  className="text-zinc-100 dark:text-zinc-800/60"
+                  stroke="rgba(255, 255, 255, 0.05)"
                   strokeDasharray="4 4"
                 />
                 <text
-                  x={padding.left - 10}
+                  x={padding.left - 12}
                   y={y + 4}
-                  fontSize="11"
-                  fontWeight="500"
+                  fontSize="10"
+                  fontFamily="var(--font-geist-mono), monospace"
                   textAnchor="end"
-                  className="fill-zinc-400 dark:fill-zinc-500"
+                  fill="#71737F"
                 >
                   {Math.round(val)}
                 </text>
@@ -142,126 +130,87 @@ export default function BurndownChart({
             <text
               key={i}
               x={scaleX(i)}
-              y={height - 5}
-              fontSize="11"
-              fontWeight="500"
+              y={height - 8}
+              fontSize="10"
+              fontFamily="var(--font-geist-mono), monospace"
               textAnchor="middle"
-              className="fill-zinc-400 dark:fill-zinc-500"
+              fill="#71737F"
             >
               Day {d.day}
             </text>
           ))}
 
           {/* Area fill for remaining path */}
-          <path d={areaPath} fill="url(#areaGradient)" className="transition-all duration-500" />
+          <path d={areaPath} fill="url(#linearAreaGradient)" className="transition-all duration-500" />
 
           {/* Ideal Path */}
           <path
             d={idealPath}
             fill="none"
-            stroke="currentColor"
-            className="text-zinc-300 dark:text-zinc-600"
-            strokeWidth="2"
-            strokeDasharray="6 6"
+            stroke="rgba(255, 255, 255, 0.2)"
+            strokeWidth="1.5"
+            strokeDasharray="4 4"
           />
 
           {/* Remaining Path */}
           <path
             d={remainingPath}
             fill="none"
-            stroke="currentColor"
-            className="text-violet-500"
-            strokeWidth="3"
-            filter="url(#glow)"
-            style={{ strokeLinecap: "round", strokeLinejoin: "round" }}
+            stroke="#5E6AD2"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
 
-          {/* Interactive Layer & Points */}
+          {/* Interactive Data Points */}
           {data.map((d, i) => {
-            const x = scaleX(i);
-            const yRemaining = scaleY(d.remaining);
-            const yIdeal = scaleY(d.ideal);
+            const cx = scaleX(i);
+            const cy = scaleY(d.remaining);
             const isHovered = hoveredIndex === i;
 
             return (
               <g
                 key={i}
+                className="cursor-pointer"
                 onMouseMove={(e) => handleMouseMove(e, i)}
-                onMouseLeave={() => {
-                  setHoveredIndex(null);
-                  setTooltipPos(null);
-                }}
-                className="cursor-crosshair outline-none"
+                onMouseEnter={(e) => handleMouseMove(e, i)}
               >
-                {/* Hover Guide Line */}
-                <line
-                  x1={x}
-                  y1={padding.top}
-                  x2={x}
-                  y2={height - padding.bottom}
-                  stroke="currentColor"
-                  className={`text-zinc-300 dark:text-zinc-700 transition-opacity duration-200 ${
-                    isHovered ? "opacity-100" : "opacity-0"
-                  }`}
-                  strokeWidth="1.5"
-                  strokeDasharray="4 4"
-                />
-
-                {/* Invisible wider area for easier hovering */}
-                <rect
-                  x={x - (chartWidth / data.length) / 2}
-                  y={padding.top}
-                  width={chartWidth / data.length}
-                  height={chartHeight}
-                  fill="transparent"
-                />
-
-                {/* Ideal Point */}
                 <circle
-                  cx={x}
-                  cy={yIdeal}
-                  r="4"
-                  className="fill-white dark:fill-zinc-900 stroke-zinc-400 dark:stroke-zinc-500 transition-all duration-200"
+                  cx={cx}
+                  cy={cy}
+                  r={isHovered ? 6 : 4}
+                  fill="#5E6AD2"
+                  stroke="#08090A"
                   strokeWidth="2"
+                  className="transition-all duration-150"
                 />
-
-                {/* Remaining Point */}
                 <circle
-                  cx={x}
-                  cy={yRemaining}
-                  r={isHovered ? "6" : "4.5"}
-                  className="fill-white dark:fill-zinc-900 stroke-violet-500 transition-all duration-200"
-                  strokeWidth={isHovered ? "3" : "2"}
-                  filter={isHovered ? "url(#glow)" : ""}
+                  cx={cx}
+                  cy={cy}
+                  r={20}
+                  fill="transparent"
                 />
               </g>
             );
           })}
         </svg>
 
-        {/* Floating Tooltip */}
+        {/* Hover Tooltip */}
         {hoveredIndex !== null && tooltipPos && (
           <div
-            className="absolute z-10 pointer-events-none transition-all duration-75 ease-out flex flex-col bg-zinc-900/95 dark:bg-zinc-100/95 backdrop-blur-md text-zinc-50 dark:text-zinc-900 px-3 py-2 rounded-lg shadow-xl text-sm border border-zinc-800 dark:border-zinc-200/50"
-            style={{
-              left: `${tooltipPos.x}px`,
-              top: `${tooltipPos.y}px`,
-              transform: `translate(-50%, calc(-100% - 16px))`,
-            }}
+            className="absolute pointer-events-none z-20 px-3 py-2 rounded-lg bg-[#18191E] border border-white/[0.12] shadow-2xl text-xs space-y-1 transform -translate-x-1/2 -translate-y-full"
+            style={{ left: tooltipPos.x, top: tooltipPos.y - 12 }}
           >
-            <div className="font-semibold mb-1 opacity-90 border-b border-zinc-700 dark:border-zinc-300 pb-1">
+            <div className="font-mono text-[10px] text-zinc-400">
               Day {data[hoveredIndex].day}
             </div>
-            <div className="flex justify-between gap-4">
-              <span className="opacity-70">Remaining:</span>
-              <span className="font-bold text-violet-400 dark:text-violet-600">{data[hoveredIndex].remaining} pts</span>
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-white font-mono">{data[hoveredIndex].remaining}p</span>
+              <span className="text-zinc-500">remaining</span>
             </div>
-            <div className="flex justify-between gap-4">
-              <span className="opacity-70">Ideal:</span>
-              <span className="font-bold">{Math.round(data[hoveredIndex].ideal)} pts</span>
+            <div className="text-[10px] text-zinc-500">
+              Ideal: {Math.round(data[hoveredIndex].ideal)}p
             </div>
-            {/* Tooltip caret */}
-            <div className="absolute left-1/2 -bottom-1 -translate-x-1/2 w-2 h-2 rotate-45 bg-zinc-900/95 dark:bg-zinc-100/95 border-r border-b border-zinc-800 dark:border-zinc-200/50"></div>
           </div>
         )}
       </div>

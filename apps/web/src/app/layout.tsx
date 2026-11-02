@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Pillar — Engineering Workflow & Project Intelligence",
-  description: "A clean, subtle, and focused issue tracker and engineering platform for modern development teams.",
+  title: "Pillar — Engineering Intelligence & Issue Tracking",
+  description: "The purpose-built, high-velocity project management platform for focused software engineering teams.",
 };
 
 export default function RootLayout({
@@ -28,10 +28,17 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
     >
-      <body className="min-h-full flex flex-col bg-[#FAFAFA] dark:bg-[#09090B] text-zinc-900 dark:text-zinc-100 selection:bg-zinc-200 dark:selection:bg-zinc-800">
-        <Providers>{children}</Providers>
+      <body className="min-h-full flex flex-col bg-[#08090A] text-[#F4F4F6] selection:bg-[#5E6AD2]/35 selection:text-white relative">
+        {/* Signature Linear Top Ambient Glow Mesh */}
+        <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[340px] bg-gradient-to-b from-[#5E6AD2]/12 via-[#5E6AD2]/[0.02] to-transparent blur-[120px] pointer-events-none z-0" />
+        
+        <Providers>
+          <div className="relative z-10 flex-1 flex flex-col">
+            {children}
+          </div>
+        </Providers>
       </body>
     </html>
   );

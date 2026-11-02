@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { createInviteAction } from '@/actions/workspaceActions';
-import { UserPlus } from 'lucide-react';
+import { UserPlus, Send, Loader2 } from 'lucide-react';
 
 export function InviteForm({ workspaceId }: { workspaceId: string }) {
   const [email, setEmail] = useState('');
@@ -29,10 +29,10 @@ export function InviteForm({ workspaceId }: { workspaceId: string }) {
   };
 
   return (
-    <form onSubmit={handleInvite} className="mt-6 pt-6 border-t border-zinc-200/80 dark:border-zinc-800/80 flex flex-col gap-3">
+    <form onSubmit={handleInvite} className="mt-6 pt-6 border-t border-white/[0.08] flex flex-col gap-3">
       <div className="flex items-center gap-2">
-        <UserPlus className="w-3.5 h-3.5 text-zinc-500" />
-        <h4 className="text-xs font-medium text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Invite new member</h4>
+        <UserPlus className="w-3.5 h-3.5 text-[#5E6AD2]" />
+        <h4 className="text-xs font-medium text-[#EDEDED] uppercase tracking-wider">Invite new member</h4>
       </div>
       <div className="flex flex-col sm:flex-row gap-2">
         <input
@@ -40,28 +40,30 @@ export function InviteForm({ workspaceId }: { workspaceId: string }) {
           placeholder="colleague@company.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="flex-1 bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400"
+          className="flex-1 bg-[#0B0C0E] border border-white/10 rounded-md px-3 py-1.5 text-xs focus:outline-none focus:border-[#5E6AD2] focus:ring-1 focus:ring-[#5E6AD2]/50 text-[#EDEDED] placeholder:text-[#626773]"
           required
         />
         <select
           value={role}
           onChange={(e) => setRole(e.target.value)}
-          className="bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 text-zinc-900 dark:text-zinc-100"
+          className="bg-[#0B0C0E] border border-white/10 rounded-md px-3 py-1.5 text-xs focus:outline-none focus:border-[#5E6AD2] text-[#EDEDED] cursor-pointer"
         >
-          <option value="ADMIN">Admin</option>
-          <option value="MEMBER">Member</option>
-          <option value="VIEWER">Viewer</option>
+          <option value="ADMIN" className="bg-[#141519]">Admin</option>
+          <option value="MEMBER" className="bg-[#141519]">Member</option>
+          <option value="VIEWER" className="bg-[#141519]">Viewer</option>
         </select>
         <button
           type="submit"
           disabled={status === 'loading'}
-          className="bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 px-4 py-1.5 rounded-lg text-xs font-medium disabled:opacity-50 transition-colors shadow-sm"
+          className="bg-[#5E6AD2] hover:bg-[#525ec2] text-white px-4 py-1.5 rounded-md text-xs font-medium disabled:opacity-50 transition-all shadow-[0_0_12px_rgba(94,106,210,0.3)] flex items-center justify-center gap-1.5"
         >
-          {status === 'loading' ? 'Sending...' : 'Send Invite'}
+          {status === 'loading' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+          <span>{status === 'loading' ? 'Sending...' : 'Send Invite'}</span>
         </button>
       </div>
+
       {message && (
-        <p className={`text-xs ${status === 'success' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+        <p className={`text-xs ${status === 'success' ? 'text-emerald-400' : 'text-[#F43F5E]'}`}>
           {message}
         </p>
       )}

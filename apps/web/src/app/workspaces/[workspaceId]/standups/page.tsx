@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import ClientStandupFeed from "../../../../components/ClientStandupFeed";
+import { ArrowLeft, Clock } from "lucide-react";
 
 export default async function StandupsPage(props: { params: Promise<{ workspaceId: string }> }) {
   const { workspaceId } = await props.params;
@@ -19,22 +20,26 @@ export default async function StandupsPage(props: { params: Promise<{ workspaceI
     cookieStore.get("__Secure-next-auth.session-token")?.value;
 
   return (
-    <div className="flex flex-col flex-1 items-center bg-zinc-50 font-sans dark:bg-black min-h-screen py-16">
-      <main className="w-full max-w-5xl px-8 flex flex-col gap-12">
-        <div className="flex justify-between items-center w-full pb-8 border-b border-zinc-200 dark:border-zinc-800">
-          <div className="flex flex-col gap-2">
-            <h1 className="text-3xl font-semibold tracking-tight text-black dark:text-zinc-50">
-              Team Standups
-            </h1>
-            <p className="text-sm text-zinc-500">
-              AI-generated daily async updates.
+    <div className="flex flex-col flex-1 items-center min-h-screen py-12 px-6">
+      <main className="w-full max-w-5xl flex flex-col gap-10">
+        <div className="flex justify-between items-center w-full pb-6 border-b border-white/[0.08]">
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <Clock className="w-5 h-5 text-[#5E6AD2]" />
+              <h1 className="text-2xl font-bold tracking-tight text-[#EDEDED]">
+                Team Standups
+              </h1>
+            </div>
+            <p className="text-xs text-[#8A8F98]">
+              Automated daily async updates aggregated from git commits, PRs, and resolved issues.
             </p>
           </div>
           <Link
             href={`/workspaces/${workspaceId}`}
-            className="text-sm font-medium text-zinc-500 hover:text-black dark:hover:text-white transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-[#8A8F98] hover:text-[#EDEDED] transition-colors px-3 py-1.5 rounded-md hover:bg-white/[0.04]"
           >
-            ← Back to Dashboard
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Dashboard</span>
           </Link>
         </div>
 

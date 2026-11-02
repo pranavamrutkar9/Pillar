@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createWorkspaceAction } from "@/actions/workspaceActions";
+import { Plus, Loader2 } from "lucide-react";
 
 export function WorkspaceForm() {
   const [name, setName] = useState("");
@@ -31,27 +32,37 @@ export function WorkspaceForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-3 font-sans text-xs">
       {error && (
-        <div className="p-2 rounded bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs">
+        <div className="p-2.5 rounded-md bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs">
           {error}
         </div>
       )}
-      <div className="space-y-1">
-        <label className="text-[11px] font-medium text-zinc-400">Workspace name</label>
+      <div className="space-y-1.5">
+        <label className="text-[11px] font-medium text-zinc-300">Workspace Name</label>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="e.g. Acme Corp"
-          className="w-full px-3 py-2 rounded-md bg-white/[0.03] border border-white/[0.08] text-white text-xs outline-none focus:border-[#5E6AD2] focus:ring-1 focus:ring-[#5E6AD2]"
+          placeholder="e.g. Acme Engineering"
+          className="linear-input w-full"
           required
         />
       </div>
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-2 rounded-md bg-gradient-to-b from-[#5E6AD2] to-[#4B55C1] hover:brightness-110 text-white font-medium text-xs shadow-xs transition-all disabled:opacity-50 cursor-pointer"
+        className="linear-btn-primary w-full py-2 shadow-linear-glow disabled:opacity-50"
       >
-        {loading ? "Creating..." : "Create Workspace"}
+        {loading ? (
+          <span className="flex items-center gap-1.5">
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            <span>Creating...</span>
+          </span>
+        ) : (
+          <span className="flex items-center gap-1.5">
+            <Plus className="w-3.5 h-3.5" />
+            <span>Create Workspace</span>
+          </span>
+        )}
       </button>
     </form>
   );

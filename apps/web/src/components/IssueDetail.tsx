@@ -12,7 +12,6 @@ import {
   Layers, 
   Tag, 
   GitPullRequest, 
-  Clock, 
   Loader2,
   Check,
   Edit3
@@ -21,11 +20,11 @@ import {
 function getStatusDot(statusName: string, customColor?: string) {
   if (customColor) return customColor;
   const name = statusName.toLowerCase();
-  if (name.includes('done') || name.includes('complete') || name.includes('shipped')) return '#10b981';
-  if (name.includes('progress') || name.includes('doing') || name.includes('active')) return '#f59e0b';
-  if (name.includes('review') || name.includes('testing')) return '#a855f7';
-  if (name.includes('todo') || name.includes('ready') || name.includes('unstarted')) return '#0ea5e9';
-  return '#71717a';
+  if (name.includes('done') || name.includes('complete') || name.includes('shipped')) return '#5E6AD2';
+  if (name.includes('progress') || name.includes('doing') || name.includes('active')) return '#F5A623';
+  if (name.includes('review') || name.includes('testing')) return '#8B5CF6';
+  if (name.includes('todo') || name.includes('ready') || name.includes('unstarted')) return '#38BDF8';
+  return '#626773';
 }
 
 export default function IssueDetail({ issue, project, cycles = [], modules = [] }: { issue: any, project: any, cycles?: any[], modules?: any[] }) {
@@ -58,22 +57,22 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
   const statusColor = getStatusDot(currentStatus?.name || '', currentStatus?.color);
 
   return (
-    <div className="bg-white dark:bg-zinc-950 p-6 sm:p-8 rounded-2xl shadow-xs border border-zinc-200/80 dark:border-zinc-800/80 space-y-8">
+    <div className="bg-[#111215] p-6 sm:p-8 rounded-xl border border-white/[0.08] shadow-2xl space-y-7">
       
       {/* Title & Key */}
-      <div className="space-y-2">
+      <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono font-medium text-zinc-400 px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/60">
+            <span className="text-xs font-mono font-medium text-[#8A8F98] px-2 py-0.5 rounded bg-white/[0.05] border border-white/[0.08]">
               {project.slug}-{issue.sequenceId}
             </span>
-            <span className="text-xs text-zinc-400 font-mono">
+            <span className="text-xs text-[#626773] font-mono">
               Created {format(new Date(issue.createdAt), 'MMM d, yyyy')}
             </span>
           </div>
 
           {loading && (
-            <span className="inline-flex items-center gap-1 text-[11px] text-zinc-400 font-mono">
+            <span className="inline-flex items-center gap-1.5 text-[11px] text-[#5E6AD2] font-mono">
               <Loader2 className="w-3 h-3 animate-spin" /> Saving...
             </span>
           )}
@@ -83,17 +82,17 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           onBlur={() => { if(title !== issue.title) handleUpdate("title", title); }}
-          className="text-2xl sm:text-3xl font-semibold tracking-tight w-full bg-transparent text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 rounded-lg px-1.5 py-1 -ml-1.5 transition-all"
+          className="text-xl sm:text-2xl font-semibold tracking-tight w-full bg-transparent text-[#EDEDED] focus:outline-none focus:ring-1 focus:ring-[#5E6AD2]/60 rounded-md px-2 py-1 -ml-2 transition-all border border-transparent hover:border-white/[0.06]"
         />
       </div>
 
-      {/* Properties Ribbon */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-zinc-50/70 dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/60">
+      {/* Properties Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-lg bg-[#141519] border border-white/[0.06]">
         
         {/* Status */}
         <div>
-          <label className="text-[10px] font-mono uppercase text-zinc-400 block mb-1">Status</label>
-          <div className="flex items-center gap-1.5 bg-white dark:bg-zinc-950 px-2.5 py-1.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs">
+          <label className="text-[10px] font-mono uppercase text-[#626773] block mb-1">Status</label>
+          <div className="flex items-center gap-1.5 bg-[#0B0C0E] px-2.5 py-1.5 rounded-md border border-white/[0.08]">
             <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: statusColor }} />
             <select 
               value={statusId}
@@ -101,11 +100,11 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
                 setStatusId(e.target.value);
                 handleUpdate("statusId", e.target.value);
               }}
-              className="w-full bg-transparent text-xs font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer"
+              className="w-full bg-transparent text-xs font-medium text-[#EDEDED] focus:outline-none cursor-pointer"
               disabled={loading}
             >
               {project.issueStatuses?.map((s: any) => (
-                <option key={s.id} value={s.id}>{s.name}</option>
+                <option key={s.id} value={s.id} className="bg-[#141519] text-[#EDEDED]">{s.name}</option>
               ))}
             </select>
           </div>
@@ -113,43 +112,43 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
 
         {/* Priority */}
         <div>
-          <label className="text-[10px] font-mono uppercase text-zinc-400 block mb-1">Priority</label>
-          <div className="bg-white dark:bg-zinc-950 px-2.5 py-1.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs">
+          <label className="text-[10px] font-mono uppercase text-[#626773] block mb-1">Priority</label>
+          <div className="bg-[#0B0C0E] px-2.5 py-1.5 rounded-md border border-white/[0.08]">
             <select 
               value={priority}
               onChange={(e) => {
                 setPriority(e.target.value);
                 handleUpdate("priority", e.target.value);
               }}
-              className="w-full bg-transparent text-xs font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer"
+              className="w-full bg-transparent text-xs font-medium text-[#EDEDED] focus:outline-none cursor-pointer"
               disabled={loading}
             >
-              <option value="NONE">None</option>
-              <option value="LOW">Low</option>
-              <option value="MEDIUM">Medium</option>
-              <option value="HIGH">High</option>
-              <option value="URGENT">Urgent</option>
+              <option value="NONE" className="bg-[#141519] text-[#EDEDED]">None</option>
+              <option value="LOW" className="bg-[#141519] text-[#EDEDED]">Low</option>
+              <option value="MEDIUM" className="bg-[#141519] text-[#EDEDED]">Medium</option>
+              <option value="HIGH" className="bg-[#141519] text-[#EDEDED]">High</option>
+              <option value="URGENT" className="bg-[#141519] text-[#EDEDED]">Urgent</option>
             </select>
           </div>
         </div>
 
         {/* Assignee */}
         <div>
-          <label className="text-[10px] font-mono uppercase text-zinc-400 block mb-1">Assignee</label>
-          <div className="bg-white dark:bg-zinc-950 px-2.5 py-1.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex items-center gap-1.5">
-            <User className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+          <label className="text-[10px] font-mono uppercase text-[#626773] block mb-1">Assignee</label>
+          <div className="bg-[#0B0C0E] px-2.5 py-1.5 rounded-md border border-white/[0.08] flex items-center gap-1.5">
+            <User className="w-3.5 h-3.5 text-[#626773] shrink-0" />
             <select 
               value={assigneeId}
               onChange={(e) => {
                 setAssigneeId(e.target.value);
                 handleUpdate("assigneeId", e.target.value || null);
               }}
-              className="w-full bg-transparent text-xs font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer"
+              className="w-full bg-transparent text-xs font-medium text-[#EDEDED] focus:outline-none cursor-pointer"
               disabled={loading}
             >
-              <option value="">Unassigned</option>
+              <option value="" className="bg-[#141519] text-[#EDEDED]">Unassigned</option>
               {(project.workspace?.members || project.members)?.map((m: any) => (
-                <option key={m.userId} value={m.userId}>{m.user?.username || m.user?.email}</option>
+                <option key={m.userId} value={m.userId} className="bg-[#141519] text-[#EDEDED]">{m.user?.username || m.user?.email}</option>
               ))}
             </select>
           </div>
@@ -157,8 +156,8 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
 
         {/* Estimate */}
         <div>
-          <label className="text-[10px] font-mono uppercase text-zinc-400 block mb-1">Estimate</label>
-          <div className="bg-white dark:bg-zinc-950 px-2.5 py-1.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs">
+          <label className="text-[10px] font-mono uppercase text-[#626773] block mb-1">Estimate</label>
+          <div className="bg-[#0B0C0E] px-2.5 py-1.5 rounded-md border border-white/[0.08]">
             <input 
               type="number"
               min="0"
@@ -169,7 +168,7 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
                 setEstimate(val);
                 handleUpdate("estimate", val === "" ? null : val);
               }}
-              className="w-full bg-transparent text-xs font-mono font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none"
+              className="w-full bg-transparent text-xs font-mono font-medium text-[#EDEDED] focus:outline-none placeholder:text-[#626773]"
               disabled={loading}
             />
           </div>
@@ -177,21 +176,21 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
 
         {/* Cycle */}
         <div>
-          <label className="text-[10px] font-mono uppercase text-zinc-400 block mb-1">Cycle</label>
-          <div className="bg-white dark:bg-zinc-950 px-2.5 py-1.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex items-center gap-1.5">
-            <Repeat className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+          <label className="text-[10px] font-mono uppercase text-[#626773] block mb-1">Cycle</label>
+          <div className="bg-[#0B0C0E] px-2.5 py-1.5 rounded-md border border-white/[0.08] flex items-center gap-1.5">
+            <Repeat className="w-3.5 h-3.5 text-[#626773] shrink-0" />
             <select 
               value={cycleId}
               onChange={(e) => {
                 setCycleId(e.target.value);
                 handleUpdate("cycleId", e.target.value || null);
               }}
-              className="w-full bg-transparent text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer"
+              className="w-full bg-transparent text-xs text-[#EDEDED] focus:outline-none cursor-pointer"
               disabled={loading}
             >
-              <option value="">No Cycle</option>
+              <option value="" className="bg-[#141519] text-[#EDEDED]">No Cycle</option>
               {cycles.map((c: any) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
+                <option key={c.id} value={c.id} className="bg-[#141519] text-[#EDEDED]">{c.name}</option>
               ))}
             </select>
           </div>
@@ -199,21 +198,21 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
 
         {/* Module */}
         <div>
-          <label className="text-[10px] font-mono uppercase text-zinc-400 block mb-1">Module</label>
-          <div className="bg-white dark:bg-zinc-950 px-2.5 py-1.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex items-center gap-1.5">
-            <Layers className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+          <label className="text-[10px] font-mono uppercase text-[#626773] block mb-1">Module</label>
+          <div className="bg-[#0B0C0E] px-2.5 py-1.5 rounded-md border border-white/[0.08] flex items-center gap-1.5">
+            <Layers className="w-3.5 h-3.5 text-[#626773] shrink-0" />
             <select 
               value={moduleId}
               onChange={(e) => {
                 setModuleId(e.target.value);
                 handleUpdate("moduleId", e.target.value || null);
               }}
-              className="w-full bg-transparent text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer"
+              className="w-full bg-transparent text-xs text-[#EDEDED] focus:outline-none cursor-pointer"
               disabled={loading}
             >
-              <option value="">No Module</option>
+              <option value="" className="bg-[#141519] text-[#EDEDED]">No Module</option>
               {modules.map((m: any) => (
-                <option key={m.id} value={m.id}>{m.name}</option>
+                <option key={m.id} value={m.id} className="bg-[#141519] text-[#EDEDED]">{m.name}</option>
               ))}
             </select>
           </div>
@@ -221,9 +220,9 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
 
         {/* Due Date */}
         <div>
-          <label className="text-[10px] font-mono uppercase text-zinc-400 block mb-1">Due Date</label>
-          <div className="bg-white dark:bg-zinc-950 px-2.5 py-1.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex items-center gap-1.5">
-            <Calendar className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+          <label className="text-[10px] font-mono uppercase text-[#626773] block mb-1">Due Date</label>
+          <div className="bg-[#0B0C0E] px-2.5 py-1.5 rounded-md border border-white/[0.08] flex items-center gap-1.5">
+            <Calendar className="w-3.5 h-3.5 text-[#626773] shrink-0" />
             <input 
               type="date"
               value={dueDate}
@@ -231,7 +230,7 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
                 setDueDate(e.target.value);
                 handleUpdate("dueDate", e.target.value ? new Date(e.target.value).toISOString() : null);
               }}
-              className="w-full bg-transparent text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none"
+              className="w-full bg-transparent text-xs text-[#EDEDED] focus:outline-none [color-scheme:dark]"
               disabled={loading}
             />
           </div>
@@ -239,9 +238,9 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
 
         {/* Labels Count Summary */}
         <div>
-          <label className="text-[10px] font-mono uppercase text-zinc-400 block mb-1">Labels</label>
-          <div className="bg-white dark:bg-zinc-950 px-2.5 py-1.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex items-center gap-1.5 text-xs text-zinc-600 dark:text-zinc-400">
-            <Tag className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+          <label className="text-[10px] font-mono uppercase text-[#626773] block mb-1">Labels</label>
+          <div className="bg-[#0B0C0E] px-2.5 py-1.5 rounded-md border border-white/[0.08] flex items-center gap-1.5 text-xs text-[#8A8F98]">
+            <Tag className="w-3.5 h-3.5 text-[#626773] shrink-0" />
             <span>{labelIds.length} applied</span>
           </div>
         </div>
@@ -250,8 +249,8 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
 
       {/* Labels Selector */}
       {project.issueLabels && project.issueLabels.length > 0 && (
-        <div className="space-y-1.5">
-          <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">Applied Labels</label>
+        <div className="space-y-2">
+          <label className="text-xs font-medium text-[#8A8F98]">Applied Labels</label>
           <div className="flex flex-wrap gap-1.5">
             {project.issueLabels.map((label: any) => {
               const isSelected = labelIds.includes(label.id);
@@ -270,10 +269,10 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
                     setLabelIds(newLabelIds);
                     handleUpdate("labelIds", newLabelIds);
                   }}
-                  className={`px-2.5 py-1 text-xs rounded-lg border transition-all ${
+                  className={`px-2.5 py-1 text-xs rounded-md border transition-all ${
                     isSelected 
-                      ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 border-zinc-900 dark:border-zinc-100 font-medium' 
-                      : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300'
+                      ? 'bg-[#5E6AD2]/20 text-[#8B96FF] border-[#5E6AD2]/50 font-medium' 
+                      : 'bg-white/[0.03] border-white/[0.08] text-[#8A8F98] hover:text-[#EDEDED] hover:border-white/20'
                   } disabled:opacity-50`}
                 >
                   {label.name}
@@ -286,9 +285,9 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
 
       {/* Pull Requests Integration */}
       {issue.PullRequestIssue && issue.PullRequestIssue.length > 0 && (
-        <div className="space-y-2 pt-4 border-t border-zinc-100 dark:border-zinc-900">
-          <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-            <GitPullRequest className="w-4 h-4 text-purple-500" />
+        <div className="space-y-2.5 pt-4 border-t border-white/[0.06]">
+          <label className="text-xs font-medium text-[#EDEDED] flex items-center gap-1.5">
+            <GitPullRequest className="w-4 h-4 text-[#5E6AD2]" />
             <span>Linked Pull Requests ({issue.PullRequestIssue.length})</span>
           </label>
           <div className="space-y-2">
@@ -300,9 +299,9 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
       )}
 
       {/* Description Area */}
-      <div className="space-y-3 pt-4 border-t border-zinc-100 dark:border-zinc-900">
+      <div className="space-y-3 pt-4 border-t border-white/[0.06]">
         <div className="flex justify-between items-center">
-          <h3 className="text-xs font-mono font-medium text-zinc-400 uppercase tracking-wider">Description</h3>
+          <h3 className="text-xs font-mono font-medium text-[#626773] uppercase tracking-wider">Description</h3>
           <button 
             onClick={() => {
               if(isEditingDesc && JSON.stringify(description) !== JSON.stringify(issue.description)) {
@@ -310,17 +309,17 @@ export default function IssueDetail({ issue, project, cycles = [], modules = [] 
               }
               setIsEditingDesc(!isEditingDesc);
             }}
-            className="inline-flex items-center gap-1 text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-[#8A8F98] hover:text-[#EDEDED] transition-colors"
           >
             {isEditingDesc ? (
-              <><Check className="w-3.5 h-3.5 text-emerald-500" /> <span>Save</span></>
+              <><Check className="w-3.5 h-3.5 text-[#5E6AD2]" /> <span>Save</span></>
             ) : (
               <><Edit3 className="w-3.5 h-3.5" /> <span>Edit</span></>
             )}
           </button>
         </div>
         
-        <div className="rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 overflow-hidden bg-white dark:bg-zinc-950 p-2">
+        <div className="rounded-lg border border-white/[0.08] overflow-hidden bg-[#141519] p-3 text-[#EDEDED]">
           <TiptapEditor 
             value={description} 
             onChange={setDescription} 

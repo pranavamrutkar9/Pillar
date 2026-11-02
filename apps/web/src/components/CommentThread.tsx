@@ -29,40 +29,40 @@ export default function CommentThread({ issueId, projectId, comments }: { issueI
   };
 
   return (
-    <div className="space-y-6 pt-6 border-t border-zinc-200/80 dark:border-zinc-800/80">
+    <div className="space-y-5 pt-6 border-t border-white/[0.08]">
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-          <MessageSquare className="w-4 h-4 text-zinc-500" />
+        <h3 className="font-semibold text-sm text-[#EDEDED] flex items-center gap-2">
+          <MessageSquare className="w-4 h-4 text-[#8A8F98]" />
           Comments
-          <span className="text-xs px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-normal">
+          <span className="text-xs px-2 py-0.5 rounded-full bg-white/[0.06] text-[#8A8F98] font-normal">
             {comments.length}
           </span>
         </h3>
       </div>
       
-      <div className="space-y-4">
+      <div className="space-y-3">
         {comments.map((comment: any) => (
           <div key={comment.id} className="space-y-3">
-            <div className="border border-zinc-200/80 dark:border-zinc-800/80 p-4 rounded-xl bg-white dark:bg-zinc-900/60 shadow-sm transition-all hover:border-zinc-300 dark:hover:border-zinc-700">
+            <div className="border border-white/[0.08] p-4 rounded-xl bg-[#141519] shadow-md transition-all hover:border-white/20">
               <div className="flex items-start gap-3">
-                <div className="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-xs font-semibold text-zinc-700 dark:text-zinc-300 shrink-0">
+                <div className="w-7 h-7 rounded-full bg-[#1F2027] border border-white/10 flex items-center justify-center text-xs font-semibold text-[#5E6AD2] shrink-0">
                   {comment.author?.username?.[0]?.toUpperCase() || 'U'}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs font-medium text-zinc-900 dark:text-zinc-100">{comment.author?.username || 'Unknown'}</span>
-                    <span className="text-[11px] text-zinc-400 dark:text-zinc-500">
+                    <span className="text-xs font-medium text-[#EDEDED]">{comment.author?.username || 'Unknown'}</span>
+                    <span className="text-[11px] text-[#626773]">
                       {format(new Date(comment.createdAt), 'MMM d, h:mm a')}
                     </span>
                   </div>
-                  <div className="mt-2 text-sm text-zinc-700 dark:text-zinc-300">
+                  <div className="mt-2 text-sm text-[#CCCCCC]">
                     <TiptapEditor value={comment.body} onChange={() => {}} editable={false} />
                   </div>
                   
                   <div className="mt-3 flex justify-end">
                     <button 
                       onClick={() => setReplyTo(replyTo === comment.id ? null : comment.id)} 
-                      className="text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 flex items-center gap-1 transition-colors"
+                      className="text-xs text-[#8A8F98] hover:text-[#EDEDED] flex items-center gap-1 transition-colors"
                     >
                       <CornerDownRight className="w-3 h-3" />
                       {replyTo === comment.id ? "Cancel" : "Reply"}
@@ -71,20 +71,20 @@ export default function CommentThread({ issueId, projectId, comments }: { issueI
 
                   {/* Reply Form */}
                   {replyTo === comment.id && (
-                    <form onSubmit={(e) => handleSubmit(e, comment.id)} className="mt-3 p-3 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-zinc-50/50 dark:bg-zinc-950/50">
+                    <form onSubmit={(e) => handleSubmit(e, comment.id)} className="mt-3 p-3 border border-white/[0.08] rounded-lg bg-[#0B0C0E]">
                       <TiptapEditor value={body} onChange={setBody} />
                       <div className="mt-3 flex justify-end gap-2">
                         <button
                           type="button"
                           onClick={() => setReplyTo(null)}
-                          className="px-3 py-1.5 text-xs text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md transition-colors"
+                          className="px-3 py-1.5 text-xs text-[#8A8F98] hover:bg-white/[0.06] rounded-md transition-colors"
                         >
                           Cancel
                         </button>
                         <button 
                           type="submit" 
                           disabled={loading || !body} 
-                          className="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 rounded-md text-xs font-medium disabled:opacity-50 transition-colors flex items-center gap-1.5"
+                          className="px-3 py-1.5 bg-[#5E6AD2] hover:bg-[#525ec2] text-white rounded-md text-xs font-medium disabled:opacity-50 transition-colors flex items-center gap-1.5 shadow-[0_0_12px_rgba(94,106,210,0.4)]"
                         >
                           <Send className="w-3 h-3" />
                           {loading ? "Posting..." : "Reply"}
@@ -98,21 +98,21 @@ export default function CommentThread({ issueId, projectId, comments }: { issueI
 
             {/* Replies (1 level deep) */}
             {comment.replies && comment.replies.length > 0 && (
-              <div className="ml-8 space-y-3 pl-3 border-l-2 border-zinc-200 dark:border-zinc-800">
+              <div className="pl-6 space-y-2 border-l border-white/[0.08]">
                 {comment.replies.map((reply: any) => (
-                  <div key={reply.id} className="border border-zinc-200/80 dark:border-zinc-800/80 p-3 rounded-lg bg-white dark:bg-zinc-900/60 shadow-sm">
+                  <div key={reply.id} className="border border-white/[0.06] p-3 rounded-lg bg-[#111215]">
                     <div className="flex items-start gap-2.5">
-                      <div className="w-6 h-6 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-[10px] font-semibold text-zinc-700 dark:text-zinc-300 shrink-0">
+                      <div className="w-6 h-6 rounded-full bg-[#1F2027] border border-white/10 flex items-center justify-center text-[10px] font-semibold text-[#8A8F98] shrink-0">
                         {reply.author?.username?.[0]?.toUpperCase() || 'U'}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-xs font-medium text-zinc-900 dark:text-zinc-100">{reply.author?.username || 'Unknown'}</span>
-                          <span className="text-[11px] text-zinc-400 dark:text-zinc-500">
+                          <span className="text-xs font-medium text-[#EDEDED]">{reply.author?.username || 'Unknown'}</span>
+                          <span className="text-[10px] text-[#626773]">
                             {format(new Date(reply.createdAt), 'MMM d, h:mm a')}
                           </span>
                         </div>
-                        <div className="mt-1 text-sm text-zinc-700 dark:text-zinc-300">
+                        <div className="mt-1.5 text-xs text-[#CCCCCC]">
                           <TiptapEditor value={reply.body} onChange={() => {}} editable={false} />
                         </div>
                       </div>
@@ -124,25 +124,19 @@ export default function CommentThread({ issueId, projectId, comments }: { issueI
           </div>
         ))}
 
-        {comments.length === 0 && (
-          <div className="text-zinc-400 dark:text-zinc-500 text-xs py-4 text-center border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl">
-            No comments yet. Start the conversation below.
+        {/* Root Comment Box */}
+        <form onSubmit={(e) => handleSubmit(e, null)} className="border border-white/[0.08] p-4 rounded-xl bg-[#141519]">
+          <div className="mb-3">
+            <TiptapEditor value={body} onChange={setBody} />
           </div>
-        )}
-      </div>
-
-      <div className="pt-2">
-        <h4 className="text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-2">Leave a comment</h4>
-        <form onSubmit={(e) => handleSubmit(e)} className="border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl bg-white dark:bg-zinc-900/60 p-3 shadow-sm focus-within:border-zinc-400 dark:focus-within:border-zinc-600 transition-colors">
-          <TiptapEditor value={replyTo === null ? body : null} onChange={replyTo === null ? setBody : () => {}} />
-          <div className="mt-3 flex justify-end">
+          <div className="flex justify-end">
             <button 
               type="submit" 
-              disabled={loading || !body || replyTo !== null} 
-              className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 rounded-lg text-xs font-medium disabled:opacity-50 transition-colors flex items-center gap-1.5 shadow-sm"
+              disabled={loading || !body} 
+              className="px-4 py-1.5 bg-[#5E6AD2] hover:bg-[#525ec2] text-white rounded-md text-xs font-medium disabled:opacity-50 transition-all flex items-center gap-1.5 shadow-[0_0_12px_rgba(94,106,210,0.4)]"
             >
               <Send className="w-3.5 h-3.5" />
-              {loading && replyTo === null ? "Posting..." : "Post Comment"}
+              {loading ? "Posting..." : "Comment"}
             </button>
           </div>
         </form>

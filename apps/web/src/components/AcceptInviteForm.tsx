@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { acceptInviteAction } from '@/actions/workspaceActions';
+import { Loader2 } from 'lucide-react';
 
 export default function AcceptInviteForm({ token }: { token: string }) {
   const [loading, setLoading] = useState(false);
@@ -15,8 +16,6 @@ export default function AcceptInviteForm({ token }: { token: string }) {
     
     try {
       await acceptInviteAction(token);
-      
-      // Force refresh to show new workspace on the dashboard
       router.push('/');
       router.refresh();
     } catch (err: any) {
@@ -28,13 +27,14 @@ export default function AcceptInviteForm({ token }: { token: string }) {
 
   return (
     <div className="flex flex-col gap-3 w-full items-center">
-      {error && <p className="text-rose-500 text-xs">{error}</p>}
+      {error && <p className="text-[#F43F5E] text-xs">{error}</p>}
       <button 
         onClick={handleAccept} 
         disabled={loading}
-        className="w-full bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-medium py-2.5 px-4 rounded-xl text-xs disabled:opacity-50 transition-colors shadow-sm"
+        className="w-full bg-[#5E6AD2] hover:bg-[#525ec2] text-white font-medium py-2.5 px-4 rounded-md text-xs disabled:opacity-50 transition-all shadow-[0_0_16px_rgba(94,106,210,0.4)] flex items-center justify-center gap-2"
       >
-        {loading ? 'Joining workspace...' : 'Accept Invitation & Continue'}
+        {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+        <span>{loading ? 'Joining workspace...' : 'Accept Invitation & Continue'}</span>
       </button>
     </div>
   );

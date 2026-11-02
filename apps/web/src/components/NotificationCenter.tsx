@@ -101,49 +101,49 @@ export default function NotificationCenter({ sessionToken }: { sessionToken?: st
     <div className="relative" ref={dropdownRef}>
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors relative"
+        className="p-1.5 rounded-md text-[#8A8F98] hover:text-[#EDEDED] hover:bg-white/[0.06] transition-colors relative"
         title="Notifications"
       >
         <Bell className="w-4 h-4" />
         {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 w-2 h-2 bg-emerald-500 rounded-full" />
+          <span className="absolute top-1 right-1 w-2 h-2 bg-[#5E6AD2] rounded-full shadow-[0_0_8px_rgba(94,106,210,0.8)]" />
         )}
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
-          <div className="p-3 border-b border-zinc-100 dark:border-zinc-900 flex justify-between items-center bg-zinc-50/60 dark:bg-zinc-900/40">
-            <h3 className="font-semibold text-xs text-zinc-900 dark:text-zinc-100">Notifications</h3>
+        <div className="absolute right-0 mt-2 w-80 bg-[#141519] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden backdrop-blur-xl animate-in fade-in zoom-in-95 duration-100">
+          <div className="p-3 border-b border-white/[0.06] flex justify-between items-center bg-[#111215]">
+            <h3 className="font-semibold text-xs text-[#EDEDED] tracking-wide">Notifications</h3>
             {unreadCount > 0 && (
               <button 
                 onClick={markAllAsRead} 
-                className="text-[11px] font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors flex items-center gap-1"
+                className="text-[11px] font-medium text-[#8A8F98] hover:text-[#5E6AD2] transition-colors flex items-center gap-1"
               >
                 <CheckCheck className="w-3 h-3" />
                 <span>Mark all read</span>
               </button>
             )}
           </div>
-          <div className="max-h-80 overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-900">
+          <div className="max-h-80 overflow-y-auto divide-y divide-white/[0.04]">
             {notifications.length === 0 ? (
-              <div className="p-8 text-center text-xs text-zinc-400 flex flex-col items-center gap-1">
-                <Bell className="w-6 h-6 text-zinc-300 dark:text-zinc-700 mb-1" />
-                <p className="font-medium text-zinc-700 dark:text-zinc-300">All caught up</p>
-                <p>No new notifications at this time.</p>
+              <div className="p-8 text-center text-xs text-[#8A8F98] flex flex-col items-center gap-1.5">
+                <Bell className="w-6 h-6 text-[#4D535E] mb-1" />
+                <p className="font-medium text-[#EDEDED]">All caught up</p>
+                <p className="text-[#8A8F98]">No new notifications at this time.</p>
               </div>
             ) : (
               notifications.map((n) => (
                 <div 
                   key={n.id} 
                   onClick={() => handleNotificationClick(n)}
-                  className={`p-3 text-xs cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors ${!n.readAt ? 'bg-zinc-50/70 dark:bg-zinc-900/30' : ''}`}
+                  className={`p-3 text-xs cursor-pointer hover:bg-white/[0.04] transition-colors ${!n.readAt ? 'bg-[#5E6AD2]/5' : ''}`}
                 >
                   <div className="flex items-center justify-between mb-0.5">
-                    <span className="font-medium text-zinc-900 dark:text-zinc-100">{n.title}</span>
-                    {!n.readAt && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />}
+                    <span className="font-medium text-[#EDEDED]">{n.title}</span>
+                    {!n.readAt && <span className="w-1.5 h-1.5 rounded-full bg-[#5E6AD2] shrink-0" />}
                   </div>
-                  <div className="text-zinc-500 text-[11px] leading-snug">{n.body}</div>
-                  <div className="text-zinc-400 font-mono text-[10px] mt-1.5">
+                  <div className="text-[#8A8F98] text-[11px] leading-snug">{n.body}</div>
+                  <div className="text-[#626773] font-mono text-[10px] mt-1.5">
                     {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
                   </div>
                 </div>

@@ -26,7 +26,6 @@ export default async function InvitePage(props: { params: Promise<{ token: strin
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    // Redirect to sign in with callback URL
     redirect(`/api/auth/signin?callbackUrl=${encodeURIComponent(`/invite/${token}`)}`);
   }
 
@@ -34,34 +33,34 @@ export default async function InvitePage(props: { params: Promise<{ token: strin
 
   if (!invite) {
     return (
-      <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 dark:bg-zinc-950 min-h-screen p-4">
-        <div className="max-w-md w-full bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 p-8 rounded-2xl shadow-sm text-center">
-          <div className="w-12 h-12 bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 rounded-full flex items-center justify-center mx-auto mb-4 border border-amber-200/50 dark:border-amber-800/30">
+      <div className="flex flex-col flex-1 items-center justify-center min-h-screen p-4 text-[#EDEDED]">
+        <div className="max-w-md w-full bg-[#141519] border border-white/[0.08] p-8 rounded-xl shadow-2xl text-center">
+          <div className="w-12 h-12 bg-[#F43F5E]/10 text-[#F43F5E] rounded-full flex items-center justify-center mx-auto mb-4 border border-[#F43F5E]/20">
             <ShieldAlert className="w-5 h-5" />
           </div>
-          <h1 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-2">Invalid or Expired Invite</h1>
-          <p className="text-xs text-zinc-500">This workspace invitation link is invalid, has expired, or has already been accepted.</p>
+          <h1 className="text-lg font-semibold text-[#EDEDED] mb-2">Invalid or Expired Invite</h1>
+          <p className="text-xs text-[#8A8F98]">This workspace invitation link is invalid, has expired, or has already been accepted.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 dark:bg-zinc-950 min-h-screen p-4">
-      <div className="max-w-md w-full bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 p-8 rounded-2xl shadow-sm flex flex-col items-center text-center">
-        <div className="w-12 h-12 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-2xl flex items-center justify-center mb-6 border border-zinc-200 dark:border-zinc-700 shadow-sm">
+    <div className="flex flex-col flex-1 items-center justify-center min-h-screen p-4 text-[#EDEDED]">
+      <div className="max-w-md w-full bg-[#141519] border border-white/[0.08] p-8 rounded-xl shadow-2xl flex flex-col items-center text-center">
+        <div className="w-12 h-12 bg-[#5E6AD2]/10 text-[#8B96FF] rounded-xl flex items-center justify-center mb-6 border border-[#5E6AD2]/30 shadow-[0_0_16px_rgba(94,106,210,0.3)]">
           <UserCheck className="w-6 h-6" />
         </div>
         
-        <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
+        <h1 className="text-xl font-bold text-[#EDEDED] mb-2 tracking-tight">
           Workspace Invitation
         </h1>
         
-        <p className="text-xs text-zinc-600 dark:text-zinc-400 mb-6 leading-relaxed">
-          <strong className="text-zinc-900 dark:text-zinc-200">{invite.sender?.username || invite.sender?.email}</strong> has invited you to join the <strong className="text-zinc-900 dark:text-zinc-200">{invite.workspace?.name}</strong> workspace as a <span className="inline-block px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-medium">{invite.role.toLowerCase()}</span>.
+        <p className="text-xs text-[#8A8F98] mb-6 leading-relaxed">
+          <strong className="text-[#EDEDED]">{invite.sender?.username || invite.sender?.email}</strong> has invited you to join the <strong className="text-[#EDEDED]">{invite.workspace?.name}</strong> workspace as a <span className="inline-block px-2 py-0.5 rounded-full bg-white/[0.06] text-[#8B96FF] border border-white/10 font-medium">{invite.role.toLowerCase()}</span>.
         </p>
 
-        <p className="text-[11px] text-zinc-400 mb-6">
+        <p className="text-[11px] text-[#626773] font-mono mb-6">
           Signed in as {session.user?.email}
         </p>
 
