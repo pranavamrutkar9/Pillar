@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: light;
   --background: #FFFDF8;
   --foreground: #09090b;
   --surface: #ffffff;
@@ -33,32 +34,21 @@
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0D0E12;
-    --foreground: #F4F4F5;
-    --surface: #181920;
-    --surface-hover: #22232D;
-    --surface-active: #2D2E3A;
-    --border-subtle: #F4F4F5;
-    --border-strong: #FFFFFF;
-    --muted: #9CA3AF;
-    --neo-shadow-color: #FFFFFF;
-    --neo-border-color: #FFFFFF;
-  }
-}
+/* Force light mode regardless of system prefers-color-scheme */
+@custom-variant dark (&:where([data-theme="force-dark"]));
 
 .dark {
-  --background: #0D0E12;
-  --foreground: #F4F4F5;
-  --surface: #181920;
-  --surface-hover: #22232D;
-  --surface-active: #2D2E3A;
-  --border-subtle: #F4F4F5;
-  --border-strong: #FFFFFF;
-  --muted: #9CA3AF;
-  --neo-shadow-color: #FFFFFF;
-  --neo-border-color: #FFFFFF;
+  color-scheme: light;
+  --background: #FFFDF8;
+  --foreground: #09090b;
+  --surface: #ffffff;
+  --surface-hover: #FFF9E6;
+  --surface-active: #FEF08A;
+  --border-subtle: #000000;
+  --border-strong: #000000;
+  --muted: #4B5563;
+  --neo-shadow-color: #000000;
+  --neo-border-color: #000000;
 }
 
 html {
