@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: light;
   --background: #FAF6EE;
   --foreground: #121212;
   --surface: #FFFFFF;
@@ -18,17 +19,19 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #111215;
-    --foreground: #FAF6EE;
-    --surface: #181A20;
-    --bauhaus-red: #EF5350;
-    --bauhaus-blue: #42A5F5;
-    --bauhaus-yellow: #FFEE58;
-    --bauhaus-black: #FFFFFF;
-    --border: #FFFFFF;
-  }
+/* Force light mode regardless of system prefers-color-scheme */
+@custom-variant dark (&:where([data-theme="force-dark"]));
+
+.dark {
+  color-scheme: light;
+  --background: #FAF6EE;
+  --foreground: #121212;
+  --surface: #FFFFFF;
+  --bauhaus-red: #D32F2F;
+  --bauhaus-blue: #1976D2;
+  --bauhaus-yellow: #FBC02D;
+  --bauhaus-black: #121212;
+  --border: #121212;
 }
 
 html {
@@ -58,9 +61,9 @@ body {
 }
 
 .dark .bauhaus-card {
-  border-color: #FFFFFF;
-  background-color: #181A20;
-  box-shadow: 4px 4px 0px 0px #FFFFFF;
+  border-color: #121212;
+  background-color: #FFFFFF;
+  box-shadow: 4px 4px 0px 0px #121212;
 }
 
 .bauhaus-btn-red {

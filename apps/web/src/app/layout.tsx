@@ -31,8 +31,9 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      style={{ colorScheme: "light" }}
     >
-      <body className="min-h-full flex flex-col bg-[#FAF6EE] dark:bg-[#111215] text-[#121212] dark:text-[#FAF6EE] selection:bg-[#FBC02D] selection:text-[#121212]">
+      <body className="min-h-full flex flex-col bg-[#FAF6EE] text-[#121212] selection:bg-[#FBC02D] selection:text-[#121212]">
         {/* Signature Bauhaus Primary Triad Accent Bar */}
         <div className="fixed top-0 left-0 right-0 h-1.5 z-50 grid grid-cols-3">
           <div className="bg-[#D32F2F]" />
